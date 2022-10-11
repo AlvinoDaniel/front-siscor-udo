@@ -29,19 +29,22 @@
               <v-icon
                 size="19"
                 class="mx-2"
-                :color="item.leido !== null && item.leido === 1 ? 'yellow darken-1' : 'grey lighten-2'"
-                v-text="item.copia !== null && item.copia === 1 ? 'mdi-text-box' : 'mdi-text-box-outline'"
+                :color="'grey lighten-2'"
+                v-text="'mdi-text-box'"
               />
               <v-icon
                 size="19"
                 class="mx-2"
-                :color="item.leido !== null && item.leido === 1 ? 'icono' : 'grey lighten-2'"
-                v-text="item.leido !== null && item.leido === 1 ? 'mdi-check-all' : 'mdi-check-outline'"
+                :color="'grey lighten-2'"
+                v-text="'mdi-check-outline'"
               />
             </div>
           </template>
-           <template v-slot:item.propietario="{ item }">
-            <span v-text="item.propietario.nombre" />
+           <template v-slot:item.enviados="{ item }">
+            <div v-for="(dpto,i) in item.enviados" :key="i">
+              <span>{{dpto.nombre}}</span>
+              <span v-if="i < item.enviados.length">, </span>
+            </div>
            </template>
           <template v-slot:item.asunto="{ item }">
             <div class="d-flex align-center">
@@ -79,7 +82,7 @@ export default {
     headers: [
       { text: '', value: 'data-table-select', width: '40px' },
       { text: '', value: 'iconos', align: ' px-0', width: '60px' },
-      { text: '', value: 'propietario' },
+      { text: '', value: 'enviados' },
       { text: '', value: 'asunto', align: '' },
       { text: '', value: 'fecha_enviado', width: '100' },
     ],

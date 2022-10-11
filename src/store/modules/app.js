@@ -21,7 +21,7 @@ const state = {
         p: 'inventario.consulta',
       },
       icon: 'mdi-send-outline mdi-rotate-315',
-      to: '/inventario/',
+      to: '/enviados',
     },
     {
       title: 'Por Corregir',

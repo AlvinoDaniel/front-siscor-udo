@@ -39,6 +39,17 @@ const createRouter = () => new Router({
           ),
         },
         {
+          name: 'Enviados',
+          path: '/enviados',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/Enviados/index'
+          ),
+        },
+        {
           name: 'Redactar',
           path: '/redactar',
           meta:{
