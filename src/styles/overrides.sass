@@ -1,0 +1,215 @@
+.text-mono
+  font-family: monospace
+
+// Helpers
+.flex-1-1-auto
+  flex: 1 1 auto !important
+
+.flex-1-0-auto
+  flex: 1 0 auto !important
+
+.flex-0-1-auto
+  flex: 0 1 auto !important
+
+.flex-0-0-auto
+  flex: 0 0 auto !important
+
+.position-relative
+  position: relative !important
+
+.overflow-y-scroll
+  overflow-y: scroll
+
+.inbox thead, .inbox .v-data-footer .v-data-footer__select 
+  display: none
+
+table
+  > thead > tr > th,
+  > tbody > tr > td
+    font-weight: 300 !important
+
+.header-data
+  background-color: rgba(185,194,208,.3) !important
+  color: #003B49 !important
+  font-size: 0.875rem !important
+  text-transform: uppercase
+
+.theme--light.v-text-field--outlined:not(.v-input--is-focused):not(.v-input--has-state) > .v-input__control > .v-input__slot fieldset
+  color: rgba(0, 0, 0, 0.18) !important
+
+.field-white.v-text-field--outlined:not(.v-input--is-focused):not(.v-input--has-state) > .v-input__control > .v-input__slot fieldset
+  background-color: #FFFFFF
+  padding-top: 12px
+  padding-bottom: 12px
+
+.actions--style
+  border: solid
+  border-width: 0 0 0 thin
+  border-color: rgba(0, 0, 0, 0.09)
+
+.theme-custom.v-text-field--filled > .v-input__control > .v-input__slot
+  background: #eceff1 !important
+  min-height: 32px !important
+  &:before  
+    border: none !important
+  & .v-input__prepend-inner
+    margin-top: 5px !important
+  & .v-input__append-inner
+    margin-top: 5px !important
+
+.theme-custom.v-text-field > .v-input__control > .v-input__slot:before
+  border: none !important
+
+.v-input.expand-search 
+  transition: max-width 0.3s
+  .v-input__slot
+    cursor: pointer !important
+    &:before, &:after
+      border-color: transparent !important
+      border-style: hidden !important
+  &.closed
+    max-width: 45px
+    .v-input__slot
+      background: transparent !important
+
+.container-map
+  height: calc(100vh - 120px)
+  right: 0
+  transform: translateX(0%)
+
+.active-menu
+  background-color: rgba(67,176,42,.12) !important
+  border-color: #43b02a !important
+
+.active-submenu, .v-list-group__items
+  background-color: rgba(0,0,0,.12) !important
+  border-color: rgba(0,0,0,.12) !important
+
+.content-scroll::-webkit-scrollbar, .v-navigation-drawer__content::-webkit-scrollbar
+  width: 10px !important
+
+.content-scroll::webkit-scrollbar-track, .v-navigation-drawer__content::webkit-scrollbar-track
+  background: transparent !important
+
+.content-scroll::-webkit-scrollbar-thumb
+  background: transparent
+
+.content-scroll:hover::-webkit-scrollbar-thumb, .v-navigation-drawer__content::-webkit-scrollbar-thumb
+  background: #BCC9D3 !important
+  opacity: 0.5
+
+.tabs-general--items
+  overflow: visible !important
+  background-color: transparent !important
+  & .v-window__container--is-active
+    overflow: visible !important
+
+.red-alert
+  background-color: rgba(244,67,54,0.12) !important
+  border-color: rgba(244,67,54,0.12) important !important
+  color: #F44336 !important
+
+.warning-alert
+  background-color: rgba(251,140,0,0.12) !important
+  border-color: rgba(251,140,0,0.12) important !important
+  color: #FB8C00 !important
+
+.success-alert
+  background-color: rgba(67, 176, 42,0.12) !important
+  border-color: rgba(67, 176, 42,0.12) important !important
+  color: #43b02a !important
+
+.disabled-alert
+  background-color: rgba(96, 125, 139,0.12) !important
+  border-color: rgba(96, 125, 139,0.12) important !important
+  color: #607d8b !important
+
+.purple-alert
+  background-color: rgba(49,27,146, 0.12) !important
+  border-color: rgba(49,27,146, 0.12) important !important
+  color: #311B92 !important
+
+.card-programa
+  -webkit-box-flex: 0 !important
+  -ms-flex: 0 0 26vw !important
+  flex: 1 0 26vw !important
+  width: 26vw !important
+  max-width: 26vw !important
+  padding: 12px 6px !important
+
+.card-programa-sm
+  -webkit-box-flex: 0 !important
+  -ms-flex: 0 0 40vw !important
+  flex: 0 0 40vw !important
+  max-width: 40vw !important
+  padding: 12px 6px !important
+
+.card-programa-xs
+  -webkit-box-flex: 0 !important
+  -ms-flex: 0 0 80vw !important
+  flex: 0 0 80vw !important
+  max-width: 80vw !important
+  padding: 12px 6px !important
+
+.light-blue-color
+  background: #F4F5FC !important
+  border-color: #F4F5FC !important
+
+.toolbar-imagen 
+  user-select: none
+  position: absolute
+  overflow: hidden
+  bottom: 8px
+  left: 50%
+  transform: translate(-50%)
+  opacity: 0.9
+  display: flex
+  background-color: rgb(45, 45, 45)
+  border-radius: 4px
+  padding: 0
+
+  .toolbar-imagen-btn 
+    user-select: none
+    flex-shrink: 0
+    cursor: pointer
+    padding: 6px 10px
+    font-size: 20px
+    color: #fff
+    background-color: #2D2D2D
+    -webkit-tap-highlight-color: transparent
+    outline: none
+
+    &:hover,
+    &:active 
+      background-color: rgb(61, 61, 61)
+.v-data-table>.v-data-table__wrapper .v-data-table__mobile-table-row
+  margin: 10px
+  border: 1px solid #ededed
+  display: block !important
+  & .v-data-table__mobile-row
+    border-bottom: 1px solid rgba(0,0,0,0.05)
+
+.input-imagen > .vue-file-agent.file-input-wrapper
+  padding: 15px !important
+
+.input-imagen .vue-file-agent .file-preview-new:before
+  background: transparent !important
+
+.input-imagen .vue-file-agent .file-preview-new svg
+  fill: #003b49 !important
+
+.input-imagen canvas
+  left: 0 !important
+
+.fill-width
+  width: 100% !important
+
+/* .input-imagen .vue-file-agent .file-input
+  z-index:100 !important
+  */
+  
+
+
+
+
+
