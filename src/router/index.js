@@ -50,6 +50,17 @@ const createRouter = () => new Router({
           ),
         },
         {
+          name: 'Por Corregir',
+          path: '/por-corregir',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/PorCorregir/index'
+          ),
+        },
+        {
           name: 'Redactar',
           path: '/redactar',
           meta:{

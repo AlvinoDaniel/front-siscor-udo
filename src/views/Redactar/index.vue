@@ -107,10 +107,10 @@
         <v-btn @click="saveDocument('enviar')" depressed color="secondary" class="mx-2">
           Enviar
         </v-btn>
-        <v-btn @click="saveDocument('borrador')" depressed color="info" class="mx-2">
+        <v-btn @click="saveDocument('corregir')" depressed color="info" class="mx-2">
           Por Corregir
         </v-btn>
-        <v-btn @click="saveDocument('corregir')" depressed color="info" class="mx-2">
+        <v-btn @click="saveDocument('borrador')" depressed color="info" class="mx-2">
           Guardar como borrador
         </v-btn>
       </v-col>
@@ -186,7 +186,7 @@ export default {
         this.doc.departamentos_copias = this.dataDpto.copias.length > 0 ? this.dataDpto.copias.join(',') : ''
         this.loading = true
         try {
-          const { message } = await sendDocument({ datos: this.doc })
+          const { message } = await sendDocument({ datos: this.doc, status })
            this.$root.$showAlert(message);
            this.$router.push({ name: 'Recibidos' })
         } catch (error) {

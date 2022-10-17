@@ -32,7 +32,6 @@
         max-width="100"
       />
     </div>
-    <settings-app />
 
     <v-spacer />
 
@@ -57,10 +56,6 @@
       DefaultAccount: () => import(
         /* webpackChunkName: "default-account" */
         './widgets/Account'
-      ),
-      SettingsApp: () => import(
-        /* webpackChunkName: "settings-app" */
-        './widgets/Settings'
       ),
       DefaultDrawerToggle: () => import(
         /* webpackChunkName: "default-drawer-toggle" */

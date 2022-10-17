@@ -29,7 +29,7 @@ const state = {
         p: 'ruta-vendedores.consulta',
       },
       icon: 'mdi-email-edit-outline',
-      to: '/rutas-vendedores',
+      to: '/por-corregir',
     },
     {
       title: 'Borradores',
