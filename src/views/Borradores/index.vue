@@ -8,7 +8,7 @@
     <v-row class="ma-0">
       <v-col cols="12" class="pa-4">
         <h4 class="font-weight-bold">
-          Por Corregir
+          Borradores
         </h4>
       </v-col>
     </v-row>
@@ -32,10 +32,16 @@
                 :color="'grey lighten-2'"
                 v-text="'mdi-text-box'"
               />
+              <!-- <v-icon
+                size="19"
+                class="mx-2"
+                :color="'grey lighten-2'"
+                v-text="'mdi-check-outline'"
+              /> -->
             </div>
           </template>
            <template v-slot:item.enviados="{ item }">
-            <div v-for="(dpto,i) in item.enviados" :key="i">
+            <div v-for="(dpto,i) in item.enviados" :key="i+'-BB'">
               <span>{{dpto.nombre}}</span>
               <span v-if="i < (item.enviados.length - 1)">, </span>
             </div>
@@ -83,13 +89,13 @@ export default {
     data: [],
   }),
   created () {
-    this.getBandejaPorCorregir()
+    this.getBandejaBorradores()
   },
   methods: {
-    async getBandejaPorCorregir () {
+    async getBandejaBorradores () {
       this.loading = true
       try {
-        const { documentos } = await getBandeja({ bandeja: 'por-corregir' })
+        const { documentos } = await getBandeja({ bandeja: 'borradores' })
         this.data = documentos
       } catch (error) {
         console.log(error)

@@ -13,3 +13,12 @@ export const sendDocument = async ({ datos, status }) => {
     return Promise.reject(error)
   }
 }
+
+export const viewDocument = async ({ id }) => {
+  try {
+    const { data } = await api.get(`documento/${id}`)
+    return data
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}

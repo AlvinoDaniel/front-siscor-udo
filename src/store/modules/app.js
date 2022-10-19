@@ -37,7 +37,7 @@ const state = {
         p: 'cobros.consulta',
       },
       icon: 'mdi-text-box-outline',
-      to: '/cobros',
+      to: '/borradores',
     },
 
   ],

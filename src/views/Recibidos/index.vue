@@ -8,7 +8,7 @@
     <v-row class="ma-0">
       <v-col cols="12" class="pa-4">
         <h4 class="font-weight-bold">
-          Recibidos
+          Documento
         </h4>
       </v-col>
     </v-row>
@@ -23,13 +23,14 @@
           single-select
           show-select
           class="inbox"
+          @click:row="viewDocumento"
         >
           <template v-slot:item.iconos="{ item }">
             <div class="d-flex justify-center align-center">
               <v-icon
                 size="19"
                 class="mx-2"
-                :color="item.leido !== null && item.leido === 1 ? 'yellow darken-1' : 'grey lighten-2'"
+                :color="item.copia !== null && item.copia === 1 ? 'yellow darken-1' : 'grey lighten-2'"
                 v-text="item.copia !== null && item.copia === 1 ? 'mdi-text-box' : 'mdi-text-box-outline'"
               />
               <v-icon
@@ -41,7 +42,10 @@
             </div>
           </template>
            <template v-slot:item.propietario="{ item }">
-            <span v-text="item.propietario.nombre" />
+            <span 
+              :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
+               v-text="item.propietario.nombre" 
+            />
            </template>
           <template v-slot:item.asunto="{ item }">
             <div class="d-flex align-center">
@@ -54,13 +58,17 @@
               <span
                 style="width:30rem"
                 class="d-inline-flex text-truncate"
+                :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
                 v-text="item.asunto"
               />
             </div>
           </template>
            <template v-slot:item.fecha_enviado="{ item }">
             <div class="d-flex justify-end ">
-              <span class="grey--text font-weight-normal">
+              <span 
+                class="grey--text font-weight-normal"
+                :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
+              >
                 {{ item.fecha_enviado | shortDate }}
               </span>
             </div>
@@ -99,6 +107,10 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    viewDocumento (row) {
+      this.$router.push({ path: `/documento/${ row.id }` })
+      // this.$router.push({ path: '/documento', params: { id: row.id } })
     },
   },
 }

@@ -43,7 +43,7 @@
            <template v-slot:item.enviados="{ item }">
             <div v-for="(dpto,i) in item.enviados" :key="i">
               <span>{{dpto.nombre}}</span>
-              <span v-if="i < item.enviados.length">, </span>
+              <span v-if="i < (item.enviados.length - 1)">, </span>
             </div>
            </template>
           <template v-slot:item.asunto="{ item }">

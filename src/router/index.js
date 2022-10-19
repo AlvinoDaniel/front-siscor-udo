@@ -28,6 +28,17 @@ const createRouter = () => new Router({
       redirect: { name: 'Recibidos' },
       children: [
         {
+          name: 'Documento',
+          path: '/documento/:id',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/VistaDocumento/index'
+          ),
+        },
+        {
           name: 'Recibidos',
           path: '/recibidos',
           meta:{
@@ -61,6 +72,17 @@ const createRouter = () => new Router({
           ),
         },
         {
+          name: 'Borradores',
+          path: '/borradores',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/Borradores/index'
+          ),
+        },
+        {
           name: 'Redactar',
           path: '/redactar',
           meta:{
@@ -70,7 +92,7 @@ const createRouter = () => new Router({
             /* webpackChunkName: "views-[request]" */
             '@/views/Redactar/index'
           ),
-        },
+        },        
         {
           name: 'Error-permission',
           path: '/403',
