@@ -122,7 +122,9 @@
   import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
   import '@ckeditor/ckeditor5-build-classic/build/translations/es'
   import { getDepartamentoList } from '@/services/departamento'
-  import { sendDocument } from '@/services/documento'
+  import { sendDocument, viewDocument } from '@/services/documento'
+   import { get } from 'vuex-pathify'
+
 export default {
   name: 'Redactar',
   data: () => ({
@@ -161,8 +163,14 @@ export default {
     departamentos: [],
     loading: false,
   }),
+  computed: {
+    doc_id: get('route/params@doc'),
+  },
   created () {
     this.getDepartamentos()
+    if (this.doc_id) {
+      this.getDocumento()
+    }
   },
   methods: {
     async getDepartamentos () {
@@ -194,6 +202,27 @@ export default {
         } finally {
           this.loading = false
         }
+      }
+    },
+
+    async getDocumento () {
+      this.loading = true
+      try {
+        const documento = await viewDocument({ id: this.doc_id })
+        console.log(documento)
+        this.doc.asunto = documento.asunto
+        this.doc.contenido = documento.contenido
+        this.doc.tipo_documento = documento.tipo_documento
+        this.doc.copias = documento?.temporal?.departamentos_copias !== null
+        this.dataDpto.destino = documento.temporal.departamentos_destino.split(',').map(item => parseInt(item))
+        this.dataDpto.copias = documento.temporal.departamentos_copias !== null
+          ? documento.temporal.departamentos_copias.split(',')
+          : []
+        
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.loading = false
       }
     },
   },

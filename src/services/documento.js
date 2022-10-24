@@ -17,7 +17,7 @@ export const sendDocument = async ({ datos, status }) => {
 export const viewDocument = async ({ id }) => {
   try {
     const { data } = await api.get(`documento/${id}`)
-    return data
+    return data.data
   } catch (error) {
     return Promise.reject(error)
   }

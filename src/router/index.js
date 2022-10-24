@@ -84,7 +84,7 @@ const createRouter = () => new Router({
         },
         {
           name: 'Redactar',
-          path: '/redactar',
+          path: '/redactar/:doc(\\d+)?',
           meta:{
             auth: true,
           },

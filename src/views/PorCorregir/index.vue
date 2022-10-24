@@ -23,6 +23,7 @@
           single-select
           show-select
           class="inbox"
+          @click:row="updateDocumento"
         >
           <template v-slot:item.iconos="{ item }">
             <div class="d-flex justify-center align-center">
@@ -96,6 +97,10 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+     updateDocumento (row) {
+      this.$router.push({ path: `/redactar/${ row.id }` })
+      // this.$router.push({ path: '/documento', params: { id: row.id } })
     },
   },
 }
