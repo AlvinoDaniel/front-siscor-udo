@@ -22,6 +22,8 @@
           :loading="loading"
           single-select
           show-select
+          sort-by="fecha_enviado"
+          :sort-desc="true"
           class="inbox"
           @click:row="viewDocumento"
         >
