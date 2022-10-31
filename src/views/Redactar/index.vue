@@ -97,7 +97,7 @@
               :editor="editor"
               :config="editorConfig"
             />
-            <!-- <small>{{errors[0]}}</small> -->
+            <small>{{doc.contenido}}</small>
           </validation-provider>
         </v-col>
       </v-row>
@@ -218,7 +218,7 @@ export default {
         this.dataDpto.copias = documento.temporal.departamentos_copias !== null
           ? documento.temporal.departamentos_copias.split(',')
           : []
-        
+
       } catch (error) {
         console.log(error)
       } finally {

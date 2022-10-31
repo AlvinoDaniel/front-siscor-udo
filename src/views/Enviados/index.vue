@@ -23,6 +23,7 @@
           single-select
           show-select
           class="inbox"
+          @click:row="viewDocumento"
         >
           <template v-slot:item.iconos="{ item }">
             <div class="d-flex justify-center align-center">
@@ -102,6 +103,9 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    viewDocumento (row) {
+      this.$router.push({ path: `/documento/${ row.id }` })
     },
   },
 }

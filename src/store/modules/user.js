@@ -64,6 +64,13 @@ const getters = {
       ? { username, email, fullName, departamento }
       : ''
   },
+  departamento (state) {
+    const { departamento_id, departamento } = state.info
+
+    return state.info.id
+      ? { departamento_id, departamento }
+      : ''
+  },
 }
 
 export default {

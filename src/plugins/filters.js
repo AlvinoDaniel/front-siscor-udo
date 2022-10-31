@@ -29,3 +29,8 @@ Vue.filter('FullDate', (date) => {
   moment.locale('es');
   return date ? moment(date).format('DD MMM YYYY, hh:mm A') : '';
 })
+
+Vue.filter('DocDate', (date) => {
+  moment.locale('es');
+  return date ? moment(date).format('DD [de] MMMM [de] YYYY') : '';
+})

@@ -8,7 +8,7 @@
     <v-row class="ma-0">
       <v-col cols="12" class="pa-4">
         <h4 class="font-weight-bold">
-          Documento
+          Recibidos
         </h4>
       </v-col>
     </v-row>
@@ -44,9 +44,9 @@
             </div>
           </template>
            <template v-slot:item.propietario="{ item }">
-            <span 
+            <span
               :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
-               v-text="item.propietario.nombre" 
+               v-text="item.propietario.nombre"
             />
            </template>
           <template v-slot:item.asunto="{ item }">
@@ -67,7 +67,7 @@
           </template>
            <template v-slot:item.fecha_enviado="{ item }">
             <div class="d-flex justify-end ">
-              <span 
+              <span
                 class="grey--text font-weight-normal"
                 :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
               >
