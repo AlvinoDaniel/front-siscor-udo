@@ -97,7 +97,6 @@
               :editor="editor"
               :config="editorConfig"
             />
-            <small>{{doc.contenido}}</small>
           </validation-provider>
         </v-col>
       </v-row>
