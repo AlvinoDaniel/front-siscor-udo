@@ -65,23 +65,39 @@
                       hide-details
                       row
                       class="mt-0 pt-0"
+                      active-class="active-type"
                       @change="clearInputs"
                     >
                       <v-radio
-                        color="secondary"
-                        label="Oficio"
+                        color="tertiary"
                         value="oficio"
-                      />
+                        on-icon="mdi-check-circle-outline"
+                      >
+                        <template v-slot:label>
+                          <v-icon small left>mdi-file-document-outline</v-icon>
+                          <span>Oficio</span>
+                        </template>                        
+                      </v-radio>
                       <v-radio
-                        color="secondary"
-                        label="Circular"
+                        color="tertiary"
                         value="circular"
-                      />
+                        on-icon="mdi-check-circle-outline"
+                      >
+                        <template v-slot:label>
+                          <v-icon small left>mdi-text-box-multiple-outline</v-icon>
+                          <span>Circular</span>
+                        </template>
+                      </v-radio>
                       <v-radio
-                        color="secondary"
-                        label="Memorandun"
+                        color="tertiary"
                         value="memorandum"
-                      />
+                        on-icon="mdi-check-circle-outline"
+                      >
+                        <template v-slot:label>
+                          <v-icon small left>mdi-sticker-alert-outline</v-icon>
+                          <span>Memorandum</span>
+                        </template>
+                      </v-radio>
                     </v-radio-group>
                 </div>
               </div>
@@ -402,6 +418,10 @@ export default {
       height: 28px
       &.v-icon.v-icon::after
         background-color: transparent !important
-
+  .active-type .v-label, .active-type i
+    color: #EE6C4D !important
+  
+  .ck.ck-editor__main>.ck-editor__editable
+    min-height: 200px !important
 
 </style>

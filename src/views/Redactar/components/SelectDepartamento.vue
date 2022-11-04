@@ -64,7 +64,7 @@ export default {
   props: {
 
     value: {
-      type: [Array, Number],
+      type: [Array, Number, String],
       default: () => ([]),
     },
     items: {
