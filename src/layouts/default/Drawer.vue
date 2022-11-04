@@ -6,7 +6,8 @@
     mini-variant-width="80"
     app
     width="250"
-    color="primary"
+    color="sidebar"
+    class="elevation-3"
   >
     <div class="px-2">
       <default-drawer-header />
@@ -17,7 +18,7 @@
         <v-list-item class="py-1 lighten-4">
           <v-list-item-content>
               <v-btn
-                color="secondary"
+                color="tertiary"
                 dark
                 depressed
                 :to="{name: 'Redactar'}"
@@ -36,7 +37,7 @@
       <v-list nav>
         <v-list-item link class="py-1 lighten-4" @click="handleLogout">
           <v-list-item-icon class="my-2 ml-4 align-self-center">
-            <v-icon color="white">mdi-logout</v-icon>
+            <v-icon color="tertiary">mdi-logout</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>SALIR</v-list-item-title>

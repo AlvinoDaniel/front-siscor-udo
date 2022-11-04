@@ -3,14 +3,13 @@
     id="default-app-bar"
     app
     absolute
-    outlined
-    class=""
-    :color="$vuetify.breakpoint.mobile ? 'primary' : 'white'"
+    class="white-bar"
     :clipped-left="$vuetify.rtl"
     :clipped-right="!$vuetify.rtl"
     height="60"
     flat
   >
+    <!-- :color="$vuetify.breakpoint.mobile ? 'primary' : 'white'" -->
     <v-app-bar-nav-icon
       class="hidden-md-and-up"
       @click="drawer = !drawer"
@@ -80,3 +79,9 @@
     },
   }
 </script>
+<style>
+.white-bar {
+  background-color: #FFFFFF !important;
+  border-bottom: thin solid rgba(0, 0, 0, 0.12) !important;
+}
+</style>

@@ -10,9 +10,11 @@ Vue.use(Vuetify, { directives: { ripple } })
 
 const theme = {
   // primary: '#164360',
-  primary: '#FFFFFF',
+  primary: '#3D5A80',
   // secondary: '#63B041',
   secondary: '#2DB2D5',
+  tertiary: '#EE6C4D',
+  sidebar: '#F5F8FA',
   accent: '#323D4B',
   info: '#00CAE3',
   success: '#2CC09C',
