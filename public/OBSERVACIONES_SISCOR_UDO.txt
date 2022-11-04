@@ -1,0 +1,8 @@
+1. El oficio es dirigido solo a una dependencia.
+2. circular va dirigido a varias dependencias sin copias.
+3. El correo externo es enviado desde un correo central.
+4. crear plantillas
+5. crear grupos
+6. No mostrar en el caso de envios copia si esta leido o no.
+7. incluir adjuntar anexo en envio de solo tipo Oficio.
+
