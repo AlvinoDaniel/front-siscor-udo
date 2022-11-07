@@ -61,14 +61,20 @@ const getters = {
     const { usuario: username, email, fullName, departamento } = state.info
 
     return state.info.id
-      ? { username, email, fullName, departamento }
+      ? { username, email, fullName, departamento: departamento.nombre }
       : ''
   },
   departamento (state) {
-    const { departamento_id, departamento } = state.info
+    const { departamento } = state.info
 
     return state.info.id
-      ? { departamento_id, departamento }
+      ? {
+          id: departamento.id,
+          nombre: departamento.nombre,
+          siglas: departamento.siglas,
+          jefe: departamento.jefe ? departamento.jefe.nombres_apellidos : 'Jefe del Departamento',
+          cargo_jefe: departamento.jefe ? departamento.jefe.descripcion_cargo : '',
+        }
       : ''
   },
 }

@@ -18,3 +18,23 @@ export const getBase64 = (file) => {
     reader.onerror = error => reject(error);
   });
 }
+
+export const validateFile = (type) => {
+  const typeAllowed = [
+    'application/msword',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.ms-excel',
+    'application/x-msexcel',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/vnd.ms-publisher',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/plain',
+    'application/pdf',
+    'image/gif',
+    'image/jpeg',
+    'image/png',
+  ]
+
+  return typeAllowed.includes(type)
+}

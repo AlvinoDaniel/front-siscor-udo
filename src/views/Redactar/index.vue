@@ -5,45 +5,61 @@
     tag="section"
     class=""
   >
-    <loader-app v-if="loading" />
+    <loader-app v-if="loading || loadingDoc" />
     <v-row class="pa-3">
       <v-col cols="12" class="d-flex align-center justify-space-between">
         <h4 class="font-weight-bold">
-          <v-icon left>mdi-arrow-left</v-icon>
+          <v-icon left @click="$router.go(-1)">
+            mdi-arrow-left
+          </v-icon>
           Redactar Documento
         </h4>
-        <div class="d-flex">
-          <!-- <v-btn
-            v-if="isOficio"
-            small
-            outlined
-            depressed
-            color="blue-grey"
-            class="mx-1 px-0 rounded-lg"
-            @click="addAnexo"
-          >
-            <v-icon>mdi-paperclip</v-icon>
-          </v-btn> -->
-
+        <div
+          v-if="!loadingDoc"
+          class="d-flex"
+        >
           <v-file-input
             hide-input
-            multiple
             hide-details
             dense
             prepend-icon="mdi-paperclip"
             class="pt-0 mt-0 mx-1 btn-adjuntar"
             @change="addAnexo"
           />
-
-          <v-btn small outlined @click="saveDocument('borrador')" depressed color="blue-grey" class="mx-1 rounded-lg">
+          <v-btn
+            v-if="estatus === 'nuevo' || isBorrador"
+            small
+            outlined
+            depressed
+            color="blue-grey"
+            class="mx-1 rounded-lg"
+            @click="saveDocument('borrador')"
+          >
             <v-icon left>mdi-text-box-outline</v-icon>
+            <span v-if="isBorrador" class="pr-1">Guardar </span>
             Borrador
           </v-btn>
-          <v-btn small outlined @click="saveDocument('corregir')" depressed color="blue-grey" class="mx-1 rounded-lg">
+          <v-btn
+            v-if="estatus === 'nuevo' || isCorregir"
+            small
+            :outlined="$hasPermission('jefe')"
+            :color="$hasPermission('jefe') ? 'blue-grey' : 'secondary'"
+            class="mx-1 rounded-lg"
+            depressed
+            @click="saveDocument('corregir')"
+          >
             <v-icon left>mdi-email-edit-outline</v-icon>
+            <span v-if="isCorregir" class="pr-1">Guardar </span>
             Corregir
           </v-btn>
-          <v-btn small @click="saveDocument('enviar')" depressed color="secondary" class="mx-1 rounded-lg">
+          <v-btn
+            v-if="$hasPermission('jefe')"
+            small
+            depressed
+            color="secondary"
+            class="mx-1 rounded-lg"
+            @click="saveDocument('enviar')"
+          >
             <v-icon left>mdi-send-outline</v-icon>
             Enviar
           </v-btn>
@@ -56,7 +72,7 @@
           <validation-provider name="Tipo de Documento" vid="doc.tipo_documento" rules="required" v-slot="{ errors }">
             <div class="input-redactar theme--light d-flex align-self-center">
               <div class="v-input__control">
-                <div class="border-input v-input__slot pb-3">
+                <div class="border-input v-input__slot pb-2">
                   <div class="v-input__prepend-inner">
                     <span class="px-2 pt-1"> Tipo: </span>
                   </div>
@@ -65,21 +81,21 @@
                       hide-details
                       row
                       class="mt-0 pt-0"
-                      active-class="active-type"
+                      active-class="active-type font-weight-bold"
                       @change="clearInputs"
                     >
                       <v-radio
-                        color="tertiary"
+                        color="secondary"
                         value="oficio"
                         on-icon="mdi-check-circle-outline"
                       >
                         <template v-slot:label>
                           <v-icon small left>mdi-file-document-outline</v-icon>
                           <span>Oficio</span>
-                        </template>                        
+                        </template>
                       </v-radio>
                       <v-radio
-                        color="tertiary"
+                        color="secondary"
                         value="circular"
                         on-icon="mdi-check-circle-outline"
                       >
@@ -89,12 +105,12 @@
                         </template>
                       </v-radio>
                       <v-radio
-                        color="tertiary"
+                        color="secondary"
                         value="memorandum"
                         on-icon="mdi-check-circle-outline"
                       >
                         <template v-slot:label>
-                          <v-icon small left>mdi-sticker-alert-outline</v-icon>
+                          <v-icon small left>mdi-file-alert-outline</v-icon>
                           <span>Memorandum</span>
                         </template>
                       </v-radio>
@@ -111,9 +127,9 @@
               label-text="Enviar a:"
               class="input-redactar input-cc"
               :items="departamentos"
-              :multiple="multipleDestinatarios"
+              :multiple="isCircular"
               :error="errors[0]"
-              :btn-copia="!multipleDestinatarios"
+              :btn-copia="!isCircular"
               @showCopia="getShowCopia"
               @change="verificateCopia"
             />
@@ -133,10 +149,9 @@
           </validation-provider>
         </v-col>
         <v-col cols="12" class="py-0">
-          <validation-provider name="Asunto" vid="doc.asunto" rules="required" v-slot="{ errors }">
+          <validation-provider name="Asunto" vid="doc.asunto" v-slot="{ errors }">
             <v-text-field
               v-model="doc.asunto"
-              color="purple darken-2"
               class="input-redactar"
               :error-messages="errors[0]"
             >
@@ -150,41 +165,72 @@
         </v-col>
         <v-col v-if="anexos.length > 0 && isOficio" cols="12" class="pt-0">
           <div class="input-redactar theme--light d-flex align-self-center">
-              <div class="v-input__control">
-                <div class="v-input__slot pb-3">
-                  <div class="v-input__prepend-inner">
-                    <span class="px-2 pt-1">Anexos: </span>
-                  </div>
-                   <v-chip
-                    v-for="(file,i) in anexos"
-                    :key="'fileAnexo-'+i"
-                    class="mx-2"
-                    close
-                    color="blue-grey"
-                    text-color="white"
-                    label
-                    large
-                  >
-                    <!-- <v-avatar rounded left>
-                    </v-avatar> -->
-                      <v-icon large>mdi-file</v-icon>
-                    <span class="px-3" v-text="file.name" />
-                  </v-chip>
+            <div class="v-input__control">
+              <div class="v-input__slot pb-3">
+                <div class="v-input__prepend-inner">
+                  <span class="px-2 pt-1">Anexos: </span>
                 </div>
+                <list-anexos
+                  :anexos="anexos"
+                  @delete="deleteAnexo"
+                />
               </div>
             </div>
+          </div>
         </v-col>
-        <v-col cols="12">
-          <validation-provider name="Contenido" vid="doc.contenido" rules="required" v-slot="{ errors }">
-            <ckeditor
-              v-model="doc.contenido"
-              :editor="editor"
-              :config="editorConfig"
-            />
+        <v-col cols="12" class="py-0">
+          <div class="input-redactar theme--light d-flex align-self-center">
+            <div class="v-input__control">
+              <div class="v-input__slot pb-0 justify-space-between">
+                <div class="v-input__prepend-inner">
+                  <span class="px-2 pt-1">Contenido: </span>
+                </div>
+                <v-btn
+                  class="btn-cc"
+                  color="blue-grey"
+                  text
+                  :disabled="doc.contenido === ''"
+                  @click="previewShow = true"
+                >
+                  <v-icon left>mdi-file-search-outline</v-icon>
+                  Vista Previa
+                </v-btn>
+              </div>
+            </div>
+          </div>
+        </v-col>
+        <v-col
+          cols="12"
+          class="pt-0"
+        >
+          <validation-provider
+            v-slot="{ errors, touched, invalid }"
+            ref="contenido"
+            name="Contenido"
+            vid="doc.contenido"
+            rules="required"
+          >
+            <div :class="{ 'invalid': touched && invalid }">
+              <ckeditor
+                v-model="doc.contenido"
+                :editor="editor"
+                :config="editorConfig"
+              />
+            </div>
+            <div v-if="touched" class=" pt-2 v-messages theme--light error--text" role="alert">
+              <div class="v-messages__wrapper">
+                <div class="v-messages__message" v-text="errors[0]" />
+              </div>
+            </div>
           </validation-provider>
         </v-col>
       </v-row>
     </validation-observer>
+    <preview
+      v-model="previewShow"
+      :doc="doc"
+      :data-dptos="previewDptos"
+    />
   </v-container>
 </template>
 <script>
@@ -206,9 +252,11 @@
   import Font from '@ckeditor/ckeditor5-font/src/font';
   import Highlight from '@ckeditor/ckeditor5-highlight/src/highlight';
   import RemoveFormat from '@ckeditor/ckeditor5-remove-format/src/removeformat';
+
   import { getDepartamentoList } from '@/services/departamento'
-  import { sendDocument, viewDocument } from '@/services/documento'
-   import { get } from 'vuex-pathify'
+  import { sendDocument, viewDocument, updateDocument } from '@/services/documento'
+  import { get } from 'vuex-pathify'
+  import { validateFile } from '@/util/helpers'
 
 export default {
   name: 'Redactar',
@@ -216,6 +264,14 @@ export default {
     SelectDepartamento: () => import(
       /* webpackChunkName: "select-departamento" */
       './components/SelectDepartamento.vue'
+    ),
+    ListAnexos: () => import(
+      /* webpackChunkName: "list-anexos" */
+      './components/ListAnexos.vue'
+    ),
+    Preview: () => import(
+      /* webpackChunkName: "preview" */
+      './components/Preview.vue'
     ),
   },
   data: () => ({
@@ -232,10 +288,11 @@ export default {
       destino: [],
       copias: [],
     },
+    estatus: 'nuevo',
     anexos: [],
     copiaShow: false,
+    previewShow: false,
     editor: ClassicEditor,
-    editorData: '<p>Content of the editor.</p>',
     editorConfig: {
       language: 'es',
       plugins: [
@@ -267,14 +324,26 @@ export default {
     },
     departamentos: [],
     loading: false,
+    loadingDoc: false,
+    urlBandejas: {
+      enviar: 'Enviados',
+      corregir: 'Por Corregir',
+      borrador: 'Borradores',
+    },
   }),
   computed: {
     doc_id: get('route/params@doc'),
-    multipleDestinatarios () {
+    isCircular () {
       return this.doc.tipo_documento === 'circular'
     },
     isOficio () {
       return this.doc.tipo_documento === 'oficio'
+    },
+    isBorrador () {
+      return this.estatus === 'borrador'
+    },
+    isCorregir () {
+      return this.estatus === 'por_corregir'
     },
     getDepartamentosCopia () {
      if (this.departamentos.length === 0) return []
@@ -287,6 +356,33 @@ export default {
          ? !this.dataDpto.destino.includes(item.id)
          : this.dataDpto.destino !== item.id
       })
+    },
+    destinosCircular () {
+      const defaultData = [{ nombre: 'SIN DEFINIR' }]
+
+      return this.dataDpto.destino.length > 0
+        ? this.departamentos.filter(item => this.dataDpto.destino.includes(item.id))
+        : defaultData
+    },
+    destinos () {
+       const defaultValue = {
+        nombre: 'DEPARTAMENTO SIN DEFINIR',
+        siglas: 'XX',
+        jefe: {
+          nombres_apellidos: 'JEFE DE DEPARTAMENTO',
+          descripcion_cargo: 'SIN DEFINIR',
+        },
+      }
+
+      return typeof this.dataDpto.destino === 'number'
+        ? this.departamentos.filter(item => item.id === this.dataDpto.destino)[0]
+        : defaultValue
+    },
+    previewDptos () {
+      return {
+        destinatario: this.isCircular ? this.destinosCircular : this.destinos,
+        copias: this.departamentos.filter(item => this.dataDpto.copias.includes(item.id)),
+      }
     },
   },
   created () {
@@ -312,45 +408,70 @@ export default {
       const valid = await this.$refs.WRITE_FORM.validate()
       if (valid) {
         this.doc.estatus = status;
-        this.doc.departamentos_destino = this.dataDpto.destino.join(',')
-        this.doc.copias = this.dataDpto.copias.length > 0
+        this.doc.departamentos_destino = this.isCircular ? this.dataDpto.destino.join(',') : this.dataDpto.destino.toString()
+        this.doc.copias = this.dataDpto.copias.length > 0 ? '1' : '0'
         this.doc.departamentos_copias = this.dataDpto.copias.length > 0 ? this.dataDpto.copias.join(',') : ''
+
+        const data = new FormData()
+        for (const key in this.doc) {
+          if (Object.hasOwnProperty.call(this.doc, key)) {
+            data.append(key, this.doc[key])
+          }
+        }
+
+        if (this.anexos.length > 0) {
+          this.anexos.forEach(anexo => {
+            data.append('anexos[]', anexo)
+          })
+        }
+
         this.loading = true
         try {
-          const { message } = await sendDocument({ datos: this.doc, status })
-           this.$root.$showAlert(message);
-           this.$router.push({ name: 'Recibidos' })
+          const { message } = this.doc_id
+            ? await updateDocument({ datos: data, id: this.doc_id })
+            : await sendDocument({ datos: data, status })
+
+           this.$root.$showAlert(message, 'success')
+           this.$router.push({ name: this.urlBandejas[status] })
         } catch (error) {
           console.log(error)
         } finally {
           this.loading = false
         }
+      } else {
+        this.$refs.contenido.setFlags({ touched: true })
       }
     },
 
     async getDocumento () {
-      this.loading = true
+      this.loadingDoc = true
       try {
-        const documento = await viewDocument({ id: this.doc_id })
+        const { temporal, ...documento } = await viewDocument({ id: this.doc_id, estatus: 'temporal' })
         this.doc.asunto = documento.asunto
         this.doc.contenido = documento.contenido
         this.doc.tipo_documento = documento.tipo_documento
-        this.doc.copias = documento?.temporal?.departamentos_copias !== null
-        this.dataDpto.destino = documento.temporal.departamentos_destino.split(',').map(item => parseInt(item))
-        this.dataDpto.copias = documento.temporal.departamentos_copias !== null
-          ? documento.temporal.departamentos_copias.split(',')
+        this.doc.copias = temporal?.departamentos_copias !== null
+
+        this.dataDpto.destino = documento.tipo_documento === 'circular'
+          ? temporal?.departamentos_destino.split(',').map(item => parseInt(item))
+          : parseInt(temporal?.departamentos_destino)
+
+        this.dataDpto.copias = temporal.departamentos_copias !== null
+          ? temporal.departamentos_copias.split(',')
           : []
 
+        this.estatus = documento.estatus
       } catch (error) {
         console.log(error)
       } finally {
-        this.loading = false
+        this.loadingDoc = false
       }
     },
 
     clearInputs (event) {
       this.dataDpto.destino = ''
       this.dataDpto.copias = ''
+      this.$refs.WRITE_FORM.reset()
     },
 
     getShowCopia (value) {
@@ -365,10 +486,23 @@ export default {
       }
     },
 
-    addAnexo (files) {
-      files.forEach(file => {
-        this.anexos.push(file)
-      })
+    addAnexo (file) {
+      console.log(file)
+      const isPermited = validateFile(file.type)
+      if (!isPermited) {
+         this.$root.$showAlert(
+          'Formato inválido. Solo se permiten Imágenes y/o Documentos.',
+          'error',
+          'mdi-file-remove-outline',
+        )
+        return
+      }
+
+      this.anexos.push(file)
+    },
+
+    deleteAnexo (index) {
+       this.anexos.splice(index, 1)
     },
   },
 }
@@ -419,9 +553,13 @@ export default {
       &.v-icon.v-icon::after
         background-color: transparent !important
   .active-type .v-label, .active-type i
-    color: #EE6C4D !important
-  
+    color: #2DB2D5 !important
+    font-weight: 500 !important
+
   .ck.ck-editor__main>.ck-editor__editable
     min-height: 200px !important
+
+  .invalid .ck.ck-editor__main>.ck-editor__editable:not(.ck-focused)
+    border-color: #ff5252 !important
 
 </style>

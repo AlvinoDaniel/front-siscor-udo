@@ -6,8 +6,6 @@
     placeholder=""
     :multiple="multiple"
     chips
-    color="blue-grey lighten-2"
-    item-color="label"
     item-text="nombre"
     item-value="id"
     :class="$attrs.class"

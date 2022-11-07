@@ -1,43 +1,70 @@
 <template>
   <div class="page-container">
     <div id="pageDocument" class="page">
-      <div class="page-header">
-        <img :src="udoLogo" width="70" height="62">
-        <span>UNIVERSIDAD DE ORIENTE</span>
-        <span v-text="dataDoc.propietario.nombre" />
-        <span>RECTORADO</span>
-      </div>
-      <div class="page-date">
-        <span class="font-weight-bold">{{ dataDoc.propietario.siglas }} N° {{ dataDoc.nro_documento }}-{{ year }}</span>
-        <span>Cumaná, {{ dataDoc.fecha_enviado | DocDate }}</span>
-      </div>
-      <div class="page-addressee">
-        <span>Ciudadano(a):</span>
-        <span
-          class="font-weight-bold"
-          v-text="destinatario.jefe.nombres_apellidos"
-        />
-        <span
-          class="font-weight-bold"
-          v-text="destinatario.jefe.descripcion_cargo"
-        />
-        <span>Su Despacho.- </span>
-      </div>
-      <div
-        class="page-body"
-        v-html="dataDoc.contenido"
-      />
-      <div class="page-sincerely">
-        <span>Atentamente,</span>
-          <v-img
-            :src="
-              require('@/assets/firma-y-sello.png')"
-            width="200"
+      <div class="page-content">
+        <div>
+          <div class="page-header">
+            <img :src="udoLogo" width="70" height="62">
+            <span>UNIVERSIDAD DE ORIENTE</span>
+            <span v-text="dataDoc.propietario.nombre" />
+            <span>RECTORADO</span>
+          </div>
+          <div class="page-date">
+            <span class="font-weight-bold">{{ dataDoc.propietario.siglas }} N° {{ dataDoc.nro_documento }}-{{ year }}</span>
+            <span>Cumaná, {{ dataDoc.fecha_enviado | DocDate }}</span>
+          </div>
+          <div v-if="isCircular" class="page-header title-header">
+            <span>CIRCULAR</span>
+          </div>
+          <template v-if="isCircular">
+            <div class="page-addressee">
+              <p>
+                <span>Para:</span>
+                <span class="font-bold font-uppercase"> {{ destinoCircular }}</span>
+              </p>
+              <p>
+                <span>De: </span>
+                <span class="font-bold font-uppercase"> {{ dataDoc.propietario.nombre }}</span>
+              </p>
+            </div>
+          </template>
+          <template v-else>
+            <div class="page-addressee">
+              <span>Ciudadano(a):</span>
+              <span
+                class="font-weight-bold"
+                v-text="destinatario.jefe.nombres_apellidos"
+              />
+              <span
+                class="font-weight-bold"
+                v-text="destinatario.jefe.descripcion_cargo"
+              />
+              <span>Su Despacho.- </span>
+            </div>
+          </template>
+          <div
+            class="page-body"
+            v-html="dataDoc.contenido"
           />
-        <div class="page-user-signature">
-          <span v-text="dataDoc.propietario.jefe.nombres_apellidos" />
+          <div class="page-sincerely">
+            <span>Atentamente,</span>
+              <v-img
+                :src="
+                  require('@/assets/firma-y-sello.png')"
+                width="200"
+              />
+            <div class="page-user-signature">
+              <span v-text="dataDoc.propietario.jefe.nombres_apellidos" />
+            </div>
+            <span v-text="dataDoc.propietario.jefe.descripcion_cargo" />
+          </div>
         </div>
-        <span v-text="dataDoc.propietario.nombre" />
+        <template v-if="hasCopia">
+          <div class="page-copys">
+            <span>CC: </span>
+            <span class="font-uppercase font-medium" v-text="dataCopia" />
+          </div>
+        </template>
       </div>
       <div class="page-footer">
         <span class="font-weight-bold">DEL PUEBLO VENIMOS / HACIA EL PUEBLO VAMOS</span>
@@ -58,12 +85,12 @@ export default {
       default: () => ({}),
     },
     destinatario: {
-      type: Object,
-      default: () => ({}),
+      type: [Object, Array],
+      default: () => ([]),
     },
     copias: {
-      type: Object,
-      default: () => ({}),
+      type: Array,
+      default: () => ([]),
     },
     preview: {
       type: Boolean,
@@ -74,6 +101,22 @@ export default {
     year: moment().format('YYYY'),
     udoLogo: LogoUdo,
   }),
+  computed: {
+    isCircular () {
+      return this.dataDoc.tipo_documento === 'circular'
+    },
+    hasCopia () {
+      return this.copias.length > 0
+    },
+    dataCopia () {
+      return this.copias.map(item => item.nombre).join(',')
+    },
+    destinoCircular () {
+      return typeof this.destinatario === 'object'
+        ? this.destinatario.map(item => item.nombre).join(',')
+        : ''
+    },
+  },
   methods: {
 
   },
@@ -106,8 +149,9 @@ export default {
   background-color: white;
   overflow: hidden;
   border: 0;
-  padding: 25px 60px;
+  padding: 25px 60px 50px 60px;
   font-size: 11pt;
+  color: #000000
 }
 
 .page p {
@@ -129,10 +173,11 @@ export default {
   -webkit-box-align: center !important;
   -ms-flex-align: center !important;
   align-items: center !important;
+  margin-bottom: 20px;
 }
 
 .page-date {
-  margin: 20px 0px;
+  margin-bottom: 20px;
    display: -webkit-box !important;
   display: -ms-flexbox !important;
   display: flex !important;
@@ -163,6 +208,18 @@ export default {
 .page-body {
   margin: 10px 0;
   text-align: justify;
+}
+
+.page-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100% !important;
+}
+.page-copys {
+  padding: 20px 0;
+  text-align: justify;
+  font-size: 10pt;
 }
 
 .page-sincerely {
@@ -204,5 +261,21 @@ export default {
   border-color: black;
   border-style: solid;
   border-width: 1px 0 0 0;
+}
+
+.title-header {
+  font-size: 1.2em;
+}
+
+.font-bold {
+  font-weight: bold !important;
+}
+
+.font-medium {
+  font-weight: 400 !important;
+}
+
+.font-uppercase {
+  text-transform: uppercase !important;
 }
 </style>

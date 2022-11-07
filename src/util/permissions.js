@@ -5,14 +5,9 @@ import store from '../store'
  * @returns {Boolean}
  */
 
-const hasPermission = permiso => {
-	if (permiso && permiso !== '') {
-		const { permisos } = store.getters['user/info']
-		return permisos.some(item => permiso === item)
-
-	} else {
-	return false
-	}
+const hasPermission = rolName => {
+  const { rol } = store.getters['user/info']
+  return rolName === rol
 }
 
 let __servicePermissions = false;

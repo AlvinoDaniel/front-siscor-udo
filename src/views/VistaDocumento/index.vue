@@ -52,43 +52,6 @@
         </v-col>
         <v-col cols="12">
           <document :data-doc="doc" :destinatario="destinatario" />
-          <!-- <div class="page-container">
-            <div id="pageDocument" class="page">
-              <div class="page-header">
-                <img :src="udoLogo" width="70" height="62">
-                <span>UNIVERSIDAD DE ORIENTE</span>
-                <span v-text="doc.propietario.nombre" />
-                <span>RECTORADO</span>
-              </div>
-              <div class="page-date">
-                <span class="font-weight-bold">{{ doc.propietario.siglas }} N° {{ doc.nro_documento }}-{{ year }}</span>
-                <span>Cumaná, {{ doc.fecha_enviado | DocDate }}</span>
-              </div>
-              <div class="page-addressee">
-                <span>Ciudadano(a):</span>
-                <span class="font-weight-bold" v-text="destinatario.jefe.nombres_apellidos" />
-                <span class="font-weight-bold" v-text="destinatario.jefe.descripcion_cargo" />
-                <span>Su Despacho.- </span>
-              </div>
-              <div class="page-body" v-html="doc.contenido" />
-              <div class="page-sincerely">
-                <span>Atentamente,</span>
-                  <v-img
-                    :src="
-                      require('@/assets/firma-y-sello.png')"
-                    width="200"
-                  />
-                <div class="page-user-signature">
-                  <span v-text="doc.propietario.jefe.nombres_apellidos" />
-                </div>
-                <span v-text="doc.propietario.nombre" />
-              </div>
-              <div class="page-footer">
-                <span class="font-weight-bold">DEL PUEBLO VENIMOS / HACIA EL PUEBLO VAMOS</span>
-                <span style="font-size:10px">Calle el Parque. Transversal con Avenida Gran Mariscal. Quinta Villa Angelitos. Cumaná – Edo. Sucre. Teléfonos 0293-4008220 / 4008221</span>
-              </div>
-            </div>
-          </div> -->
         </v-col>
       </v-row>
     </section>
@@ -98,7 +61,6 @@
   import { get } from 'vuex-pathify'
   import { viewDocument } from '@/services/documento'
   import { screenshot } from '@/util/CaptureData'
-
 
 export default {
   name: 'Documento',
@@ -128,9 +90,11 @@ export default {
     async getDocumento () {
       this.loading = true
       try {
-        const { enviados, dpto_copias, ...dataDoc } = await viewDocument({ id: this.id })
+        const { enviados, dpto_copias, ...dataDoc } = await viewDocument({ id: this.id, estatus: 'enviado' })
         this.doc = { ...dataDoc }
-        this.destinatario = enviados.filter(item => item.id === this.infoDepart.departamento_id)[0]
+        this.destinatario = dataDoc.tipo_documento === 'circular'
+          ? enviados
+          : enviados.filter(item => item.id === this.infoDepart.id)[0]
         this.copias = dpto_copias
         this.doc.nro_documento = this.doc.nro_documento.toString().padStart(4, '0')
       } catch (error) {
