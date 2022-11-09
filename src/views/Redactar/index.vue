@@ -104,16 +104,6 @@
                           <span>Circular</span>
                         </template>
                       </v-radio>
-                      <v-radio
-                        color="secondary"
-                        value="memorandum"
-                        on-icon="mdi-check-circle-outline"
-                      >
-                        <template v-slot:label>
-                          <v-icon small left>mdi-file-alert-outline</v-icon>
-                          <span>Memorandum</span>
-                        </template>
-                      </v-radio>
                     </v-radio-group>
                 </div>
               </div>
@@ -420,8 +410,10 @@ export default {
         }
 
         if (this.anexos.length > 0) {
-          this.anexos.forEach(anexo => {
-            data.append('anexos[]', anexo)
+          this.anexos
+            .filter(item => 'File' in window && item instanceof File)
+            .forEach(anexo => {
+              data.append('anexos[]', anexo)
           })
         }
 
@@ -446,7 +438,7 @@ export default {
     async getDocumento () {
       this.loadingDoc = true
       try {
-        const { temporal, ...documento } = await viewDocument({ id: this.doc_id, estatus: 'temporal' })
+        const { temporal, anexos, ...documento } = await viewDocument({ id: this.doc_id, estatus: 'temporal' })
         this.doc.asunto = documento.asunto
         this.doc.contenido = documento.contenido
         this.doc.tipo_documento = documento.tipo_documento
@@ -461,6 +453,9 @@ export default {
           : []
 
         this.estatus = documento.estatus
+        this.anexos = anexos.length > 0
+          ? anexos.map(item => ({ name: item.nombre }))
+          : []
       } catch (error) {
         console.log(error)
       } finally {
@@ -487,7 +482,7 @@ export default {
     },
 
     addAnexo (file) {
-      console.log(file)
+      console.log(typeof file)
       const isPermited = validateFile(file.type)
       if (!isPermited) {
          this.$root.$showAlert(

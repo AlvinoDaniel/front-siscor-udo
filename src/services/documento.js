@@ -31,3 +31,21 @@ export const viewDocument = async ({ id, estatus }) => {
     return Promise.reject(error)
   }
 }
+
+export const deleteAttach = async ({ id }) => {
+  try {
+    const { data } = await api.get(`documento/eliminar-anexo/${id}`)
+    return data
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}
+
+export const addAttach = async ({ datos }) => {
+  try {
+    const { data } = await api.post('documento/agregar-anexo', datos)
+    return data
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}

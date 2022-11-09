@@ -19,7 +19,7 @@ export const screenshot = async ({id, title, width}) => {
   var container = document.getElementById(id);
   await wait(1000)
   return new Promise((resolve, reject) => {
-    const pdf = new jsPDF('p', 'pt', 'letter')
+    const pdf = new jsPDF('p', 'pt', 'a3')
     pdf.html(container,{
       callback: (doc) => {
         doc.save('sample-document.pdf')

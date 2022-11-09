@@ -10,7 +10,7 @@
             <span>RECTORADO</span>
           </div>
           <div class="page-date">
-            <span class="font-weight-bold">{{ dataDoc.propietario.siglas }} N° {{ dataDoc.nro_documento }}-{{ year }}</span>
+            <span class="font-bold">{{ dataDoc.propietario.siglas }} N° {{ dataDoc.nro_documento }}-{{ year }}</span>
             <span>Cumaná, {{ dataDoc.fecha_enviado | DocDate }}</span>
           </div>
           <div v-if="isCircular" class="page-header title-header">
@@ -32,11 +32,11 @@
             <div class="page-addressee">
               <span>Ciudadano(a):</span>
               <span
-                class="font-weight-bold"
+                class="font-bold"
                 v-text="destinatario.jefe.nombres_apellidos"
               />
               <span
-                class="font-weight-bold"
+                class="font-bold"
                 v-text="destinatario.jefe.descripcion_cargo"
               />
               <span>Su Despacho.- </span>
@@ -67,7 +67,7 @@
         </template>
       </div>
       <div class="page-footer">
-        <span class="font-weight-bold">DEL PUEBLO VENIMOS / HACIA EL PUEBLO VAMOS</span>
+        <span class="font-bold">DEL PUEBLO VENIMOS / HACIA EL PUEBLO VAMOS</span>
         <span style="font-size:10px">Calle el Parque. Transversal con Avenida Gran Mariscal. Quinta Villa Angelitos. Cumaná – Edo. Sucre. Teléfonos 0293-4008220 / 4008221</span>
       </div>
     </div>
