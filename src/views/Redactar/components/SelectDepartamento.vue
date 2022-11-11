@@ -36,6 +36,7 @@
         v-bind="data.attrs"
         :input-value="data.selected"
         close
+        text-color="blue-grey darken-4"
         @click="data.select"
         @click:close="remove(data.item)"
       >

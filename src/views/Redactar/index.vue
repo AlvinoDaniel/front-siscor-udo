@@ -35,7 +35,7 @@
             class="mx-1 rounded-lg"
             @click="saveDocument('borrador')"
           >
-            <v-icon left>mdi-text-box-outline</v-icon>
+            <v-icon left color="secondary">mdi-text-box-outline</v-icon>
             <span v-if="isBorrador" class="pr-1">Guardar </span>
             Borrador
           </v-btn>
@@ -48,7 +48,7 @@
             depressed
             @click="saveDocument('corregir')"
           >
-            <v-icon left>mdi-email-edit-outline</v-icon>
+            <v-icon color="secondary" left>mdi-email-edit-outline</v-icon>
             <span v-if="isCorregir" class="pr-1">Guardar </span>
             Corregir
           </v-btn>
@@ -70,7 +70,7 @@
       <v-row class="pa-3">
         <v-col cols="12" class="py-0">
           <validation-provider name="Tipo de Documento" vid="doc.tipo_documento" rules="required" v-slot="{ errors }">
-            <div class="input-redactar theme--light d-flex align-self-center">
+            <div class="input-redactar theme--light d-flex align-self-center pb-2">
               <div class="v-input__control">
                 <div class="border-input v-input__slot pb-2">
                   <div class="v-input__prepend-inner">
@@ -540,6 +540,9 @@ export default {
   .btn-adjuntar
     & .v-input__prepend-outer
       margin-top: 2px !important
+    & .v-icon.v-icon
+      font-size: 20px
+      color: #2db2d5 !important
     & button
       border: thin solid #607d8b
       border-radius: 8px !important

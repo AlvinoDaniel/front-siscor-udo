@@ -3,15 +3,17 @@
     <v-chip
       v-for="(file,i) in anexos"
       :key="'fileAnexo-'+i"
-      class="mx-2"
+      class="mx-2 label-anexo"
       close
-      color="blue-grey rounded-lg"
-      text-color="white"
+      color="cyan lighten-4 rounded-lg"
+      text-color="light-blue darken-4"
       label
       large
       @click:close="deleteFile(i)"
     >
-        <v-icon large>mdi-file</v-icon>
+      <v-avatar size="121" rounded color="cyan lighten-5">
+        <v-icon small color="blue">mdi-file</v-icon>
+      </v-avatar>
       <span class="px-3" v-text="file.name" />
     </v-chip>
   </div>
@@ -39,3 +41,10 @@ export default {
   }
 }
 </script>
+<style>
+.label-anexo .v-avatar {
+  height: 30px !important;
+   min-width: 30px !important;
+  width: 30px !important;
+}
+</style>
