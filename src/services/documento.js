@@ -34,9 +34,10 @@ export const viewDocument = async ({ id, estatus }) => {
 
 export const deleteAttach = async ({ id }) => {
   try {
-    const { data } = await api.get(`documento/eliminar-anexo/${id}`)
-    return data
+    const { data } = await api.post(`documento/eliminar-anexo/${id}`)
+    return Promise.resolve(data)
   } catch (error) {
+    console.log({error})
     return Promise.reject(error)
   }
 }

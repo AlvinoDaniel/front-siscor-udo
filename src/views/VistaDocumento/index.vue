@@ -50,6 +50,13 @@
             v-text="doc.asunto"
           />
         </v-col>
+        <v-col v-if="this.anexos.length > 0" cols="12" class="py-2">
+          <div class="d-blok text-subtitle label-text pl-2 pb-1">
+            <v-icon small color="label">mdi-file</v-icon>
+            Anexos
+          </div>
+          <list-anexos-descarga :anexos="anexos" @download="downloadAnexo" />
+        </v-col>
         <v-col cols="12">
           <document :data-doc="doc" :destinatario="destinatario" />
         </v-col>
@@ -69,6 +76,10 @@ export default {
       /* webpackChunkName: "document" */
       '@/widgets/Document'
     ),
+    ListAnexosDescarga: () => import(
+      /* webpackChunkName: "list-anexos-descarga" */
+      '@/widgets/ListAnexosDescarga.vue'
+    ),
   },
   data: () => ({
     doc: null,
@@ -77,6 +88,7 @@ export default {
     loading: false,
     destinatario: {},
     copias: [],
+    anexos: [],
 
   }),
   computed: {
@@ -90,13 +102,19 @@ export default {
     async getDocumento () {
       this.loading = true
       try {
-        const { enviados, dpto_copias, ...dataDoc } = await viewDocument({ id: this.id, estatus: 'enviado' })
+        const { enviados, dpto_copias, anexos, ...dataDoc } = await viewDocument({ id: this.id, estatus: 'enviado' })
         this.doc = { ...dataDoc }
         this.destinatario = dataDoc.tipo_documento === 'circular'
           ? enviados
           : enviados.filter(item => item.id === this.infoDepart.id)[0]
         this.copias = dpto_copias
         this.doc.nro_documento = this.doc.nro_documento.toString().padStart(4, '0')
+        this.anexos = anexos.map(item => {
+          return {
+            file: item,
+            loader:false
+          }
+        })
       } catch (error) {
         console.log(error)
       } finally {
@@ -114,6 +132,10 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+
+    downloadAnexo (index) {
+      this.anexos[index].loader = true
     }
   },
 }

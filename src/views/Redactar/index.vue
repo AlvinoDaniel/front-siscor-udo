@@ -116,7 +116,7 @@
               v-model="dataDpto.destino"
               label-text="Enviar a:"
               class="input-redactar input-cc"
-              :items="departamentos"
+              :items="allDepartamentos"
               :multiple="isCircular"
               :error="errors[0]"
               :btn-copia="!isCircular"
@@ -244,7 +244,7 @@
   import RemoveFormat from '@ckeditor/ckeditor5-remove-format/src/removeformat';
 
   import { getDepartamentoList } from '@/services/departamento'
-  import { sendDocument, viewDocument, updateDocument } from '@/services/documento'
+  import { sendDocument, viewDocument, updateDocument, deleteAttach } from '@/services/documento'
   import { get } from 'vuex-pathify'
   import { validateFile } from '@/util/helpers'
 
@@ -335,6 +335,25 @@ export default {
     isCorregir () {
       return this.estatus === 'por_corregir'
     },
+    allDepartamentos () {
+      const comunidad = {
+        id: 'all',
+        nombre: 'Comunidad Universitaria',
+        siglas: 'CU',
+        jefe: {
+          nombres_apellidos: 'Todos los Departamentos'
+        }
+      }
+      const data = this.departamentos.map(item => {
+        return {
+          ...item,
+          disabled: typeof this.dataDpto.destino === 'object' && this.dataDpto.destino.includes('all')
+        }
+      })
+      if (this.isCircular) data.unshift(comunidad)
+
+      return data
+    },
     getDepartamentosCopia () {
      if (this.departamentos.length === 0) return []
 
@@ -411,9 +430,9 @@ export default {
 
         if (this.anexos.length > 0) {
           this.anexos
-            .filter(item => 'File' in window && item instanceof File)
+            .filter(item => 'File' in window && item.file instanceof File)
             .forEach(anexo => {
-              data.append('anexos[]', anexo)
+              data.append('anexos[]', anexo.file)
           })
         }
 
@@ -445,7 +464,7 @@ export default {
         this.doc.copias = temporal?.departamentos_copias !== null
 
         this.dataDpto.destino = documento.tipo_documento === 'circular'
-          ? temporal?.departamentos_destino.split(',').map(item => parseInt(item))
+          ? temporal?.departamentos_destino.split(',').map(item => item !== 'all' ? parseInt(item) : item)
           : parseInt(temporal?.departamentos_destino)
 
         this.dataDpto.copias = temporal.departamentos_copias !== null
@@ -454,7 +473,7 @@ export default {
 
         this.estatus = documento.estatus
         this.anexos = anexos.length > 0
-          ? anexos.map(item => ({ name: item.nombre }))
+          ? anexos.map(item => ({ file:{name: item.nombre, id: item.id}, loader:false }))
           : []
       } catch (error) {
         console.log(error)
@@ -493,11 +512,28 @@ export default {
         return
       }
 
-      this.anexos.push(file)
+      this.anexos.push({file:file, loader:false})
     },
 
-    deleteAnexo (index) {
-       this.anexos.splice(index, 1)
+    async deleteAnexo (index) {
+      if (this.doc_id && this.anexos[index].file.id) {
+        this.anexos[index].loader = true
+        try {
+          const { message } = await deleteAttach({id: this.anexos[index].file.id })
+          this.$root.$showAlert(
+            'Se ha eliminado el anexo exitosamente',
+            'success',
+          )
+        } catch (error) {
+          this.$root.$showAlert(
+            'Hubo un error al intentar eliminar el anexo.',
+            'error',
+          )
+          this.anexos[index].loader = false
+          return
+        }
+      }
+      this.anexos.splice(index, 1)
     },
   },
 }

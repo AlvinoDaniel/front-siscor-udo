@@ -55,6 +55,17 @@
         <v-list-item-subtitle v-html="data.item.jefe.nombres_apellidos" />
       </v-list-item-content>
     </template>
+    <!-- <template v-slot:prepend-item>
+      <v-list-item @click="allSeleted">
+        <v-list-item-avatar color="tertiary" class="justify-center">
+          <span class="white--text font-weight-bold" v-text="'C'" />
+        </v-list-item-avatar>
+        <v-list-item-content>
+          <v-list-item-title v-text="'Comunidad Universitaria'" />
+          <v-list-item-subtitle v-text="'Todos los Departamentos'" />
+        </v-list-item-content>
+      </v-list-item>
+    </template> -->
   </v-autocomplete>
 </template>
 <script>
@@ -115,6 +126,10 @@ export default {
       this.$emit('showCopia', Boolean(this.copia))
     },
     emitChange (e) {
+      console.log(e)
+      if(typeof e === 'object' && e.includes('all')){
+        this.selected = e.filter(item => item === 'all')
+      }
       if (!this.multiple) this.$emit('change', e)
     },
   }

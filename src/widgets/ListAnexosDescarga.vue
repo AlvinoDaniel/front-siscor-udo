@@ -2,20 +2,20 @@
   <div>
     <v-chip
       v-for="(file,i) in anexos"
-      :key="'fileAnexo-'+i"
-      :disabled="file.loader"
+      :key="'fileAnexoDescarga-'+i"
       class="mx-2 label-anexo"
-      :close="!file.loader"
-      color="cyan lighten-4 rounded-lg"
+      color="grey lighten-4 rounded-lg"
       text-color="light-blue darken-4"
       label
       large
-      @click:close="deleteFile(i)"
     >
-    <v-avatar size="121" rounded color="cyan lighten-5">
+    <v-avatar rounded color="grey lighten-3">
       <v-icon small color="blue">mdi-file</v-icon>
     </v-avatar>
-    <span class="px-3" v-text="file.file.name" />
+    <span class="px-3" v-text="file.file.nombre" />
+    <v-btn v-if="!file.loader" small icon text @click="downloadFile(i)">
+      <v-icon color="secondary" >mdi-download</v-icon>
+    </v-btn>
     <v-progress-circular
       v-if="file.loader"
         indeterminate
@@ -34,17 +34,13 @@ export default {
       type: Array,
       default: () => ([]),
     },
-    modeDoc: {
-      type: String,
-      default: 'oficio',
-    },
   },
   data: () => ({
 
   }),
   methods: {
-    deleteFile (index) {
-      this.$emit('delete', index)
+    downloadFile (index) {
+      this.$emit('download', index)
     },
   }
 }
