@@ -54,7 +54,7 @@ export const addAttach = async ({ datos }) => {
 export const downloadAttach = async ({ id }) => {
   try {
     const { data } = await api.get(`documento/descargar-anexo/${id}`, { responseType: 'blob'})
-    return data.data
+    return data
   } catch (error) {
     console.log({error})
     return Promise.reject(error)

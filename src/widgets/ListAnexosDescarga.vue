@@ -3,7 +3,7 @@
     <v-chip
       v-for="(file,i) in anexos"
       :key="'fileAnexoDescarga-'+i"
-      class="mx-2 label-anexo"
+      class="mx-2 mb-2 label-anexo"
       color="grey lighten-4 rounded-lg"
       text-color="light-blue darken-4"
       label

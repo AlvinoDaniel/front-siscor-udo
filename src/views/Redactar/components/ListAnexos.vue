@@ -4,7 +4,7 @@
       v-for="(file,i) in anexos"
       :key="'fileAnexo-'+i"
       :disabled="file.loader"
-      class="mx-2 label-anexo"
+      class="mx-2 mb-2 label-anexo "
       :close="!file.loader"
       color="cyan lighten-4 rounded-lg"
       text-color="light-blue darken-4"
