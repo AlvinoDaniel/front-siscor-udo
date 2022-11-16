@@ -55,7 +55,7 @@
             <v-icon small color="label">mdi-file</v-icon>
             Anexos
           </div>
-          <list-anexos-descarga :anexos="anexos" @download="downloadAnexo" />
+          <list-anexos-descarga :anexos="anexos" />
         </v-col>
         <v-col cols="12">
           <document :data-doc="doc" :destinatario="destinatario" />

@@ -27,6 +27,7 @@
   </div>
 </template>
 <script>
+import { downloadAttach } from '@/services/documento'
 export default {
   name: 'ListAnexos',
   props: {
@@ -39,8 +40,26 @@ export default {
 
   }),
   methods: {
-    downloadFile (index) {
-      this.$emit('download', index)
+    async downloadFile (index) {
+      this.anexos[index].loader = true
+      try {
+        const file = await downloadAttach({ id: this.anexos[index]?.file?.id })
+        var anexoURL = window.URL.createObjectURL(new Blob([file]));
+        var anexoLink = document.createElement('a');
+
+        anexoLink.href = anexoURL;
+        anexoLink.setAttribute('download',this.anexos[index]?.file?.nombre);
+        document.body.appendChild(anexoLink);
+        anexoLink.click();
+        anexoLink.remove();
+      } catch (error) {
+        this.$root.$showAlert(
+          'Lo siento, hubo un error al intentar obtener el Anexo.',
+          'error'
+        )
+      } finally {
+        this.anexos[index].loader = false
+      }
     },
   }
 }
