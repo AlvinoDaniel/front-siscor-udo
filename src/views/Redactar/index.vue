@@ -139,7 +139,7 @@
           </validation-provider>
         </v-col>
         <v-col cols="12" class="py-0">
-          <validation-provider name="Asunto" vid="doc.asunto" v-slot="{ errors }">
+          <validation-provider name="Asunto" vid="doc.asunto" rules="max:100" v-slot="{ errors }">
             <v-text-field
               v-model="doc.asunto"
               class="input-redactar"

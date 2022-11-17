@@ -1,6 +1,6 @@
 <template>
   <div class="page-container">
-    <div id="pageDocument" class="page">
+    <div id="pageDocument" class="page page-shadow">
       <div class="page-content">
         <div>
           <div class="page-header">
@@ -124,8 +124,8 @@ export default {
 </script>
 <style>
 .page-container {
-    background-color: #ffffff;
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjOWU5ZTllIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiM4ODgiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=);
+  background-color: #ebe8e8;
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjOWU5ZTllIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiM4ODgiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=);
     background-repeat: repeat;
     backdrop-filter: multiply;
     -webkit-transition: left 500ms;
@@ -143,7 +143,6 @@ export default {
   width: 8.5in;
   height: 11in;
   margin: 13px auto;
-  box-shadow: 1px 1px 3px 1px #333;
   border-collapse: separate;
   position: relative;
   background-color: white;
@@ -154,6 +153,9 @@ export default {
   color: #000000
 }
 
+.page-shadow {
+  box-shadow: 1px 1px 3px 1px #333;
+}
 .page p {
   margin-bottom: 8px !important;
   text-align: justify;

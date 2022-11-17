@@ -10,14 +10,15 @@
     v-if="doc !== null"
     id="header"
     >
-      <v-row>
-        <v-col cols="8" class="pb-1">
-          <span class="text-h4 font-weight-bold primary--text" v-text="doc.asunto" />
+      <v-row align="center">
+        <v-col cols="10" class="pb-1 d-flex">
+          <span class="text-h4 font-weight-bold primary--text" v-text="doc.asunto" />          
         </v-col>
-        <v-col cols="4" class="pb-1 d-flex justify-end">
+        <v-col cols="2" class="pb-1 d-flex justify-end">
           <v-btn
             icon
             color="label"
+            @click="getScreenshot"
           >
           <!-- mdi-image-plus mdi-camera-plus -->
             <v-icon>mdi-image-plus</v-icon>
@@ -46,15 +47,14 @@
             </v-list-item-avatar>
             <v-list-item-content>
               <v-list-item-title class="font-weight-bold">
-                <span v-text="doc.propietario.nombre" />
+                <span v-text="doc.propietario.nombre" />                
                 <v-chip
-                  class="mx-2"
+                  class="mx-2 text-uppercase"
                   color="success"
                   small
                   outlined
-                >
-                  OFICIO
-                </v-chip>
+                  v-text="doc.tipo_documento"
+                />
               </v-list-item-title>
               <v-list-item-subtitle v-text="doc.propietario.jefe.nombres_apellidos" />
             </v-list-item-content>
@@ -146,6 +146,8 @@ export default {
     },
 
     async getScreenshot () {
+      const page = document.getElementById('pageDocument')
+      page.classList.remove('page-shadow')
       try {
         await screenshot({
           id: 'pageDocument',
@@ -154,6 +156,8 @@ export default {
         })
       } catch (error) {
         console.log(error)
+      } finally {
+        page.classList.add('page-shadow')
       }
     },
 
@@ -164,4 +168,11 @@ export default {
 }
 // E2E7F1
 </script>
-
+<style>
+.chip-label-tipo {
+  min-width: 90px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+</style>
