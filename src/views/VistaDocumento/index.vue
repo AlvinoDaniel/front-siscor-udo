@@ -42,46 +42,46 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="12" md="8" class="d-flex align-center">
-          <v-list-item class="px-0">
-            <v-list-item-avatar>
-              <v-avatar
-                color="indigo"
-                size="40"
-              >
-                <span
-                  class="white--text font-weight-bold text-4"
-                  v-text="doc.propietario.siglas"
-                />
-              </v-avatar>
-            </v-list-item-avatar>
-            <v-list-item-content>
-              <v-list-item-title class="font-weight-bold">
-                <span v-text="doc.propietario.nombre" />
-              </v-list-item-title>
-              <v-list-item-subtitle v-if="isRecibido" v-text="doc.propietario.jefe.nombres_apellidos" />
-              <v-list-item-subtitle v-if="isEnviado">
-                enviado a: {{ textEnviados }}
-                <v-chip
-                  class="mx-2 px-1 py-0"
-                  label
-                  small
-                  color="info"
-                  dark
-                  @click="showList = true"
+        <v-col cols="12" md="8" class="d-flex align-center pb-0">
+          <v-list :two-line="copias.length === 0" :three-line="copias.length > 0" class="pt-0">
+            <v-list-item class="px-0">
+              <v-list-item-avatar rounded>
+                <v-avatar
+                  color="indigo"
+                  size="40"
+                  rounded
                 >
-                  <strong>+2</strong>
-                </v-chip>
-              </v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
+                  <span
+                    class="white--text font-weight-bold text-4"
+                    v-text="doc.propietario.siglas"
+                  />
+                </v-avatar>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title class="font-weight-bold">
+                  <span v-text="doc.propietario.nombre" />
+                </v-list-item-title>
+                <v-list-item-subtitle v-if="isRecibido" v-text="doc.propietario.jefe.nombres_apellidos" />
+                <template v-if="isEnviado">
+                  <v-list-item-subtitle>
+                    Enviado a: {{ textEnviados }}        
+                    <v-icon class="mt-n1" @click="showModalEnviados">mdi-menu-down</v-icon>  
+                  </v-list-item-subtitle>
+                  <v-list-item-subtitle v-if="copias.length > 0">
+                    Copias a: {{ textCopia }}      
+                    <v-icon class="mt-n1" @click="showModalCopias">mdi-menu-down</v-icon>           
+                  </v-list-item-subtitle>
+                </template>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
         </v-col>
         <v-col
           cols="12"
           md="4"
-          class="d-flex align-center justify-end pr-6"
+          class="d-flex align-start justify-end pr-6"
         >
-         <span class="text-subtitle-1">{{ doc.fecha_enviado | FullDate }}</span>
+         <span class="text-subtitle-1 blue-grey--text pb-6">{{ doc.fecha_enviado | FullDate }}</span>
         </v-col>
         <!-- <v-col cols="12" class="pl-8 py-2">
           <span
@@ -102,6 +102,7 @@
       </v-row>
     </section>
     <list-departaments-send v-model="showList" :items="enviados" />
+    <list-departaments-send v-model="showListCopy" :items="copias" copias />
   </v-container>
 </template>
 <script>
@@ -142,7 +143,8 @@ export default {
       circular: 'tertiary',
       oficio: 'info'
     },
-    showList: false
+    showList: false,
+    showListCopy: false,
 
   }),
   computed: {
@@ -156,10 +158,17 @@ export default {
       return this.tab === 'recibido'
     },
     textEnviados () {
+      const more = this.enviados.length > 2 ? `... +${this.enviados.length - 2}` : '' 
       return this.enviados.length > 0
-        ? this.enviados.slice(0,2).map(item => item.nombre).join(', ')
+        ? this.enviados.slice(0,2).map(item => item.nombre).join(', ') + more
         : ''
-    }
+    },
+    textCopia () {
+      const more = this.copias.length > 2 ? `... +${this.copias.length - 2}` : '' 
+      return this.copias.length > 0
+        ? this.copias.slice(0,1).map(item => item.nombre).join(', ') + more
+        : ''
+    },
   },
   created () {
     this.getDocumento()
@@ -217,7 +226,14 @@ export default {
 
     downloadAnexo (index) {
       this.anexos[index].loader = true
-    }
+    },
+
+    showModalEnviados () {
+      this.showList = true
+    },
+    showModalCopias () {
+      this.showListCopy = true
+    },
   },
 }
 // E2E7F1

@@ -32,14 +32,22 @@
               <v-icon
                 size="19"
                 class="mx-2"
-                :color="'grey lighten-2'"
-                v-text="'mdi-text-box'"
+                :color="item.dpto_copias.length > 0 ? 'yellow darken-1' : 'grey lighten-2'"
+                v-text="item.dpto_copias.length > 0 ? 'mdi-text-box' : 'mdi-text-box-outline'"
               />
               <v-icon
+                v-if="item.tipo_documento === 'oficio'"
                 size="19"
                 class="mx-2"
-                :color="'grey lighten-2'"
-                v-text="'mdi-check-outline'"
+                :color="item.enviados[0].leido !== null && item.enviados[0].leido === 1 ? 'icono' : 'grey lighten-2'"
+                v-text="item.enviados[0].leido !== null && item.enviados[0].leido === 1 ? 'mdi-check-all' : 'mdi-check-outline'"
+              />
+              <v-icon
+                v-if="item.tipo_documento === 'circular'"
+                size="19"
+                class="mx-2"
+                :color="item.enviados[0].leido !== null && item.enviados[0].leido === 1 ? 'icono' : 'grey lighten-2'"
+                v-text="item.enviados[0].leido !== null && item.enviados[0].leido === 1 ? 'mdi-check-all' : 'mdi-check-outline'"
               />
             </div>
           </template>
