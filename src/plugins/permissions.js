@@ -15,13 +15,13 @@ router.beforeEach(async (to, from, next) => {
 
       const hasUser = Object.values(store.getters['user/info']).length > 0;
       if(hasUser) {
-        return to.path.endsWith('/') ? next() : next(trailingSlash(to.path));
+        return next();
       }
       else {
         try {
           store.dispatch('app/setOverlay', true);
           await store.dispatch('user/getInfo');
-          return to.path.endsWith('/') ? next({...to, replace: true}) : next(trailingSlash(to.path))
+          return  next({...to, replace: true})
         } catch (e) {
           console.log('error', e)
           await store.dispatch('user/logout');
@@ -32,7 +32,7 @@ router.beforeEach(async (to, from, next) => {
   }
   else {
     if(to.matched.length > 0 && !to.matched.some(record => record.meta.auth)) {
-      return to.path.endsWith('/') ? next() : next(trailingSlash(to.path));
+      return next()
     }
     else {
       next({ path: '/auth/login/' })

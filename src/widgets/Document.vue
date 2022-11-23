@@ -109,11 +109,11 @@ export default {
       return this.copias.length > 0
     },
     dataCopia () {
-      return this.copias.map(item => item.nombre).join(',')
+      return this.copias.map(item => item.nombre).join(', ')
     },
     destinoCircular () {
       return typeof this.destinatario === 'object'
-        ? this.destinatario.map(item => item.nombre).join(',')
+        ? this.destinatario.map(item => item.nombre).join(', ')
         : ''
     },
   },

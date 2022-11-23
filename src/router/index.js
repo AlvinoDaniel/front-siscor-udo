@@ -37,6 +37,14 @@ const createRouter = () => new Router({
             /* webpackChunkName: "views-[request]" */
             '@/views/VistaDocumento/index'
           ),
+          beforeEnter: (to, from, next) => {
+            const ALLOWED = ['enviado', 'recibido']
+            if(to.query.tab && ALLOWED.includes(to.query.tab)) {
+              next()
+            } else {
+              next({ path: '/404' })
+            }
+          },
         },
         {
           name: 'Recibidos',
@@ -92,7 +100,7 @@ const createRouter = () => new Router({
             /* webpackChunkName: "views-[request]" */
             '@/views/Redactar/index'
           ),
-        },        
+        },
         {
           name: 'Error-permission',
           path: '/403',

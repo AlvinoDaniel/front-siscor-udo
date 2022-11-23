@@ -5,30 +5,40 @@
     tag="section"
     class="px-8"
   >
-    <loader-app v-if="loading" />
+    <loader-doc v-if="loading" />
     <section
     v-if="doc !== null"
     id="header"
     >
       <v-row align="center">
-        <v-col cols="10" class="pb-1 d-flex">
-          <span class="text-h4 font-weight-bold primary--text" v-text="doc.asunto" />          
-        </v-col>
-        <v-col cols="2" class="pb-1 d-flex justify-end">
-          <v-btn
+        <v-col cols="12" class="pb-0 d-flex justify-space-between align-center">
+          <v-chip
+            class="text-uppercase"
+            :color="colorTipo[doc.tipo_documento]"
+            small
+            outlined
+            label
+            v-text="doc.tipo_documento"
+          />
+          <div>
+            <v-btn
             icon
             color="label"
             @click="getScreenshot"
           >
           <!-- mdi-image-plus mdi-camera-plus -->
-            <v-icon>mdi-image-plus</v-icon>
+            <v-icon>mdi-camera-plus-outline</v-icon>
           </v-btn>
           <v-btn
             icon
             color="label"
           >
-            <v-icon>mdi-download</v-icon>
+            <v-icon>mdi-file-download-outline</v-icon>
           </v-btn>
+          </div>
+        </v-col>
+        <v-col cols="12" md="11" class="pt-0">
+          <span class="text-h4 font-weight-bold primary--text d-block" v-text="doc.asunto" />
         </v-col>
       </v-row>
       <v-row>
@@ -47,16 +57,22 @@
             </v-list-item-avatar>
             <v-list-item-content>
               <v-list-item-title class="font-weight-bold">
-                <span v-text="doc.propietario.nombre" />                
-                <v-chip
-                  class="mx-2 text-uppercase"
-                  color="success"
-                  small
-                  outlined
-                  v-text="doc.tipo_documento"
-                />
+                <span v-text="doc.propietario.nombre" />
               </v-list-item-title>
-              <v-list-item-subtitle v-text="doc.propietario.jefe.nombres_apellidos" />
+              <v-list-item-subtitle v-if="isRecibido" v-text="doc.propietario.jefe.nombres_apellidos" />
+              <v-list-item-subtitle v-if="isEnviado">
+                enviado a: {{ textEnviados }}
+                <v-chip
+                  class="mx-2 px-1 py-0"
+                  label
+                  small
+                  color="info"
+                  dark
+                  @click="showList = true"
+                >
+                  <strong>+2</strong>
+                </v-chip>
+              </v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </v-col>
@@ -85,6 +101,7 @@
         </v-col>
       </v-row>
     </section>
+    <list-departaments-send v-model="showList" :items="enviados" />
   </v-container>
 </template>
 <script>
@@ -103,6 +120,14 @@ export default {
       /* webpackChunkName: "list-anexos-descarga" */
       '@/widgets/ListAnexosDescarga.vue'
     ),
+    ListDepartamentsSend: () => import(
+      /* webpackChunkName: "list-departament-send" */
+      '@/widgets/ListDepartamentsSend.vue'
+    ),
+    LoaderDoc: () => import(
+      /* webpackChunkName: "loader-doc" */
+      './components/LoaderDoc.vue'
+    ),
   },
   data: () => ({
     doc: null,
@@ -112,11 +137,29 @@ export default {
     destinatario: {},
     copias: [],
     anexos: [],
+    enviados: [],
+    colorTipo: {
+      circular: 'tertiary',
+      oficio: 'info'
+    },
+    showList: false
 
   }),
   computed: {
     id: get('route/params@id'),
+    tab: get('route/query@tab'),
     infoDepart: get('user/departamento'),
+    isEnviado () {
+      return this.tab === 'enviado'
+    },
+    isRecibido () {
+      return this.tab === 'recibido'
+    },
+    textEnviados () {
+      return this.enviados.length > 0
+        ? this.enviados.slice(0,2).map(item => item.nombre).join(', ')
+        : ''
+    }
   },
   created () {
     this.getDocumento()
@@ -127,9 +170,20 @@ export default {
       try {
         const { enviados, dpto_copias, anexos, ...dataDoc } = await viewDocument({ id: this.id, estatus: 'enviado' })
         this.doc = { ...dataDoc }
-        this.destinatario = dataDoc.tipo_documento === 'circular'
-          ? enviados
-          : enviados.filter(item => item.id === this.infoDepart.id)[0]
+
+        if(this.isRecibido) {
+          this.destinatario = dataDoc.tipo_documento === 'circular'
+            ? enviados
+            : enviados.filter(item => item.id === this.infoDepart.id)[0]
+        }
+
+        if(this.isEnviado) {
+          this.destinatario = dataDoc.tipo_documento === 'circular'
+            ? enviados
+            : enviados[0]
+          this.enviados = enviados
+        }
+
         this.copias = dpto_copias
         this.doc.nro_documento = this.doc.nro_documento.toString().padStart(4, '0')
         this.anexos = anexos.map(item => {

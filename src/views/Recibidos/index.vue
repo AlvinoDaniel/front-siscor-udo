@@ -51,7 +51,7 @@
            </template>
           <template v-slot:item.asunto="{ item }">
             <div class="d-flex align-center">
-              <v-icon color="info">mdi-circle-medium</v-icon>
+              <v-icon :color="colorTipo[item.tipo_documento]">mdi-circle-medium</v-icon>
               <span
                 class="font-weight-bold text-uppercase"
                 v-text="item.tipo_documento"
@@ -94,6 +94,10 @@ export default {
       { text: '', value: 'fecha_enviado', width: '100' },
     ],
     data: [],
+    colorTipo: {
+      circular: 'tertiary',
+      oficio: 'info'
+    }
   }),
   created () {
     this.getBandejaRecibidos()
@@ -111,8 +115,8 @@ export default {
       }
     },
     viewDocumento (row) {
-      this.$router.push({ path: `/documento/${ row.id }` })
-      // this.$router.push({ path: '/documento', params: { id: row.id } })
+      // this.$router.push({ path: `/documento/${ row.id }`, query: {tab: 'recibido'} })
+      this.$router.push({ name: 'Documento', params: { id: row.id }, query: {tab: 'recibido'} })
     },
   },
 }
