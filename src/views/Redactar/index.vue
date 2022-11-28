@@ -413,14 +413,25 @@ export default {
       }
     },
 
+    getDepartamentSend (destino) {
+      if (destino.includes('all')) {
+        return this.departamentos.map(item => item.id).join(',')
+      }
+      
+      return destino.join(',')
+    },
+
     async saveDocument (status) {
       const valid = await this.$refs.WRITE_FORM.validate()
       if (valid) {
-        this.doc.estatus = status;
-        this.doc.departamentos_destino = this.isCircular ? this.dataDpto.destino.join(',') : this.dataDpto.destino.toString()
+        this.doc.estatus = this.dataDpto.destino.includes('all') ? 'enviar_all' : status
+
+        this.doc.departamentos_destino = this.isCircular 
+          ? this.getDepartamentSend(this.dataDpto.destino) 
+          : this.dataDpto.destino.toString()
+
         this.doc.copias = this.dataDpto.copias.length > 0 ? '1' : '0'
         this.doc.departamentos_copias = this.dataDpto.copias.length > 0 ? this.dataDpto.copias.join(',') : ''
-
         const data = new FormData()
         for (const key in this.doc) {
           if (Object.hasOwnProperty.call(this.doc, key)) {

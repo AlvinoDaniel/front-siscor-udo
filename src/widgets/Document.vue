@@ -112,6 +112,18 @@ export default {
       return this.copias.map(item => item.nombre).join(', ')
     },
     destinoCircular () {
+      const comunidad = {
+        nombre: 'Comunidad Universitaria',
+        siglas: 'CU',
+        jefe: {
+          nombres_apellidos: 'Todos los Departamentos'
+        },
+      }
+
+      if (this.dataDoc?.estatus === 'enviado_all') {
+        return comunidad.nombre
+      }
+
       return typeof this.destinatario === 'object'
         ? this.destinatario.map(item => item.nombre).join(', ')
         : ''

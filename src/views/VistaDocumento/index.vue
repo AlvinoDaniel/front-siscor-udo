@@ -64,7 +64,9 @@
                 <v-list-item-subtitle v-if="isRecibido" v-text="doc.propietario.jefe.nombres_apellidos" />
                 <template v-if="isEnviado">
                   <v-list-item-subtitle>
-                    Enviado a: {{ textEnviados }}
+                    Enviado a:
+                    <span v-if="doc.estatus === 'enviado_all'">COMUNIDAD UNIVERSITARIA</span>
+                    <span v-else v-text="textEnviados" />
                     <v-icon class="mt-n1" @click="showModalEnviados">mdi-menu-down</v-icon>
                   </v-list-item-subtitle>
                   <v-list-item-subtitle v-if="copias.length > 0">

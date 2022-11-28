@@ -126,8 +126,7 @@ export default {
       this.$emit('showCopia', Boolean(this.copia))
     },
     emitChange (e) {
-      console.log(e)
-      if(typeof e === 'object' && e.includes('all')){
+      if(typeof e === 'object' && e.includes('all')) {
         this.selected = e.filter(item => item === 'all')
       }
       if (!this.multiple) this.$emit('change', e)
