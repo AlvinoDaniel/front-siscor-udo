@@ -21,6 +21,7 @@ router.beforeEach(async (to, from, next) => {
         try {
           store.dispatch('app/setOverlay', true);
           await store.dispatch('user/getInfo');
+          await store.dispatch('app/getNewDocuments');
           return  next({...to, replace: true})
         } catch (e) {
           console.log('error', e)

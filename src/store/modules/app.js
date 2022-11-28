@@ -1,6 +1,6 @@
 // Pathify
 import { make } from 'vuex-pathify'
-
+import { bandeja } from '@/services/bandejas'
 // Data
 const state = {
   drawer: null,
@@ -15,7 +15,7 @@ const state = {
       icon: 'mdi-email-open-outline',
       to: '/recibidos',
       meta: {
-        badge: 5,
+        badge: null,
       },
     },
     {
@@ -45,12 +45,22 @@ const state = {
   }
 }
 
-const mutations = make.mutations(state)
+const mutations = {
+  ...make.mutations(state),
+  NEW_DOCUMENTS(state, news){
+    let { meta } = state.items[0]
+    meta.badge = news
+  }
+}
 
 const actions = {
   ...make.actions(state),
   init: async ({ dispatch }) => {
     //
+  },
+  async getNewDocuments ({commit}) {
+    const data  = await bandeja();
+    commit('NEW_DOCUMENTS', data.recibidos);
   },
 }
 

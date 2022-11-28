@@ -64,12 +64,12 @@
                 <v-list-item-subtitle v-if="isRecibido" v-text="doc.propietario.jefe.nombres_apellidos" />
                 <template v-if="isEnviado">
                   <v-list-item-subtitle>
-                    Enviado a: {{ textEnviados }}        
-                    <v-icon class="mt-n1" @click="showModalEnviados">mdi-menu-down</v-icon>  
+                    Enviado a: {{ textEnviados }}
+                    <v-icon class="mt-n1" @click="showModalEnviados">mdi-menu-down</v-icon>
                   </v-list-item-subtitle>
                   <v-list-item-subtitle v-if="copias.length > 0">
-                    Copias a: {{ textCopia }}      
-                    <v-icon class="mt-n1" @click="showModalCopias">mdi-menu-down</v-icon>           
+                    Copias a: {{ textCopia }}
+                    <v-icon class="mt-n1" @click="showModalCopias">mdi-menu-down</v-icon>
                   </v-list-item-subtitle>
                 </template>
               </v-list-item-content>
@@ -109,6 +109,7 @@
   import { get } from 'vuex-pathify'
   import { viewDocument } from '@/services/documento'
   import { screenshot } from '@/util/CaptureData'
+  import store from '@/store'
 
 export default {
   name: 'Documento',
@@ -158,13 +159,13 @@ export default {
       return this.tab === 'recibido'
     },
     textEnviados () {
-      const more = this.enviados.length > 2 ? `... +${this.enviados.length - 2}` : '' 
+      const more = this.enviados.length > 2 ? `... +${this.enviados.length - 2}` : ''
       return this.enviados.length > 0
         ? this.enviados.slice(0,2).map(item => item.nombre).join(', ') + more
         : ''
     },
     textCopia () {
-      const more = this.copias.length > 2 ? `... +${this.copias.length - 2}` : '' 
+      const more = this.copias.length > 2 ? `... +${this.copias.length - 2}` : ''
       return this.copias.length > 0
         ? this.copias.slice(0,1).map(item => item.nombre).join(', ') + more
         : ''
@@ -201,6 +202,11 @@ export default {
             loader:false
           }
         })
+
+        if(this.isRecibido) {
+          await store.dispatch('app/getNewDocuments');
+        }
+
       } catch (error) {
         console.log(error)
       } finally {

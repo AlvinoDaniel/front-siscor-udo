@@ -34,7 +34,7 @@
       <v-list-item-title v-text="item.title" />
     </v-list-item-content>
     <v-list-item-action v-if="item.meta && item.meta.badge !== null">
-      <v-chip class="px-2 py-0 chip-small" label color="tertiary" dark>5</v-chip>
+      <v-chip class="px-2 py-0 chip-small" label color="tertiary" dark v-text="item.meta.badge" />
     </v-list-item-action>
   </v-list-item>
 </template>
