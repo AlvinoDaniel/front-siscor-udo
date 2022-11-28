@@ -342,7 +342,7 @@ export default {
         siglas: 'CU',
         jefe: {
           nombres_apellidos: 'Todos los Departamentos'
-        }
+        },
       }
       const data = this.departamentos.map(item => {
         return {
