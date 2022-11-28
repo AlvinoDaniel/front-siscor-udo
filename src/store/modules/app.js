@@ -14,28 +14,25 @@ const state = {
       title: 'Recibidos',
       icon: 'mdi-email-open-outline',
       to: '/recibidos',
+      meta: {
+        badge: 5,
+      },
     },
     {
       title: 'Enviados',
-      meta: {
-        p: 'inventario.consulta',
-      },
       icon: 'mdi-send-outline mdi-rotate-315',
       to: '/enviados',
     },
     {
       title: 'Por Corregir',
       meta: {
-        p: 'ruta-vendedores.consulta',
+        badge: null,
       },
       icon: 'mdi-email-edit-outline',
       to: '/por-corregir',
     },
     {
       title: 'Borradores',
-      meta: {
-        p: 'cobros.consulta',
-      },
       icon: 'mdi-text-box-outline',
       to: '/borradores',
     },

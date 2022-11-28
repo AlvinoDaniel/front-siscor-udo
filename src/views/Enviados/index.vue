@@ -7,54 +7,41 @@
   >
     <v-row class="ma-0">
       <v-col cols="12" class="pa-4">
-        <h4 class="font-weight-bold">
-          Enviados
-        </h4>
+        <v-tabs>
+          <v-tab :ripple="false" @click="assignFilter('')"><strong>Todos</strong>({{data.length}})</v-tab>
+          <v-tab :ripple="false" @click="assignFilter('oficio')">
+            <v-icon color="info">mdi-circle-medium</v-icon>
+           <strong>Oficio</strong>({{cantOficios}})
+          </v-tab>
+          <v-tab :ripple="false" @click="assignFilter('circular')">
+            <v-icon color="tertiary">mdi-circle-medium</v-icon>
+           <strong>Circular</strong>({{cantCopias}})
+          </v-tab>
+        </v-tabs>
       </v-col>
     </v-row>
     <v-row>
       <v-col cols="12">
           <!-- :search="search"
           :loading="loadingData" -->
+          <!-- single-select
+          show-select -->
         <v-data-table
           :headers="headers"
-          :items="data"
+          :items="itemsData"
           :loading="loading"
-          single-select
-          show-select
           sort-by="fecha_enviado"
           :sort-desc="true"
           class="inbox"
           @click:row="viewDocumento"
-        >
+          >
           <template v-slot:item.iconos="{ item }">
-            <div class="d-flex justify-center align-center">
-              <v-icon
-                size="19"
-                class="mx-2"
-                :color="item.dpto_copias.length > 0 ? 'yellow darken-1' : 'grey lighten-2'"
-                v-text="item.dpto_copias.length > 0 ? 'mdi-text-box' : 'mdi-text-box-outline'"
-              />
-              <v-icon
-                v-if="item.tipo_documento === 'oficio'"
-                size="19"
-                class="mx-2"
-                :color="item.enviados[0].leido !== null && item.enviados[0].leido === 1 ? 'icono' : 'grey lighten-2'"
-                v-text="item.enviados[0].leido !== null && item.enviados[0].leido === 1 ? 'mdi-check-all' : 'mdi-check-outline'"
-              />
-              <v-icon
-                v-if="item.tipo_documento === 'circular'"
-                size="19"
-                class="mx-2"
-                :color="item.enviados[0].leido !== null && item.enviados[0].leido === 1 ? 'icono' : 'grey lighten-2'"
-                v-text="item.enviados[0].leido !== null && item.enviados[0].leido === 1 ? 'mdi-check-all' : 'mdi-check-outline'"
-              />
-            </div>
+            <viewed-copy :enviados="item.enviados" :copias="item.dpto_copias" />
           </template>
            <template v-slot:item.enviados="{ item }">
-            <div v-for="(dpto,i) in item.enviados" :key="i">
-              <span>{{dpto.nombre}}</span>
-              <span v-if="i < (item.enviados.length - 1)">, </span>
+            <div>
+              <span>{{item.enviados[0].nombre}}</span>
+              <v-chip v-if="item.enviados.length > 1" x-small color="blue-grey lighten-4" class="px-1 font-weight-bold ml-1" label>+{{item.enviados.length - 1}}</v-chip>
             </div>
            </template>
           <template v-slot:item.asunto="{ item }">
@@ -74,6 +61,7 @@
           </template>
            <template v-slot:item.fecha_enviado="{ item }">
             <div class="d-flex justify-end ">
+              <v-icon v-if="item.anexos > 0" size="19" class="mx-2" color="grey">mdi-paperclip</v-icon>
               <span class="grey--text font-weight-normal">
                 {{ item.fecha_enviado | shortDate }}
               </span>
@@ -87,13 +75,19 @@
 <script>
 import { getBandeja } from '@/services/bandejas'
 export default {
-  name: 'Recibidos',
+  name: 'Enviados',
+  components: {
+    ViewedCopy: () => import(
+      /* webpackChunkName: "viewed-copy" */
+      '@/widgets/ViewedCopy.vue'
+    ),
+  },
   data: () => ({
     loading: false,
     headers: [
       { text: '', value: 'data-table-select', width: '40px' },
       { text: '', value: 'iconos', align: ' px-0', width: '60px' },
-      { text: '', value: 'enviados' },
+      { text: '', value: 'enviados', align: ' pr-0'},
       { text: '', value: 'asunto', align: '' },
       { text: '', value: 'fecha_enviado', width: '100' },
     ],
@@ -101,8 +95,24 @@ export default {
     colorTipo: {
       circular: 'tertiary',
       oficio: 'info'
-    }
+    },
+    filterData: ''
   }),
+  computed: {
+    cantOficios () {
+      return this.data.length > 0
+        ? this.data.filter(item => item.tipo_documento === 'oficio').length
+        : 0
+    },
+    cantCopias () {
+      return this.data.length > 0
+        ? this.data.filter(item => item.tipo_documento === 'circular').length
+        : 0
+    },
+    itemsData () {
+      return this.data.filter(item => item.tipo_documento.includes(this.filterData))
+    }
+  },
   created () {
     this.getBandejaRecibidos()
   },
@@ -122,6 +132,9 @@ export default {
       // this.$router.push({ path: `/documento/${ row.id }` })
       this.$router.push({ name: 'Documento', params: { id: row.id }, query: {tab: 'enviado'} })
     },
+    assignFilter(filter) {
+      this.filterData = filter
+    }
   },
 }
 </script>

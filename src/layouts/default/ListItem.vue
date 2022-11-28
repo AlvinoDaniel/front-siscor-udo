@@ -4,7 +4,7 @@
     :rel="item.href ? 'nofollow' : undefined"
     :target="item.href ? '_blank' : undefined"
     :to="item.to"
-    active-class="active-menu secondary--text"
+    active-class="active-menu secondary--text font-weight-bold"
     link
     class="py-1"
     :class="{'sub': sub}"
@@ -33,6 +33,9 @@
     <v-list-item-content v-if="item.title">
       <v-list-item-title v-text="item.title" />
     </v-list-item-content>
+    <v-list-item-action v-if="item.meta && item.meta.badge !== null">
+      <v-chip class="px-2 py-0 chip-small" label color="tertiary" dark>5</v-chip>
+    </v-list-item-action>
   </v-list-item>
 </template>
 
@@ -62,3 +65,11 @@
     },
   }
 </script>
+<style>
+.chip-small {
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: bold;
+  height: 18px !important;
+}
+</style>

@@ -7,9 +7,17 @@
   >
     <v-row class="ma-0">
       <v-col cols="12" class="pa-4">
-        <h4 class="font-weight-bold">
-          Borradores
-        </h4>
+        <v-tabs>
+          <v-tab :ripple="false" @click="assignFilter('')"><strong>Todos</strong>({{data.length}})</v-tab>
+          <v-tab :ripple="false" @click="assignFilter('oficio')">
+            <v-icon color="info">mdi-circle-medium</v-icon>
+           <strong>Oficio</strong>({{cantOficios}})
+          </v-tab>
+          <v-tab :ripple="false" @click="assignFilter('circular')">
+            <v-icon color="tertiary">mdi-circle-medium</v-icon>
+           <strong>Circular</strong>({{cantCopias}})
+          </v-tab>
+        </v-tabs>
       </v-col>
     </v-row>
     <v-row>
@@ -18,7 +26,7 @@
           :loading="loadingData" -->
         <v-data-table
           :headers="headers"
-          :items="data"
+          :items="itemsData"
           :loading="loading"
           single-select
           show-select
@@ -92,8 +100,24 @@ export default {
     colorTipo: {
       circular: 'tertiary',
       oficio: 'info'
-    }
+    },
+    filterData: ''
   }),
+  computed: {
+    cantOficios () {
+      return this.data.length > 0
+        ? this.data.filter(item => item.tipo_documento === 'oficio').length
+        : 0
+    },
+    cantCopias () {
+      return this.data.length > 0
+        ? this.data.filter(item => item.tipo_documento === 'circular').length
+        : 0
+    },
+    itemsData () {
+      return this.data.filter(item => item.tipo_documento.includes(this.filterData))
+    }
+  },
   created () {
     this.getBandejaBorradores()
   },
@@ -113,6 +137,9 @@ export default {
       this.$router.push({ path: `/redactar/${ row.id }` })
       // this.$router.push({ path: '/documento', params: { id: row.id } })
     },
+    assignFilter(filter) {
+      this.filterData = filter
+    }
   },
 }
 </script>

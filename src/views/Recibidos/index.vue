@@ -7,9 +7,17 @@
   >
     <v-row class="ma-0">
       <v-col cols="12" class="pa-4">
-        <h4 class="font-weight-bold">
-          Recibidos
-        </h4>
+        <v-tabs>
+          <v-tab :ripple="false" @click="assignFilter('')"><strong>Todos</strong>({{data.length}})</v-tab>
+          <v-tab :ripple="false" @click="assignFilter('oficio')">
+            <v-icon color="info">mdi-circle-medium</v-icon>
+           <strong>Oficio</strong>({{cantOficios}})
+          </v-tab>
+          <v-tab :ripple="false" @click="assignFilter('circular')">
+            <v-icon color="tertiary">mdi-circle-medium</v-icon>
+           <strong>Circular</strong>({{cantCopias}})
+          </v-tab>
+        </v-tabs>
       </v-col>
     </v-row>
     <v-row>
@@ -18,7 +26,7 @@
           :loading="loadingData" -->
         <v-data-table
           :headers="headers"
-          :items="data"
+          :items="itemsData"
           :loading="loading"
           single-select
           show-select
@@ -67,6 +75,7 @@
           </template>
            <template v-slot:item.fecha_enviado="{ item }">
             <div class="d-flex justify-end ">
+              <v-icon v-if="item.anexos > 0" size="19" class="mx-2" color="grey">mdi-paperclip</v-icon>
               <span
                 class="grey--text font-weight-normal"
                 :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
@@ -81,7 +90,7 @@
   </v-container>
 </template>
 <script>
-import { getBandeja } from '@/services/bandejas'
+import { getBandeja, bandeja } from '@/services/bandejas'
 export default {
   name: 'Recibidos',
   data: () => ({
@@ -97,10 +106,27 @@ export default {
     colorTipo: {
       circular: 'tertiary',
       oficio: 'info'
-    }
+    },
+    filterData: ''
   }),
+  computed: {
+    cantOficios () {
+      return this.data.length > 0
+        ? this.data.filter(item => item.tipo_documento === 'oficio').length
+        : 0
+    },
+    cantCopias () {
+      return this.data.length > 0
+        ? this.data.filter(item => item.tipo_documento === 'circular').length
+        : 0
+    },
+    itemsData () {
+      return this.data.filter(item => item.tipo_documento.includes(this.filterData))
+    }
+  },
   created () {
     this.getBandejaRecibidos()
+    this.getBandejaCount()
   },
   methods: {
     async getBandejaRecibidos () {
@@ -114,10 +140,23 @@ export default {
         this.loading = false
       }
     },
+    async getBandejaCount() {
+      this.loading = true
+      try {
+        const { documentos } = await bandeja()
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.loading = false
+      }
+    },
     viewDocumento (row) {
       // this.$router.push({ path: `/documento/${ row.id }`, query: {tab: 'recibido'} })
       this.$router.push({ name: 'Documento', params: { id: row.id }, query: {tab: 'recibido'} })
     },
+    assignFilter(filter) {
+      this.filterData = filter
+    }
   },
 }
 </script>
