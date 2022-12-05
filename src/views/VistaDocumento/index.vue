@@ -7,7 +7,7 @@
   >
     <loader-doc v-if="loading" />
     <section
-    v-if="doc !== null"
+    v-if="(doc !== null && !loading)"
     id="header"
     >
       <v-row align="center">
@@ -25,13 +25,14 @@
             icon
             color="label"
             @click="getScreenshot"
-          >
-          <!-- mdi-image-plus mdi-camera-plus -->
+            >
+            <!-- mdi-image-plus mdi-camera-plus -->
             <v-icon>mdi-camera-plus-outline</v-icon>
           </v-btn>
           <v-btn
-            icon
-            color="label"
+          icon
+          color="label"
+          @click="generatePDF"
           >
             <v-icon>mdi-file-download-outline</v-icon>
           </v-btn>
@@ -111,6 +112,7 @@
   import { get } from 'vuex-pathify'
   import { viewDocument } from '@/services/documento'
   import { screenshot } from '@/util/CaptureData'
+  import  exportPDF from '@/util/ExportPDF'
   import store from '@/store'
 
 export default {
@@ -230,6 +232,12 @@ export default {
       } finally {
         page.classList.add('page-shadow')
       }
+    },
+
+    generatePDF () {
+      exportPDF({
+        doc: this.doc,
+      })
     },
 
     downloadAnexo (index) {

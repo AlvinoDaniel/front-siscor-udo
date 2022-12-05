@@ -35,7 +35,7 @@ export const screenshot = async ({id, title, width}) => {
       scrollX: -window.scrollX,
       escala: 1,
       width: 812,
-      height: 1056,
+      // height: 1056,
     }).then(function (canvas) {
       var link = document.createElement("a");
       document.body.appendChild(link);

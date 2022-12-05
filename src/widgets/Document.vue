@@ -48,11 +48,12 @@
           />
           <div class="page-sincerely">
             <span>Atentamente,</span>
+            <template v-if="isFirma">
               <v-img
-                :src="
-                  require('@/assets/firma-y-sello.png')"
+                :src="dataDoc.propietario.jefe.baseUrlFirma"
                 width="200"
               />
+            </template>
             <div class="page-user-signature">
               <span v-text="dataDoc.propietario.jefe.nombres_apellidos" />
             </div>
@@ -111,6 +112,9 @@ export default {
     dataCopia () {
       return this.copias.map(item => item.nombre).join(', ')
     },
+    isFirma (){
+      return this.dataDoc.propietario.jefe.baseUrlFirma !== null
+    },
     destinoCircular () {
       const comunidad = {
         nombre: 'Comunidad Universitaria',
@@ -153,7 +157,7 @@ export default {
 
 .page {
   width: 8.5in;
-  height: 11in;
+  min-height: 11in;
   margin: 13px auto;
   border-collapse: separate;
   position: relative;
