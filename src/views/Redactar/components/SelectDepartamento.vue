@@ -48,11 +48,14 @@
     </template>
     <template v-slot:item="data">
       <v-list-item-avatar color="secondary" class="justify-center">
-        <span class="white--text font-weight-bold" v-text="data.item.siglas" />
+        <span class="white--text font-weight-bold text-h6" v-text="data.item.siglas" />
       </v-list-item-avatar>
       <v-list-item-content>
         <v-list-item-title v-html="data.item.nombre" />
-        <v-list-item-subtitle v-html="data.item.jefe.nombres_apellidos" />
+        <v-list-item-subtitle
+          v-if="data.item.jefe"
+          v-html="data.item.jefe.nombres_apellidos"
+        />
       </v-list-item-content>
     </template>
     <!-- <template v-slot:prepend-item>

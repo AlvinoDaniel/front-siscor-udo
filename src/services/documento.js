@@ -32,6 +32,15 @@ export const viewDocument = async ({ id, estatus }) => {
   }
 }
 
+export const deleteDocument = async ({ id }) => {
+  try {
+    const { data } = await api.delete(`documento/eliminar-documento/${id}`)
+    return data.data
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}
+
 export const deleteAttach = async ({ id }) => {
   try {
     const { data } = await api.post(`documento/eliminar-anexo/${id}`)
@@ -54,6 +63,16 @@ export const addAttach = async ({ datos }) => {
 export const downloadAttach = async ({ id }) => {
   try {
     const { data } = await api.get(`documento/descargar-anexo/${id}`, { responseType: 'blob'})
+    return data
+  } catch (error) {
+    console.log({error})
+    return Promise.reject(error)
+  }
+}
+
+export const downloadDocument = async ({ id }) => {
+  try {
+    const { data } = await api.get(`documento/generar-documento/${id}`, { responseType: 'blob'})
     return data
   } catch (error) {
     console.log({error})

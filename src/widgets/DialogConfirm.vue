@@ -11,12 +11,12 @@
                   <v-list two-line class="grey lighten-4">
                      <v-list-item>
                         <v-list-item-avatar color="primary lighten-2" size="60">
-                            <v-icon dark size="35px" v-if="options.type == 'delete'">mdi-trash-can-outline</v-icon>                
-                            <v-icon size="40px" color="deep-orange" v-if="options.type == 'confirm'">mdi-help-circle-outline</v-icon>                
+                            <v-icon dark size="35px" v-if="options.type == 'delete'">mdi-trash-can-outline</v-icon>
+                            <v-icon size="40px" color="deep-orange" v-if="options.type == 'confirm'">mdi-help-circle-outline</v-icon>
                         </v-list-item-avatar>
                         <v-list-item-content>
                           <v-list-item-title style="white-space:normal !important">
-                            <span :class="{'black--text':options.type == 'delete' , 'blue-grey--text font-weight-bold':options.type == 'confirm' }" style="font-size:18px">{{ title }}</span>
+                            <span class="blue-grey--text font-weight-bold" style="font-size:18px">{{ title }}</span>
                           </v-list-item-title>
                           <v-list-item-subtitle class="mt-2" style="white-space:normal !important">
                             <span class="body-2">{{ message }}</span>
@@ -31,17 +31,17 @@
                 <v-btn dark @click.native="cancel" color="blue-grey lighten--4" class="px-6" small depressed>
                   <v-icon left>mdi-close-octagon-outline</v-icon>
                   {{ options.btnCancelText }}
-                </v-btn>      
-                 <v-btn 
-                  @click.native="agree" 
-                  :color="colorBtn" 
-                  small 
+                </v-btn>
+                 <v-btn
+                  @click.native="agree"
+                  :color="colorBtn"
+                  small
                   depressed
                   class="px-12 mx-4"
                 >
                   <span v-text="options.btnConfirmText" />
                   <v-icon right>mdi-check</v-icon>
-                </v-btn>      
+                </v-btn>
               </v-col>
             </v-row>
             <!-- <v-row justify="center">
@@ -64,7 +64,7 @@ export default {
     title: null,
     options: {
       type: 'delete',
-      btnConfirmText: 'Si',
+      btnConfirmText: 'Si, eliminar',
       btnCancelText: 'Descartar',
     }
   }),
@@ -126,5 +126,5 @@ export default {
     right: 0;
     top: 0;
 }
-   
+
 </style>

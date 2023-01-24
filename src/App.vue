@@ -10,6 +10,7 @@
 <script>
   // Styles
   import '@/styles/overrides.sass'
+  import '@/styles/PlusJakartaSans.css'
 
   export default {
     name: 'App',

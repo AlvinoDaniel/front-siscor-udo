@@ -102,6 +102,17 @@ const createRouter = () => new Router({
           ),
         },
         {
+          name: 'Seguridad',
+          path: '/seguridad/gestion-de-usuario',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/Auth/ResetPassword'
+          ),
+        },
+        {
           name: 'Error-permission',
           path: '/403',
           meta:{

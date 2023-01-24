@@ -15,7 +15,7 @@
       @click="drawer = !drawer"
     >
       <template slot:default>
-        <v-icon color="white">mdi-apps</v-icon>
+        <v-icon>mdi-apps</v-icon>
       </template>
     </v-app-bar-nav-icon>
 
@@ -25,10 +25,10 @@
       class="font-weight-light text-h5 hidden-sm-and-down"
       v-text="name"
     /> -->
-    <div class="pt-2 hidden-md-and-up">
+    <div class="pt-1 hidden-md-and-up">
       <v-img
         :src="require('@/assets/Logos/IDENTIDAD_1.png')"
-        max-width="100"
+        max-width="120"
       />
     </div>
 

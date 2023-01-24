@@ -34,7 +34,7 @@
       <v-list-item-title v-text="item.title" />
     </v-list-item-content>
     <v-list-item-action v-if="item.meta && item.meta.badge !== null && item.meta.badge > 0">
-      <v-chip class="px-2 py-0 chip-small" label color="tertiary" dark v-text="item.meta.badge" />
+      <v-chip class="chip-small" label color="tertiary" dark v-text="item.meta.badge" />
     </v-list-item-action>
   </v-list-item>
 </template>
@@ -68,8 +68,9 @@
 <style>
 .chip-small {
   border-radius: 12px;
-  font-size: 11px;
-  font-weight: bold;
-  height: 18px !important;
+  font-size: 11px !important;
+  font-weight: 300;
+  height: 17px !important;
+  padding: 6px !important;
 }
 </style>

@@ -38,3 +38,9 @@ export const validateFile = (type) => {
 
   return typeAllowed.includes(type)
 }
+
+export const getInitals = (name) => {
+  const INITIALS = name.split(' ').splice(0,3).map(item => item.toUpperCase().charAt(0)).join('')
+
+  return INITIALS
+}

@@ -14,7 +14,6 @@
         depressed
         plain
         :ripple="false"
-        :dark="$vuetify.breakpoint.mobile"
         :small="$vuetify.breakpoint.mobile"
         :class="{'mr-2': !$vuetify.breakpoint.mobile, 'btn-navbar': true }"
         v-bind="attrs"

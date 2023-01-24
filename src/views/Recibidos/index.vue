@@ -5,8 +5,9 @@
     tag="section"
     class="pa-0"
   >
+    <loader-app v-if="updating" />
     <v-row class="ma-0">
-      <v-col cols="12" class="pa-4">
+      <v-col cols="12" sm="7" md="6" class="pt-1">
         <v-tabs>
           <v-tab :ripple="false" @click="assignFilter('')"><strong>Todos</strong>({{data.length}})</v-tab>
           <v-tab :ripple="false" @click="assignFilter('oficio')">
@@ -19,24 +20,53 @@
           </v-tab>
         </v-tabs>
       </v-col>
+      <v-col cols="12" sm="5" md="6" class="pt-1 d-flex align-center justify-end">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              icon
+              depressed
+              color="blue-grey"
+              v-bind="attrs"
+              v-on="on"
+              @click="getBandejaRecibidos(true)"
+            >
+              <v-icon>mdi-refresh</v-icon>
+            </v-btn>
+          </template>
+          <span>Actualizar</span>
+        </v-tooltip>
+        <v-pagination
+          class="header-pagination"
+          v-model="page"
+          :length="pageCount"
+          circle
+          total-visible="0"
+        ></v-pagination>
+        <span class="text-pagination" v-text="paginationText" />
+      </v-col>
     </v-row>
     <v-row>
-      <v-col cols="12">
+      <v-col cols="12" class="py-0">
           <!-- :search="search"
           :loading="loadingData" -->
         <v-data-table
+          sort-by="fecha_enviado"
+          class="inbox"
+          hide-default-footer
+          no-data-text="No hay Documentos Recibidos"
           :headers="headers"
           :items="itemsData"
+          :item-class="setColorRow"
           :loading="loading"
-          single-select
-          show-select
-          sort-by="fecha_enviado"
           :sort-desc="true"
-          class="inbox"
+          :page.sync="page"
+          @page-count="pageCount = $event"
+          @pagination="infoPagination = $event"
           @click:row="viewDocumento"
         >
           <template v-slot:item.iconos="{ item }">
-            <div class="d-flex justify-center align-center">
+            <div class="d-flex justify-center align-center ml-3">
               <v-icon
                 size="19"
                 class="mx-2"
@@ -86,17 +116,22 @@
            </template>
         </v-data-table>
       </v-col>
+      <v-col cols="12" class="pt-0">
+        <v-divider></v-divider>
+      </v-col>
     </v-row>
   </v-container>
 </template>
 <script>
 import { getBandeja, bandeja } from '@/services/bandejas'
+import { Base64 } from 'js-base64';
 export default {
   name: 'Recibidos',
   data: () => ({
     loading: false,
+    updating: false,
     headers: [
-      { text: '', value: 'data-table-select', width: '40px' },
+      // { text: '', value: 'data-table-select', width: '40px' },
       { text: '', value: 'iconos', align: ' px-0', width: '60px' },
       { text: '', value: 'propietario' },
       { text: '', value: 'asunto', align: '' },
@@ -107,7 +142,14 @@ export default {
       circular: 'tertiary',
       oficio: 'info'
     },
-    filterData: ''
+    filterData: '',
+    page: 1,
+    pageCount: 0,
+    infoPagination: {
+      pageStart: 0,
+      pageStop: 0,
+      itemsLength:0,
+    }
   }),
   computed: {
     cantOficios () {
@@ -122,6 +164,13 @@ export default {
     },
     itemsData () {
       return this.data.filter(item => item.tipo_documento.includes(this.filterData))
+    },
+    paginationText () {
+
+      return this.infoPagination
+        ? `${this.infoPagination.pageStart + 1} - ${this.infoPagination.pageStop} de ${this.infoPagination.itemsLength}`
+        : ''
+
     }
   },
   created () {
@@ -129,7 +178,8 @@ export default {
     this.getBandejaCount()
   },
   methods: {
-    async getBandejaRecibidos () {
+    async getBandejaRecibidos (actualizar=false) {
+      if(actualizar) this.updating = true
       this.loading = true
       try {
         const { documentos } = await getBandeja({ bandeja: 'recibidos' })
@@ -138,6 +188,7 @@ export default {
         console.log(error)
       } finally {
         this.loading = false
+        if(actualizar) this.updating = false
       }
     },
     async getBandejaCount() {
@@ -152,10 +203,14 @@ export default {
     },
     viewDocumento (row) {
       // this.$router.push({ path: `/documento/${ row.id }`, query: {tab: 'recibido'} })
-      this.$router.push({ name: 'Documento', params: { id: row.id }, query: {tab: 'recibido'} })
+      this.$router.push({ name: 'Documento', params: { id: Base64.encodeURI(row.id) }, query: {tab: 'recibido'} })
     },
     assignFilter(filter) {
       this.filterData = filter
+    },
+    setColorRow(item) {
+      const NOT_READED = item.leido === 0
+      return NOT_READED ? 'unread' : ''
     }
   },
 }

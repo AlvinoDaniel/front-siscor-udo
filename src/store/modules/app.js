@@ -50,7 +50,13 @@ const mutations = {
   NEW_DOCUMENTS(state, news){
     let { meta } = state.items[0]
     meta.badge = news
+  },
+
+  NEW_DOCUMENTS_CORRECT(state, news){
+    let { meta } = state.items[2]
+    meta.badge = news
   }
+
 }
 
 const actions = {
@@ -58,9 +64,14 @@ const actions = {
   init: async ({ dispatch }) => {
     //
   },
-  async getNewDocuments ({commit}) {
+  async getNewDocuments ({commit, rootGetters}) {
     const data  = await bandeja();
+    const { rol } = rootGetters['user/info']
+    const IS_JEFE = rol === 'jefe'
+
     commit('NEW_DOCUMENTS', data.recibidos);
+    if(IS_JEFE)
+      commit('NEW_DOCUMENTS_CORRECT', data.por_corregir);
   },
 }
 

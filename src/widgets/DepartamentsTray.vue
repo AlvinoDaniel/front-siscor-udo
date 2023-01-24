@@ -39,7 +39,7 @@
                     >
                       <span
                         class="white--text font-weight-bold text-4"
-                        v-text="item.siglas || ''"
+                        v-text="item.siglas || toInitials(item.nombre)"
                       />
                     </v-avatar>
                   </v-list-item-avatar>
@@ -74,7 +74,7 @@
                     >
                       <span
                         class="white--text font-weight-bold text-4"
-                        v-text="item.siglas || ''"
+                        v-text="item.siglas || toInitials(item.nombre)"
                       />
                     </v-avatar>
                   </v-list-item-avatar>
@@ -98,6 +98,8 @@
   </v-dialog>
 </template>
 <script>
+  import { getInitals } from '@/util/helpers'
+
   export default {
     name: 'ListDepartamentsSend',
     props: {
@@ -146,5 +148,8 @@
         this.show = val
       },
     },
+    methods: {
+      toInitials: getInitals,
+    }
   }
 </script>

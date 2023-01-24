@@ -6,7 +6,9 @@
   >
     <v-card>
       <v-card-title class="text-h5 primary--text grey lighten-5 font-weight-bold">
-        Departamentos Enviados
+        Departamentos {{ copias ? 'Copias' : 'Enviados' }}
+
+
         <v-spacer />
         <v-btn
           icon
@@ -39,7 +41,7 @@
                     >
                       <span
                         class="white--text font-weight-bold text-4"
-                        v-text="item.siglas || ''"
+                        v-text="item.siglas || toInitials(item.nombre)"
                       />
                     </v-avatar>
                   </v-list-item-avatar>
@@ -47,7 +49,7 @@
                     <v-list-item-title class="font-weight-bold">
                       <span v-text="item.nombre" />
                     </v-list-item-title>
-                    <v-list-item-subtitle v-text="item.jefe.nombres_apellidos" />
+                    <v-list-item-subtitle v-if="item.jefe" v-text="item.jefe.nombres_apellidos" />
                   </v-list-item-content>
                   <v-list-item-action>
                     <v-list-item-action-text>
@@ -74,7 +76,7 @@
                     >
                       <span
                         class="white--text font-weight-bold text-4"
-                        v-text="item.siglas || ''"
+                        v-text="item.siglas || toInitials(item.nombre)"
                       />
                     </v-avatar>
                   </v-list-item-avatar>
@@ -82,7 +84,7 @@
                     <v-list-item-title class="font-weight-bold">
                       <span v-text="item.nombre" />
                     </v-list-item-title>
-                    <v-list-item-subtitle v-text="item.jefe.nombres_apellidos" />
+                    <v-list-item-subtitle v-if="item.jefe" v-text="item.jefe.nombres_apellidos" />
                   </v-list-item-content>
                 </v-list-item>
                 <v-divider
@@ -112,6 +114,7 @@
   </v-dialog>
 </template>
 <script>
+  import { getInitals } from '@/util/helpers'
   export default {
     name: 'ListDepartamentsSend',
     props: {
@@ -160,5 +163,8 @@
         this.show = val
       },
     },
+    methods: {
+      toInitials: getInitals,
+    }
   }
 </script>

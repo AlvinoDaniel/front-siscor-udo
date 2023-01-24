@@ -48,7 +48,12 @@
             depressed
             @click="saveDocument('corregir')"
           >
-            <v-icon color="secondary" left>mdi-email-edit-outline</v-icon>
+            <v-icon
+              :color="$hasPermission('jefe') ? 'secondary' : 'white'"
+              left
+            >
+              mdi-email-edit-outline
+            </v-icon>
             <span v-if="isCorregir" class="pr-1">Guardar </span>
             Corregir
           </v-btn>
@@ -246,7 +251,9 @@
   import { getDepartamentoList } from '@/services/departamento'
   import { sendDocument, viewDocument, updateDocument, deleteAttach } from '@/services/documento'
   import { get } from 'vuex-pathify'
-  import { validateFile } from '@/util/helpers'
+  import { validateFile, getInitals } from '@/util/helpers'
+  import { decode } from 'js-base64';
+
 
 export default {
   name: 'Redactar',
@@ -323,6 +330,7 @@ export default {
   }),
   computed: {
     doc_id: get('route/params@doc'),
+    responseData: get('route/query@r'),
     isCircular () {
       return this.doc.tipo_documento === 'circular'
     },
@@ -347,6 +355,7 @@ export default {
       const data = this.departamentos.map(item => {
         return {
           ...item,
+          siglas: !item.siglas ? getInitals(item.nombre) : item.siglas,
           disabled: typeof this.dataDpto.destino === 'object' && this.dataDpto.destino.includes('all')
         }
       })
@@ -364,6 +373,11 @@ export default {
         return typeof this.dataDpto.destino === 'object'
          ? !this.dataDpto.destino.includes(item.id)
          : this.dataDpto.destino !== item.id
+      }).map(item => {
+          return {
+            ...item,
+            siglas: !item.siglas ? getInitals(item.nombre) : item.siglas,
+          }
       })
     },
     destinosCircular () {
@@ -399,6 +413,10 @@ export default {
     if (this.doc_id) {
       this.getDocumento()
     }
+
+    if(this.responseData)
+      this.assignResponse()
+
   },
   methods: {
     async getDepartamentos () {
@@ -493,6 +511,14 @@ export default {
       }
     },
 
+    assignResponse () {
+      const DATA = JSON.parse(decode(this.responseData))
+      this.doc.asunto = `RESPUESTA AL OFICIO NRO ${DATA.nro_documento}`
+      this.doc.contenido = `En respuesta al oficio Nro. ${DATA.nro_documento}`
+      this.doc.tipo_documento = DATA.tipo_documento
+      this.dataDpto.destino = DATA.id
+    },
+
     clearInputs (event) {
       this.dataDpto.destino = ''
       this.dataDpto.copias = ''
@@ -548,7 +574,7 @@ export default {
     },
   },
 }
-// E2E7F1
+
 </script>
 <style lang="sass">
   .input-redactar

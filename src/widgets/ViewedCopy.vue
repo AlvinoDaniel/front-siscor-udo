@@ -1,6 +1,6 @@
 <template>
-  <div class="d-flex justify-center align-center">
-    <v-btn small icon  @click="open('copias')">
+  <div class="d-flex justify-center align-center ml-3">
+    <v-btn icon  @click.stop="open('copias')">
       <v-icon
         size="19"
         class="mx-2"
@@ -8,7 +8,7 @@
         v-text="hasCopia ? 'mdi-text-box' : 'mdi-text-box-outline'"
         />
     </v-btn>
-    <v-btn small icon @click="open('enviados')">
+    <v-btn icon @click.stop="open('enviados')">
         <v-icon
         size="19"
         class="mx-2"

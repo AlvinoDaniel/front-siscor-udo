@@ -4,13 +4,13 @@
       <div class="page-content">
         <div>
           <div class="page-header">
-            <img :src="udoLogo" width="70" height="62">
+            <img :src="udoLogo" width="70" height="68">
             <span>UNIVERSIDAD DE ORIENTE</span>
             <span v-text="dataDoc.propietario.nombre" />
-            <span>RECTORADO</span>
+            <span v-if="dataDoc.propietario.nucleo" v-text="dataDoc.propietario.nucleo.nombre" />
           </div>
           <div class="page-date">
-            <span class="font-bold">{{ dataDoc.propietario.siglas }} N° {{ dataDoc.nro_documento }}-{{ year }}</span>
+            <span class="font-bold">{{ dataDoc.propietario.siglas || toInitials(dataDoc.propietario.nombre) }} N° {{ dataDoc.nro_documento }}-{{ year }}</span>
             <span>Cumaná, {{ dataDoc.fecha_enviado | DocDate }}</span>
           </div>
           <div v-if="isCircular" class="page-header title-header">
@@ -47,7 +47,7 @@
             v-html="dataDoc.contenido"
           />
           <div class="page-sincerely">
-            <span>Atentamente,</span>
+            <span style="margin-bottom:5px">Atentamente,</span>
             <template v-if="isFirma">
               <v-img
                 :src="dataDoc.propietario.jefe.baseUrlFirma"
@@ -75,8 +75,9 @@
   </div>
 </template>
 <script>
-import { LogoUdo } from '@/util/Iconos'
+import { LogoUdo, LOGO_UDO_COLOR } from '@/util/Iconos'
 import moment from 'moment'
+import { getInitals } from '@/util/helpers'
 
 export default {
   name: 'Document',
@@ -100,7 +101,7 @@ export default {
   },
   data: () => ({
     year: moment().format('YYYY'),
-    udoLogo: LogoUdo,
+    udoLogo: LOGO_UDO_COLOR,
   }),
   computed: {
     isCircular () {
@@ -134,7 +135,7 @@ export default {
     },
   },
   methods: {
-
+    toInitials: getInitals,
   },
 }
 </script>

@@ -13,9 +13,9 @@
         lg="9"
         class="mx-auto"
       >
-        <v-card>
+        <v-card flat>
           <v-card-title class="primary--text text-h3 font-weight-bold">
-            Cambiar Contraseña
+            <div class="d-block">Cambiar Contraseña</div>
           </v-card-title>
          <v-card-subtitle class="col col-9">
             Ingrese los datos necesario para cambiar la contraseña
@@ -26,7 +26,7 @@
                 <v-col cols="12" class="mb-0">
                   <label-form text="Contraseña Actual" required/>
                   <validation-provider name="Contraseña" vid="datos.password" rules="required" v-slot="{ errors }">
-                    <v-text-field 
+                    <v-text-field
                       v-model="datos.password"
                       dense
                       outlined
@@ -34,16 +34,16 @@
                       :type="actual ? 'text' : 'password'"
                       :append-icon="actual ? 'mdi-eye' : 'mdi-eye-off'"
                       :error-messages="errors[0]"
-                      @click:append="actual = !actual"    
+                      @click:append="actual = !actual"
                     />
-                  </validation-provider>                         
+                  </validation-provider>
                 </v-col>
               </v-row>
               <v-row>
                 <v-col cols="6" class="mb-0">
-                  <label-form text="Contraseña Nueva" required /> 
-                  <validation-provider name="Nueva Contraseña" vid="datos.newpassword" rules="required|min:8" v-slot="{ errors }">       
-                    <v-text-field 
+                  <label-form text="Contraseña Nueva" required />
+                  <validation-provider name="Nueva Contraseña" vid="datos.newpassword" rules="required|min:8" v-slot="{ errors }">
+                    <v-text-field
                     v-model="datos.newpassword"
                       dense
                       outlined
@@ -53,7 +53,7 @@
                       :type="nueva ? 'text' : 'password'"
                       :append-icon="nueva ? 'mdi-eye' : 'mdi-eye-off'"
                       :error-messages="errors[0]"
-                      @click:append="nueva = !nueva"    
+                      @click:append="nueva = !nueva"
                     />
                   </validation-provider>
                   <div class="px-3 pb-4 pt-1">
@@ -68,12 +68,12 @@
                       class="blue-grey--text text--darken-3 caption font-weight-bold"
                       v-text="check.level"
                     />
-                  </div>     
+                  </div>
                 </v-col>
                 <v-col cols="6" class="mb-0">
-                  <label-form text="Repetir Contraseña" required /> 
-                  <validation-provider name="Repetir Contraseña" vid="datos.repassword" rules="required|confirmed:datos.newpassword|min:8" v-slot="{ errors }">  
-                    <v-text-field 
+                  <label-form text="Repetir Contraseña" required />
+                  <validation-provider name="Repetir Contraseña" vid="datos.repassword" rules="required|confirmed:datos.newpassword|min:8" v-slot="{ errors }">
+                    <v-text-field
                       v-model="datos.repassword"
                       dense
                       outlined
@@ -81,7 +81,7 @@
                       :type="confirmar ? 'text' : 'password'"
                       :append-icon="confirmar ? 'mdi-eye' : 'mdi-eye-off'"
                       :error-messages="errors[0]"
-                      @click:append="confirmar = !confirmar"    
+                      @click:append="confirmar = !confirmar"
                     />
                   </validation-provider>
                 </v-col>
@@ -109,13 +109,13 @@
                   <v-icon right>
                     mdi-arrow-right
                   </v-icon>
-                </v-btn>                
+                </v-btn>
               </v-col>
             </v-row>
           </v-card-text>
         </v-card>
       </v-col>
-    </v-row>  
+    </v-row>
   </v-container>
 </template>
 <script>
@@ -130,7 +130,7 @@ import { passwordStrength } from '@/util/PasswordCheck'
       datos: {
         password: '',
         newpassword: '',
-        repassword: '',        
+        repassword: '',
       },
       updated: false,
     }),
@@ -139,7 +139,7 @@ import { passwordStrength } from '@/util/PasswordCheck'
         this.datos = {
           password: '',
           newpassword: '',
-          repassword: '',        
+          repassword: '',
         }
         this.actual = this.nueva = this.confirmar = false
         this.$refs.USER_PASSWD.reset()
@@ -153,10 +153,13 @@ import { passwordStrength } from '@/util/PasswordCheck'
             this.$root.$showAlert(data.message, 'success');
             this.resetData()
           } catch (error) {
-             this.$root.$showAlert(
-              error.response.data.message,
-              'error',
-            )
+            if(error.response){
+              this.$root.$showAlert(
+                error.response.data.errors.message,
+                'error',
+              )
+
+            }
           }
           this.updated = false
         }

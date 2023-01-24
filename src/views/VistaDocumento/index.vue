@@ -12,35 +12,73 @@
     >
       <v-row align="center">
         <v-col cols="12" class="pb-0 d-flex justify-space-between align-center">
-          <v-chip
-            class="text-uppercase"
-            :color="colorTipo[doc.tipo_documento]"
-            small
-            outlined
-            label
-            v-text="doc.tipo_documento"
-          />
+          <div class="d-flex align-center">
+            <v-icon left @click="$router.go(-1)" color="blue-grey lighten-2">
+              mdi-arrow-left
+            </v-icon>
+            <span class="text-h4 font-weight-bold primary--text d-block ml-2" v-text="doc.asunto" />
+            <v-chip
+              class="text-uppercase pl-1 pr-2 py-2 font-weight-light mx-3 mt-1"
+              :color="colorTipo[doc.tipo_documento]"
+              x-small
+              outlined
+              label
+              >
+              <v-icon size="14">mdi-circle-medium</v-icon>
+              {{ doc.tipo_documento }}
+            </v-chip>
+          </div>
           <div>
-            <v-btn
-            icon
-            color="label"
-            @click="getScreenshot"
-            >
-            <!-- mdi-image-plus mdi-camera-plus -->
-            <v-icon>mdi-camera-plus-outline</v-icon>
-          </v-btn>
-          <v-btn
-          icon
-          color="label"
-          @click="generatePDF"
-          >
-            <v-icon>mdi-file-download-outline</v-icon>
-          </v-btn>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-if="isRecibido"
+                  icon
+                  color="blue-grey lighten-2"
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="responseDocument"
+                  >
+                  <v-icon size="22">mdi-undo-variant</v-icon>
+                </v-btn>
+              </template>
+              <span>Responder</span>
+            </v-tooltip>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  color="blue-grey lighten-2"
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="getScreenshot"
+                  >
+                  <!-- mdi-image-plus mdi-camera-plus -->
+                  <v-icon size="22">mdi-camera-plus-outline</v-icon>
+                </v-btn>
+              </template>
+              <span>Capturar Documento</span>
+            </v-tooltip>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  color="blue-grey lighten-2"
+                  v-bind="attrs"
+                  v-on="on"
+                  :disabled="downloading"
+                  @click="generatePDF"
+                >
+                  <v-icon size="22">mdi-file-download-outline</v-icon>
+                </v-btn>
+              </template>
+              <span>Descargar</span>
+            </v-tooltip>
           </div>
         </v-col>
-        <v-col cols="12" md="11" class="pt-0">
+        <!-- <v-col cols="12" md="11" class="pt-0">
           <span class="text-h4 font-weight-bold primary--text d-block" v-text="doc.asunto" />
-        </v-col>
+        </v-col> -->
       </v-row>
       <v-row>
         <v-col cols="12" md="8" class="d-flex align-center pb-0">
@@ -54,7 +92,7 @@
                 >
                   <span
                     class="white--text font-weight-bold text-4"
-                    v-text="doc.propietario.siglas"
+                    v-text="doc.propietario.siglas || toInitials(doc.propietario.nombre)"
                   />
                 </v-avatar>
               </v-list-item-avatar>
@@ -64,15 +102,31 @@
                 </v-list-item-title>
                 <v-list-item-subtitle v-if="isRecibido" v-text="doc.propietario.jefe.nombres_apellidos" />
                 <template v-if="isEnviado">
-                  <v-list-item-subtitle>
+                  <v-list-item-subtitle class="align-center">
                     Enviado a:
                     <span v-if="doc.estatus === 'enviado_all'">COMUNIDAD UNIVERSITARIA</span>
                     <span v-else v-text="textEnviados" />
-                    <v-icon class="mt-n1" @click="showModalEnviados">mdi-menu-down</v-icon>
+                    <v-btn
+                      x-small
+                      plain
+                      icon
+                      depressed
+                      @click="showModalEnviados"
+                    >
+                      <v-icon size="28" >mdi-menu-down</v-icon>
+                    </v-btn>
                   </v-list-item-subtitle>
                   <v-list-item-subtitle v-if="copias.length > 0">
                     Copias a: {{ textCopia }}
-                    <v-icon class="mt-n1" @click="showModalCopias">mdi-menu-down</v-icon>
+                    <v-btn
+                    x-small
+                    plain
+                    icon
+                    depressed
+                    @click="showModalCopias"
+                  >
+                    <v-icon size="28" >mdi-menu-down</v-icon>
+                  </v-btn>
                   </v-list-item-subtitle>
                 </template>
               </v-list-item-content>
@@ -82,7 +136,7 @@
         <v-col
           cols="12"
           md="4"
-          class="d-flex align-start justify-end pr-6"
+          class="d-flex align-center justify-end pr-6"
         >
          <span class="text-subtitle-1 blue-grey--text pb-6">{{ doc.fecha_enviado | FullDate }}</span>
         </v-col>
@@ -100,20 +154,27 @@
           <list-anexos-descarga :anexos="anexos" />
         </v-col>
         <v-col cols="12">
-          <document :data-doc="doc" :destinatario="destinatario" />
+          <document :data-doc="doc" :destinatario="destinatario" :copias="copias"/>
         </v-col>
       </v-row>
     </section>
+    <material-wait
+      v-model="downloading"
+      icon="mdi-file-download-outline"
+      :text="messageAwait"
+    />
     <list-departaments-send v-model="showList" :items="enviados" />
     <list-departaments-send v-model="showListCopy" :items="copias" copias />
   </v-container>
 </template>
 <script>
   import { get } from 'vuex-pathify'
-  import { viewDocument } from '@/services/documento'
+  import { viewDocument, downloadDocument } from '@/services/documento'
   import { screenshot } from '@/util/CaptureData'
   import  exportPDF from '@/util/ExportPDF'
   import store from '@/store'
+  import { getInitals } from '@/util/helpers'
+  import { encode, decode } from 'js-base64';
 
 export default {
   name: 'Documento',
@@ -150,6 +211,8 @@ export default {
     },
     showList: false,
     showListCopy: false,
+    downloading: false,
+    messageAwait: ''
 
   }),
   computed: {
@@ -179,10 +242,12 @@ export default {
     this.getDocumento()
   },
   methods: {
+    toInitials: getInitals,
+
     async getDocumento () {
       this.loading = true
       try {
-        const { enviados, dpto_copias, anexos, ...dataDoc } = await viewDocument({ id: this.id, estatus: 'enviado' })
+        const { enviados, dpto_copias, anexos, ...dataDoc } = await viewDocument({ id: decode(this.id), estatus: 'enviado' })
         this.doc = { ...dataDoc }
 
         if(this.isRecibido) {
@@ -212,7 +277,12 @@ export default {
         }
 
       } catch (error) {
-        console.log(error)
+          if(error.response) {
+            const { data: { errors } } = error?.response
+            this.$root.$showAlert(errors?.message, 'error')
+            this.$router.go(-1)
+          }
+          console.log(error.response.data)
       } finally {
         this.loading = false
       }
@@ -234,10 +304,29 @@ export default {
       }
     },
 
-    generatePDF () {
-      exportPDF({
-        doc: this.doc,
-      })
+    async generatePDF () {
+      this.downloading = true;
+      this.messageAwait= `Descargando ${this.doc.tipo_documento}, espere por favor...`
+      try {
+        const file = await downloadDocument({ id: decode(this.id) })
+        var anexoURL = window.URL.createObjectURL(new Blob([file]));
+        var anexoLink = document.createElement('a');
+
+        anexoLink.href = anexoURL;
+        anexoLink.setAttribute('download','documento.pdf');
+        document.body.appendChild(anexoLink);
+        anexoLink.click();
+        anexoLink.remove();
+      } catch (error) {
+        this.$root.$showAlert(
+          'Lo siento, hubo un error al intentar obtener el Anexo.',
+          'error'
+        )
+      }
+      finally {
+        this.downloading = false;
+        this.messageAwait= ''
+      }
     },
 
     downloadAnexo (index) {
@@ -250,6 +339,18 @@ export default {
     showModalCopias () {
       this.showListCopy = true
     },
+
+    responseDocument () {
+      const {propietario, tipo_documento, nro_documento } = this.doc
+
+      const PARAMS_JSON = {
+        id: propietario?.id,
+        tipo_documento,
+        nro_documento,
+      }
+      const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
+      this.$router.push({name: 'Redactar', query: {r: PARAMS_ENCODE}})
+    }
   },
 }
 // E2E7F1

@@ -25,6 +25,7 @@ const theme = {
 }
 
 export default new Vuetify({
+  customVariables: ['../styles/variables.scss'],
   lang: {
     locales: { es },
     current: 'es',
