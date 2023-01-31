@@ -73,10 +73,12 @@ export default {
         fecha_enviado: this.today,
         propietario: {
           nombre: this.infoDepart.nombre,
+          nucleo: this.infoDepart.nucleo,
           siglas: this.infoDepart.siglas,
           jefe: {
             nombres_apellidos: this.infoDepart.jefe,
             descripcion_cargo: this.infoDepart.cargo_jefe,
+            baseUrlFirma: this.infoDepart.firma_base_url,
           },
         },
       }

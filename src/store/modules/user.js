@@ -71,9 +71,11 @@ const getters = {
       ? {
           id: departamento.id,
           nombre: departamento.nombre,
+          nucleo: departamento?.nucleo,
           siglas: departamento.siglas,
           jefe: departamento.jefe ? departamento.jefe.nombres_apellidos : 'Jefe del Departamento',
           cargo_jefe: departamento.jefe ? departamento.jefe.descripcion_cargo : '',
+          firma_base_url: departamento?.jefe?.firma_base_url ?? '',
         }
       : ''
   },

@@ -175,6 +175,7 @@
   import store from '@/store'
   import { getInitals } from '@/util/helpers'
   import { encode, decode } from 'js-base64';
+  import moment from 'moment'
 
 export default {
   name: 'Documento',
@@ -289,12 +290,15 @@ export default {
     },
 
     async getScreenshot () {
+      const { tipo_documento, propietario: { nombre } } = this.doc
+      const date = moment().valueOf()
+      const fileName = `${tipo_documento}_${nombre}_${date}.pdf`
       const page = document.getElementById('pageDocument')
       page.classList.remove('page-shadow')
       try {
         await screenshot({
           id: 'pageDocument',
-          title: 'Documento',
+          title: fileName,
           width: '8.5in',
         })
       } catch (error) {
@@ -305,15 +309,18 @@ export default {
     },
 
     async generatePDF () {
+      const { tipo_documento, propietario: { nombre } } = this.doc
+      const date = moment().valueOf()
+      const fileName = `${tipo_documento}_${nombre}_${date}.pdf`
       this.downloading = true;
-      this.messageAwait= `Descargando ${this.doc.tipo_documento}, espere por favor...`
+      this.messageAwait= `Descargando ${tipo_documento}, espere por favor...`
       try {
         const file = await downloadDocument({ id: decode(this.id) })
         var anexoURL = window.URL.createObjectURL(new Blob([file]));
         var anexoLink = document.createElement('a');
 
         anexoLink.href = anexoURL;
-        anexoLink.setAttribute('download','documento.pdf');
+        anexoLink.setAttribute('download',fileName);
         document.body.appendChild(anexoLink);
         anexoLink.click();
         anexoLink.remove();
