@@ -72,7 +72,9 @@
           </template>
            <template v-slot:item.enviados="{ item }">
             <div>
-              <span>{{item.enviados[0].nombre}}</span>
+              <span
+              :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
+              >{{item.enviados[0].nombre}}</span>
               <v-chip v-if="item.enviados.length > 1" x-small color="blue-grey lighten-4" class="px-1 font-weight-bold ml-1" label>+{{item.enviados.length - 1}}</v-chip>
             </div>
            </template>
@@ -86,6 +88,7 @@
               <span class="mx-2">-</span>
               <span
                 style="width:30rem"
+                :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
                 class="d-inline-flex text-truncate"
                 v-text="item.asunto"
               />
@@ -94,7 +97,10 @@
            <template v-slot:item.fecha_enviado="{ item }">
               <div class="d-flex justify-end actions-date">
                 <v-icon v-if="item.anexos > 0" size="19" class="mx-2" color="grey">mdi-paperclip</v-icon>
-                <span class="grey--text font-weight-normal">
+                <span
+                  :class="{'font-weight-bold': item.leido !== null && item.leido === 0}" 
+                  class="grey--text font-weight-normal"
+                >
                   {{ item.fecha_creado | shortDate }}
                 </span>
               </div>
