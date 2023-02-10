@@ -7,7 +7,7 @@ import store from '../store'
 
 const hasPermission = rolName => {
   const { rol } = store.getters['user/info']
-  return rolName === rol
+  return rol.includes(rolName)
 }
 
 let __servicePermissions = false;
