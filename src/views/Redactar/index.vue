@@ -248,7 +248,7 @@
   import Highlight from '@ckeditor/ckeditor5-highlight/src/highlight';
   import RemoveFormat from '@ckeditor/ckeditor5-remove-format/src/removeformat';
 
-  import { getDepartamentoList } from '@/services/departamento'
+  import { getDepartamentoList, getDepartamentos } from '@/services/departamento'
   import { sendDocument, viewDocument, updateDocument, deleteAttach } from '@/services/documento'
   import { get } from 'vuex-pathify'
   import { validateFile, getInitals } from '@/util/helpers'
@@ -352,7 +352,7 @@ export default {
           nombres_apellidos: 'Todos los Departamentos'
         },
       }
-      const data = this.departamentos.map(item => {
+      const data = this.departamentos.filter(item => item?.jefe !== null).map(item => {
         return {
           ...item,
           siglas: !item.siglas ? getInitals(item.nombre) : item.siglas,
@@ -368,7 +368,7 @@ export default {
 
       return this.departamentos.filter(item => {
 
-        // if (this.dataDpto.destino.length === 0) return true
+        if (item?.jefe === null) return false
 
         return typeof this.dataDpto.destino === 'object'
          ? !this.dataDpto.destino.includes(item.id)
@@ -422,7 +422,7 @@ export default {
     async getDepartamentos () {
       this.loading = true
       try {
-        const { departamentos } = await getDepartamentoList()
+        const { departamentos } = await getDepartamentos()
         this.departamentos = departamentos
       } catch (error) {
         console.log(error)
