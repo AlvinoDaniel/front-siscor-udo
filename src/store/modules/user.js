@@ -23,7 +23,7 @@ const actions = {
     commit('info', data.data.user);
   },
   async login ({ commit }, credentials) {
-    const response = await api.post('auth/login', credentials)
+    const response = await api.post('auth/login/c', credentials)
 
     cookies.SET_TOKEN(response.data.data.token)
     commit('token', response.data.data.token)

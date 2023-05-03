@@ -126,15 +126,39 @@ const createRouter = () => new Router({
       ],
     },
     {
-      name: 'Login',
-      path: '/auth/login',
+      name: 'Auth',
+      path: '/auth',
       meta:{
         auth: false,
       },
       component: () => import(
         /* webpackChunkName: "views-[request]" */
-        '@/views/Auth/Login'
+        '@/layouts/Auth/Index'
       ),
+      children: [
+        {
+          name: 'Login',
+          path: 'login',
+          meta:{
+            auth: false,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/Auth/Login'
+          ),
+        },
+        {
+          name: 'Recuperacion',
+          path: 'recuperar-clave',
+          meta:{
+            auth: false,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/Auth/RecoverPassword'
+          ),
+        },
+      ],
     },
     {
       name: 'Error',
