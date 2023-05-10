@@ -158,6 +158,17 @@ const createRouter = () => new Router({
             '@/views/Auth/RecoverPassword'
           ),
         },
+        {
+          name: 'Verificacion',
+          path: 'resetear-clave',
+          meta:{
+            auth: false,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/Auth/VerificationCode'
+          ),
+        },
       ],
     },
     {

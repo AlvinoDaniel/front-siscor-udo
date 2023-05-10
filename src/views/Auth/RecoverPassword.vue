@@ -33,12 +33,12 @@
             <validation-observer ref="RESET_FORM">
               <v-row class="pb-3 pt-1">
                 <v-col cols="12" class="mb-0 pb-0 text-center">
-                  <span>Se enviara un correo con un código de verificación para continuar con la solicitud, por favor ingrese el correo electrónico de su usuario registrado.</span>
+                  <span>Se enviara un correo con un código de verificación para continuar con la solicitud, por favor ingrese los datos de su usuario registrado.</span>
                 </v-col>
                 <v-col cols="12" class="mb-0 pb-0">
-                  <validation-provider name="Correo Electrónico" vid="username_email" rules="required" v-slot="{ errors }">
+                  <validation-provider name="Correo Electrónico" vid="email" rules="required|email" v-slot="{ errors }">
                     <v-text-field
-                      v-model="credentials.username_email"
+                      v-model="credentials.email"
 
                       label="Correo Eléctronico"
                       clearable
@@ -47,7 +47,24 @@
                       color="label"
                     >
                       <template slot="prepend-inner">
-                        <v-icon color="label">mdi-account</v-icon>
+                        <v-icon left color="label">mdi-email</v-icon>
+                      </template>
+                    </v-text-field>
+                  </validation-provider>
+                </v-col>
+                <v-col cols="12" class="mb-0 pb-0">
+                  <validation-provider name="Cédula de Identidad" vid="identification" rules="required|numeric|max:8" v-slot="{ errors }">
+                    <v-text-field
+                      v-model="credentials.identification"
+
+                      label="Cédula de Identidad"
+                      clearable
+                      :error-messages="errors[0]"
+                      :disabled="loading"
+                      color="label"
+                    >
+                      <template slot="prepend-inner">
+                        <v-icon left color="label">mdi-badge-account-horizontal</v-icon>
                       </template>
                     </v-text-field>
                   </validation-provider>
@@ -60,7 +77,7 @@
                     depressed
                     class="px-12"
                     block
-                    @click="login"
+                    @click="verificateUser"
                     :loading="loading"
                   >
                     Enviar
@@ -100,12 +117,7 @@
         </v-card>
       </v-col>
     </v-row>
-    <!-- <v-main class="d-flex justify-center align-center blue-grey lighten-5 full-height">
-      <v-container
-        fluid
-      >
-      </v-container>
-    </v-main> -->
+    <modal-success-verificate v-model="modalSuccess" />
     <material-snackbar
       v-model="error.active"
       type="error"
@@ -115,15 +127,22 @@
   </div>
 </template>
 <script>
+import { recoverPassword } from '@/services/auth'
 export default {
   name: 'Login',
+  components: {
+    ModalSuccessVerificate: () => import(
+      /* webpackChunkName: "modal-success-verificate" */
+      './components/ModalSuccessVerificate.vue'
+    )
+  },
   data () {
     return {
       credentials: {
-        username_email: '',
-        password: '',
+        email: '',
+        identification: '',
       },
-      ShowPassword: false,
+      modalSuccess: false,
       loading: false,
       error:{
         active: false,
@@ -132,23 +151,30 @@ export default {
     }
   },
   methods:{
-    async login () {
+    async verificateUser () {
       const valid = await this.$refs.RESET_FORM.validate();
       if(valid) {
         this.loading = true;
-        this.$store.dispatch('user/login',this.credentials).then(response => {
-          this.$router.push({ path: '/'});
-          this.loading = false;
-        }).catch(e => {
+        try {
+          const response = await recoverPassword({ datos: this.credentials })
+          console.log(response)
+          this.modalSuccess = true
+        } catch ({response = null}) {
+          if(response?.status === 422) {
+            this.$refs.RESET_FORM.setErrors(response?.data?.errors)
+            return 
+          }
+          
           this.error = {
             active: true,
-            message: e.response ? e.response?.data?.errors?.message : 'Lo sentimos, hubo un error al intentar conectar con el Servidor.'
-          };
-          this.loading = false;
-        });
+            message: response ? response?.data?.errors?.message : 'Lo sentimos, hubo un error al intentar conectar con el Servidor.',
+          }          
+        } finally {
+          this.loading = false
+        }
       }
 		},
-  }
+  },
 
 }
 </script>
