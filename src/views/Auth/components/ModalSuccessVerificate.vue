@@ -51,6 +51,10 @@
     name: 'ModalSuccess',
     props: {
       value: Boolean,
+      userData: {
+        type: String,
+        value: '',
+      },
     },
     data() {
       return {
@@ -76,7 +80,7 @@
       },
       confirm () {
         this.dialog = false
-        this.$router.push({name: 'Verificacion'})
+        this.$router.push({ name: 'Verificacion', query: { r: this.userData } })
       }
     }
   }

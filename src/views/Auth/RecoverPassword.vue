@@ -117,7 +117,7 @@
         </v-card>
       </v-col>
     </v-row>
-    <modal-success-verificate v-model="modalSuccess" />
+    <modal-success-verificate v-model="modalSuccess" :user-data="response" />
     <material-snackbar
       v-model="error.active"
       type="error"
@@ -139,11 +139,12 @@ export default {
   data () {
     return {
       credentials: {
-        email: '',
-        identification: '',
+        email: 'eclopezluna@gmail.com',
+        identification: '16037750',
       },
       modalSuccess: false,
       loading: false,
+      response: '',
       error:{
         active: false,
         message: '',
@@ -156,8 +157,9 @@ export default {
       if(valid) {
         this.loading = true;
         try {
-          const response = await recoverPassword({ datos: this.credentials })
-          console.log(response)
+          const { data } = await recoverPassword({ datos: this.credentials })
+          this.response = data?.ur
+          console.log(data)
           this.modalSuccess = true
         } catch ({response = null}) {
           if(response?.status === 422) {

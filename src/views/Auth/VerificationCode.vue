@@ -23,7 +23,7 @@
                 >
                   SISTEMA DE CORRESPONDENCIA
                   <div class="text-subtitle-1 text-center mb-n4 font-weight-bold">
-                    {{ subtitleCard }}
+                    Cambiar Contraseña
                   </div>
                 </div>
               </v-theme-provider>
@@ -32,12 +32,12 @@
           <v-card-text :class="{'pa-0':$vuetify.breakpoint.xsOnly, 'px-8':!$vuetify.breakpoint.xsOnly}">
             <v-tabs-items v-model="tab">
               <v-tab-item>
-                <validation-observer ref="RESET_FORM">
+                <validation-observer ref="RESET_FORM" autocomplete="off">
                   <v-row class="pb-3 pt-1">
-                    <v-col cols="12" class="mb-0 pb-0 text-center">
+                    <!-- <v-col cols="12" class="mb-0 pb-0 text-center">
                       <span>Por favor ingrese el código de verificiación que se envio a su correo.</span>
-                    </v-col>
-                    <v-col cols="12" class="mb-0 pb-0">
+                    </v-col> -->
+                    <v-col cols="12" class="pt-0 pb-1">
                       <validation-provider name="Código" vid="code" rules="required" v-slot="{ errors }">
                         <v-text-field
                           v-model="code"
@@ -46,12 +46,48 @@
                           :error-messages="errors[0]"
                           :disabled="loading"
                           color="label"
+                          autocomplete="off"
                         />
                       </validation-provider>
                     </v-col>
                   </v-row>
                   <v-row>
-                    <v-col cols="12" class="text-center mx-auto mt-5">
+                    <v-col cols="12" class="pt-0 pb-1">
+                      <label-form text="Contraseña Nueva" required />
+                      <validation-provider name="Nueva Contraseña" vid="datos.newpassword" rules="required|min:8" v-slot="{ errors }">
+                        <v-text-field
+                        v-model="datos.newpassword"
+                          dense
+                          outlined
+                          persistent-hint
+                          hint="Mínimo 8 caracteres"
+                          :disabled="updated"
+                          :type="nueva ? 'text' : 'password'"
+                          :append-icon="nueva ? 'mdi-eye' : 'mdi-eye-off'"
+                          :error-messages="errors[0]"
+                          autocomplete="off"
+                          @click:append="nueva = !nueva"
+                        />
+                      </validation-provider>
+                    </v-col>
+                    <v-col cols="12" class="pt-0 pb-1">
+                      <label-form text="Repetir Contraseña" required />
+                      <validation-provider name="Repetir Contraseña" vid="datos.repassword" rules="required|confirmed:datos.newpassword|min:8" v-slot="{ errors }">
+                        <v-text-field
+                          v-model="datos.repassword"
+                          dense
+                          outlined
+                          :disabled="updated"
+                          :type="confirmar ? 'text' : 'password'"
+                          :append-icon="confirmar ? 'mdi-eye' : 'mdi-eye-off'"
+                          :error-messages="errors[0]"
+                          @click:append="confirmar = !confirmar"
+                        />
+                      </validation-provider>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12" class="text-center mx-auto">
                     <v-btn
                         color="secondary"
                         depressed
@@ -81,9 +117,9 @@
                   </v-row>
                 </validation-observer>
               </v-tab-item>
-              <v-tab-item>
+              <!-- <v-tab-item>
                 <reset-password-client />
-              </v-tab-item>
+              </v-tab-item> -->
             </v-tabs-items>
           </v-card-text>
         </v-card>
@@ -115,6 +151,15 @@ export default {
         message: '',
       },
       tab: 0,
+      actual: false,
+      nueva: false,
+      confirmar: false,
+      datos: {
+        password: '',
+        newpassword: '',
+        repassword: '',
+      },
+      updated: false,
     }
   },
   computed: {
@@ -127,10 +172,18 @@ export default {
       return TEXT_ACTION[this.tab] ?? ''
     },
   },
-  methods:{
+  methods: {
+    resetData () {
+        this.datos = {
+          newpassword: '',
+          repassword: '',
+        }
+        this.actual = this.nueva = this.confirmar = false
+        this.$refs.USER_PASSWD.reset()
+      },
     async verificateUser () {
       const valid = await this.$refs.RESET_FORM.validate();
-      if(valid) {
+      if (valid) {
         this.loading = true;
         try {
           this.modalSuccess = true
