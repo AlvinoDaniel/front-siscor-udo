@@ -7,8 +7,11 @@
   >
     <loader-app v-if="updating" />
     <v-row class="ma-0">
-      <v-col cols="12" sm="7" md="6" class="pt-1">
-        <v-tabs>
+      <v-col cols="12" class="pb-0">
+        <span class="text-h4 font-weight-bold">Documentos Por Corregir</span>
+      </v-col>
+      <v-col cols="12" class="py-0 d-flex align-center justify-space-between">
+        <v-tabs style="width: auto;" height="30" class="pt-3">
           <v-tab :ripple="false" @click="assignFilter('')"><strong>Todos</strong>({{data.length}})</v-tab>
           <v-tab :ripple="false" @click="assignFilter('oficio')">
             <v-icon color="info">mdi-circle-medium</v-icon>
@@ -19,31 +22,34 @@
            <strong>Circular</strong>({{cantCopias}})
           </v-tab>
         </v-tabs>
+        <div class="d-flex align-center">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                depressed
+                color="blue-grey"
+                v-bind="attrs"
+                v-on="on"
+                @click="getBandejaPorCorregir(true)"
+              >
+                <v-icon>mdi-refresh</v-icon>
+              </v-btn>
+            </template>
+            <span>Actualizar</span>
+          </v-tooltip>
+          <v-pagination
+            class="header-pagination"
+            v-model="page"
+            :length="pageCount"
+            circle
+            total-visible="0"
+          ></v-pagination>
+          <span class="text-pagination" v-text="paginationText" />
+        </div>
       </v-col>
-      <v-col cols="12" sm="5" md="6" class="pt-1 d-flex align-center justify-end">
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              icon
-              depressed
-              color="blue-grey"
-              v-bind="attrs"
-              v-on="on"
-              @click="getBandejaPorCorregir(true)"
-            >
-              <v-icon>mdi-refresh</v-icon>
-            </v-btn>
-          </template>
-          <span>Actualizar</span>
-        </v-tooltip>
-        <v-pagination
-          class="header-pagination"
-          v-model="page"
-          :length="pageCount"
-          circle
-          total-visible="0"
-        ></v-pagination>
-        <span class="text-pagination" v-text="paginationText" />
+      <v-col cols="12" class="pt-0 px-0">
+        <v-divider></v-divider>
       </v-col>
     </v-row>
     <v-row>
@@ -98,7 +104,7 @@
               <div class="d-flex justify-end actions-date">
                 <v-icon v-if="item.anexos > 0" size="19" class="mx-2" color="grey">mdi-paperclip</v-icon>
                 <span
-                  :class="{'font-weight-bold': item.leido !== null && item.leido === 0}" 
+                  :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
                   class="grey--text font-weight-normal"
                 >
                   {{ item.fecha_creado | shortDate }}
@@ -120,9 +126,21 @@
                 </v-tooltip>
               </div>
            </template>
+           <template v-slot:no-data>
+            <v-row>
+              <v-col cols="12" class="d-flex flex-column justify-center align-center pa-12">
+                <v-img
+                  :src="require('@/assets/Icons/ICONO_CORREGIR.png')"
+                  max-width="250"
+                  style="opacity: .7;"
+                />
+                <span class="text-h5 font-weight-bold blue-grey--text">No tiene documentos Por Corregir</span>
+              </v-col>
+            </v-row>
+           </template>
         </v-data-table>
       </v-col>
-      <v-col cols="12" class="pt-0">
+      <v-col v-if="itemsData.length > 0" cols="12" class="pt-0">
         <v-divider></v-divider>
       </v-col>
     </v-row>

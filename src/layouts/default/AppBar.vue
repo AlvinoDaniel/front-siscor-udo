@@ -2,12 +2,12 @@
   <v-app-bar
     id="default-app-bar"
     app
-    absolute
     class="white-bar"
     :clipped-left="$vuetify.rtl"
     :clipped-right="!$vuetify.rtl"
     height="60"
     flat
+    fixed
   >
     <!-- :color="$vuetify.breakpoint.mobile ? 'primary' : 'white'" -->
     <v-app-bar-nav-icon
@@ -25,6 +25,22 @@
       class="font-weight-light text-h5 hidden-sm-and-down"
       v-text="name"
     /> -->
+    <v-btn
+      color="blue-grey lighten-1"
+      dark
+      depressed
+      outlined
+      rounded
+      small
+      class="text-capitalize py-4 pl-1"
+      style="background-color: #fafafa; font-size: 0.8rem !important;"
+      :to="{name: 'Redactar'}"
+    >
+      <v-avatar color="tertiary" size="20" class="mr-2">
+        <v-icon color="white" size="18">mdi-plus</v-icon>
+      </v-avatar>
+      Crear documento
+    </v-btn>
     <div class="pt-1 hidden-md-and-up">
       <v-img
         :src="require('@/assets/Logos/IDENTIDAD_1.png')"

@@ -4,7 +4,7 @@
     :rel="item.href ? 'nofollow' : undefined"
     :target="item.href ? '_blank' : undefined"
     :to="item.to"
-    active-class="active-menu secondary--text font-weight-bold"
+    active-class="active-menu secondary--text font-weight-medium"
     link
     class="py-1"
     :class="{'sub': sub}"

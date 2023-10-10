@@ -7,7 +7,7 @@
   >
     <loader-app v-if="loading || loadingDoc" />
     <v-row class="pa-3">
-      <v-col cols="12" class="d-flex align-center justify-space-between">
+      <v-col cols="12" class="d-flex align-center justify-space-between pt-0">
         <h4 class="font-weight-bold">
           <v-icon left @click="$router.go(-1)">
             mdi-arrow-left
@@ -17,34 +17,50 @@
         <div
           v-if="!loadingDoc"
           class="d-flex"
+          style="gap:5px"
         >
-          <v-file-input
-            hide-input
-            hide-details
-            dense
-            prepend-icon="mdi-paperclip"
-            class="pt-0 mt-0 mx-1 btn-adjuntar"
+        <!-- prepend-icon="mdi-paperclip" -->
+        <!-- hide-input
+        hide-details
+        dense -->
+          <input
+            class="d-none"
+            ref="uploader"
+            type="file"
             @change="addAnexo"
           />
           <v-btn
-            v-if="estatus === 'nuevo' || isBorrador"
             small
-            outlined
+            text
             depressed
             color="blue-grey"
-            class="mx-1 rounded-lg"
+            class="rounded-lg"
+            @click="adjuntar"
+          >
+            <v-icon left color="secondary">mdi-paperclip</v-icon>
+            Adjuntar
+          </v-btn>
+          <v-divider vertical class="my-1"></v-divider>
+          <v-btn
+            v-if="estatus === 'nuevo' || isBorrador"
+            small
+            text
+            depressed
+            color="blue-grey"
+            class="rounded-lg"
             @click="saveDocument('borrador')"
           >
             <v-icon left color="secondary">mdi-text-box-outline</v-icon>
             <span v-if="isBorrador" class="pr-1">Guardar </span>
             Borrador
           </v-btn>
+          <v-divider vertical class="my-1"></v-divider>
           <v-btn
             v-if="estatus === 'nuevo' || isCorregir"
             small
-            :outlined="$hasPermission('jefe')"
+            :text="$hasPermission('jefe')"
             :color="$hasPermission('jefe') ? 'blue-grey' : 'secondary'"
-            class="mx-1 rounded-lg"
+            class="rounded-lg"
             depressed
             @click="saveDocument('corregir')"
           >
@@ -57,12 +73,13 @@
             <span v-if="isCorregir" class="pr-1">Guardar </span>
             Corregir
           </v-btn>
+
           <v-btn
             v-if="$hasPermission('jefe')"
             small
             depressed
             color="secondary"
-            class="mx-1 rounded-lg"
+            class="rounded-lg"
             @click="saveDocument('enviar')"
           >
             <v-icon left>mdi-send-outline</v-icon>
@@ -95,7 +112,7 @@
                         on-icon="mdi-check-circle-outline"
                       >
                         <template v-slot:label>
-                          <v-icon small left>mdi-file-document-outline</v-icon>
+                          <v-icon small class="mr-1">mdi-file-document-outline</v-icon>
                           <span>Oficio</span>
                         </template>
                       </v-radio>
@@ -105,7 +122,7 @@
                         on-icon="mdi-check-circle-outline"
                       >
                         <template v-slot:label>
-                          <v-icon small left>mdi-text-box-multiple-outline</v-icon>
+                          <v-icon small class="mr-1">mdi-text-box-multiple-outline</v-icon>
                           <span>Circular</span>
                         </template>
                       </v-radio>
@@ -537,9 +554,12 @@ export default {
       }
     },
 
+    adjuntar(){
+      this.$refs.uploader.click();
+    },
     addAnexo (file) {
-      console.log(typeof file)
-      const isPermited = validateFile(file.type)
+      console.log(file)
+      const isPermited = validateFile(file.target.files[0].type)
       if (!isPermited) {
          this.$root.$showAlert(
           'Formato inválido. Solo se permiten Imágenes y/o Documentos.',
@@ -549,7 +569,7 @@ export default {
         return
       }
 
-      this.anexos.push({file:file, loader:false})
+      this.anexos.push({file:file.target.files[0], loader:false})
     },
 
     async deleteAnexo (index) {
@@ -614,11 +634,11 @@ export default {
     & .v-input__prepend-outer
       margin-top: 2px !important
     & .v-icon.v-icon
-      font-size: 20px
+      font-size: 18px !important
       color: #2db2d5 !important
     & button
-      border: thin solid #607d8b
-      border-radius: 8px !important
+      // border: thin solid #607d8b
+      // border-radius: 8px !important
       padding: 0 8.4444444444px
       height: 28px
       &.v-icon.v-icon::after

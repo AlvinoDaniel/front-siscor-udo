@@ -14,21 +14,27 @@
 
       <v-divider class="mx-3 light divider-menu" />
 
-      <v-list nav class="py-0">
+      <!-- <v-list nav class="py-0">
         <v-list-item class="py-1 lighten-4">
           <v-list-item-content>
               <v-btn
-                color="tertiary"
+                color="blue-grey lighten-1"
                 dark
                 depressed
+                outlined
+                rounded
+                small
+                class="text-capitalize"
                 :to="{name: 'Redactar'}"
               >
-                <v-icon left>mdi-pencil-outline</v-icon>
-                Redactar
+                <v-avatar color="tertiary" size="20" class="mr-2">
+                  <v-icon color="white" size="18">mdi-plus</v-icon>
+                </v-avatar>
+                Crear documento
               </v-btn>
           </v-list-item-content>
         </v-list-item>
-      </v-list>
+      </v-list> -->
 
       <default-list :items="items" />
     </div>

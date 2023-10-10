@@ -1,5 +1,5 @@
 <template>
-  <v-list-item class="mb-0 justify-space-between pl-3 pb-0">
+  <v-list-item class="mb-0 justify-space-between pl-1 mb-4">
     <v-list-item-avatar class="py-1" v-if="mini">
       <v-expand-x-transition>
         <v-img
@@ -14,11 +14,14 @@
       v-else
       class="pl-2 pb-0"
     >
-      <v-list-item-title class="text-h4">
+      <v-list-item-title class="text-h4 d-flex align-center">
         <v-img
-          :src="require('@/assets/Logos/IDENTIDAD_1.png')"
-          max-width="180"
+          :src="require('@/assets/Logos/ICONO_IDENTIDAD_192X192.png')"
+          contain
+          max-width="40"
         />
+        <span class="text-h4 secondary--text font-weight-bold ml-2">SISCOR</span>
+        <span class="text-h4 label--text font-weight-black">UDO</span>
 
 
         <!-- <span class="primary--text">FREE</span> -->
