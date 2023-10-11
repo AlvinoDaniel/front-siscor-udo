@@ -9,10 +9,10 @@
     color="sidebar"
     class="elevation-3"
   >
-    <div class="px-2">
+    <div>
       <default-drawer-header />
 
-      <v-divider class="mx-3 light divider-menu" />
+      <!-- <v-divider class="light mx-6" /> -->
 
       <!-- <v-list nav class="py-0">
         <v-list-item class="py-1 lighten-4">
@@ -40,7 +40,7 @@
     </div>
 
     <template #append>
-      <v-list nav>
+      <v-list nav class="px-2">
         <v-list-item link class="py-1 lighten-4" @click="handleLogout">
           <v-list-item-icon class="my-2 ml-4 align-self-center">
             <v-icon color="tertiary">mdi-logout</v-icon>
@@ -126,4 +126,6 @@
 
 .divider-menu
   border-color: rgba(255, 255, 255, 0.22) !important
+.sidebar-darkten
+  background-color: #C6E2F5 !important
 </style>

@@ -2,7 +2,7 @@
   <v-app-bar
     id="default-app-bar"
     app
-    class="white-bar"
+    class="white-bar sidebar"
     :clipped-left="$vuetify.rtl"
     :clipped-right="!$vuetify.rtl"
     height="60"
@@ -33,7 +33,7 @@
       rounded
       small
       class="text-capitalize py-4 pl-1"
-      style="background-color: #fafafa; font-size: 0.8rem !important;"
+      style="background-color: #ffffff; font-size: 0.8rem !important;"
       :to="{name: 'Redactar'}"
     >
       <v-avatar color="tertiary" size="20" class="mr-2">

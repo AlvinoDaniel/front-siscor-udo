@@ -4,7 +4,9 @@
     nav
     v-bind="$attrs"
     v-on="$listeners"
+    class="px-2"
   >
+    <v-subheader class="pl-0">Bandejas</v-subheader>
     <template v-for="(item, i) in items">
       <default-list-group
         v-if="item.children"

@@ -1,5 +1,5 @@
 <template>
-  <v-list-item class="mb-0 justify-space-between pl-1 mb-4">
+  <v-list-item class="justify-space-between pl-1 pb-2">
     <v-list-item-avatar class="py-1" v-if="mini">
       <v-expand-x-transition>
         <v-img
