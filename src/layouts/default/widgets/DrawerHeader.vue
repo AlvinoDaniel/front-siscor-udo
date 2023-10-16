@@ -1,5 +1,5 @@
 <template>
-  <v-list-item class="justify-space-between pl-1 pb-2">
+  <v-list-item class="justify-space-between pl-1 pb-2" style="background-color: rgba(103,102,136,0.08)">
     <v-list-item-avatar class="py-1" v-if="mini">
       <v-expand-x-transition>
         <v-img
@@ -20,8 +20,13 @@
           contain
           max-width="40"
         />
-        <span class="text-h4 secondary--text font-weight-bold ml-2">SISCOR</span>
-        <span class="text-h4 label--text font-weight-black">UDO</span>
+        <div class="d-flex flex-column ml-2">
+          <div>
+            <span class="text-h4 secondary--text font-weight-bold">SISCOR</span>
+            <span class="text-h4 label--text font-weight-black">UDO</span>
+          </div>
+          <span class="label--text flex-grow-1" style="font-size: 0.5rem;">SISTEMA DE CORRESPONDENCIA</span>
+        </div>
 
 
         <!-- <span class="primary--text">FREE</span> -->

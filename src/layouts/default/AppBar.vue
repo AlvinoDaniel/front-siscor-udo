@@ -2,7 +2,7 @@
   <v-app-bar
     id="default-app-bar"
     app
-    class="white-bar sidebar"
+    class="white-bar"
     :clipped-left="$vuetify.rtl"
     :clipped-right="!$vuetify.rtl"
     height="60"
@@ -26,7 +26,7 @@
       v-text="name"
     /> -->
     <v-btn
-      color="blue-grey lighten-1"
+      color="blue-grey"
       dark
       depressed
       outlined

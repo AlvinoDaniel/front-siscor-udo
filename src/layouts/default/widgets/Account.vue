@@ -26,7 +26,7 @@
         >
           <span
             class="white--text font-weight-bold text-4"
-            v-text="toInitials(basic.fullName)"
+            v-text="toInitials(basic.fullName, 2)"
           />
         </v-avatar>
         <template v-if="$vuetify.breakpoint.smAndUp">

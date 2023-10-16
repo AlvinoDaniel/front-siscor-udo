@@ -42,7 +42,7 @@
     <template #append>
       <v-list nav class="px-2">
         <v-list-item link class="py-1 lighten-4" @click="handleLogout">
-          <v-list-item-icon class="my-2 ml-4 align-self-center">
+          <v-list-item-icon class="my-2 ml-4 mr-2 align-self-center tertiary--text">
             <v-icon color="tertiary">mdi-logout</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
