@@ -19,7 +19,16 @@
         v-bind="attrs"
         v-on="on"
       >
-        <v-icon size="32" color="secondary">mdi-account-circle-outline</v-icon>
+        <!-- <v-icon size="32" color="secondary">mdi-account-circle-outline</v-icon> -->
+        <v-avatar
+          color="secondary"
+          size="32"
+        >
+          <span
+            class="white--text font-weight-bold text-4"
+            v-text="toInitials(basic.fullName, 2)"
+          />
+        </v-avatar>
         <template v-if="$vuetify.breakpoint.smAndUp">
           <div class="d-flex flex-column justify-center align-start mx-2">
             <span
@@ -68,9 +77,12 @@
 
 <script>
 import { get, call } from 'vuex-pathify'
+import { getInitals } from '@/util/helpers'
+
   export default {
     name: 'DefaultAccount',
     methods:{
+      toInitials: getInitals,
       logout: call('user/logout'),
       barLogout(){
         this.logout().then(() => {
