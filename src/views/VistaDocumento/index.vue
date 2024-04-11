@@ -292,7 +292,7 @@ export default {
     async getScreenshot () {
       const { tipo_documento, propietario: { nombre } } = this.doc
       const date = moment().valueOf()
-      const fileName = `${tipo_documento}_${nombre}_${date}.pdf`
+      const fileName = `${tipo_documento}_${nombre}_${date}`
       const page = document.getElementById('pageDocument')
       page.classList.remove('page-shadow')
       try {
