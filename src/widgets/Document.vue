@@ -69,7 +69,7 @@
       </div>
       <div class="page-footer">
         <span class="font-bold">DEL PUEBLO VENIMOS / HACIA EL PUEBLO VAMOS</span>
-        <span style="font-size:10px" v-if="dataDoc.propietario.nucleo" v-text="dataDoc.propietario.nucleo.direccion" />
+        <span class="text-center" style="font-size:10px" v-text="direccion" />
       </div>
     </div>
   </div>
@@ -133,6 +133,11 @@ export default {
         ? this.destinatario.map(item => item.nombre).join(', ')
         : ''
     },
+    direccion(){
+      return this.dataDoc?.propietario?.direccion !== null
+        ? this.dataDoc?.propietario?.direccion
+        : this.dataDoc?.propietario?.nucleo?.direccion
+    }
   },
   methods: {
     toInitials: getInitals,

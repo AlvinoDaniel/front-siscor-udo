@@ -6,10 +6,15 @@
     class="pa-0"
   >
     <loader-app v-if="updating" />
-    <v-row class="ma-0">
-      <v-col cols="12" class="pb-0">
+    <v-row class="ma-0 pb-4" align="center">
+      <v-col cols="12" md="8" class="pb-0">
         <span class="text-h4 font-weight-bold">Bandeja de Enviados</span>
       </v-col>
+      <v-col cols="12" md="4" class="pb-0">
+        <search-expand v-model="search" />
+      </v-col>
+    </v-row>
+    <v-row class="ma-0">
       <v-col cols="12" class="py-0 d-flex align-center justify-space-between">
         <v-tabs style="width: auto;" height="30" class="pt-3">
           <v-tab :ripple="false" @click="assignFilter('')"><strong>Todos</strong>({{data.length}})</v-tab>
@@ -54,7 +59,7 @@
     </v-row>
     <v-row>
       <v-col cols="12" class="py-0">
-          <!-- :search="search"
+          <!--
           :loading="loadingData" -->
           <!-- single-select
           show-select -->
@@ -62,7 +67,9 @@
           :headers="headers"
           :items="itemsData"
           :loading="loading"
+          :search="search"
           no-data-text="No hay Documentos Enviados"
+          no-results-text="Ningún documento coincide con la búsqueda"
           sort-by="fecha_enviado"
           hide-default-footer
           :sort-desc="true"
@@ -75,9 +82,9 @@
           <template v-slot:item.iconos="{ item }">
             <viewed-copy :enviados="item.enviados" :copias="item.dpto_copias" />
           </template>
-           <template v-slot:item.enviados="{ item }">
+           <template v-slot:item.enviado_nombre="{ item }">
             <div>
-              <span>{{item.enviados[0].nombre}}</span>
+              <span>{{item.enviado_nombre}}</span>
               <v-chip v-if="item.enviados.length > 1" x-small color="blue-grey lighten-4" class="px-1 font-weight-bold ml-1" label>+{{item.enviados.length - 1}}</v-chip>
             </div>
            </template>
@@ -100,7 +107,7 @@
             <div class="d-flex justify-end ">
               <v-icon v-if="item.anexos > 0" size="19" class="mx-2" color="grey">mdi-paperclip</v-icon>
               <span class="grey--text font-weight-normal">
-                {{ item.fecha_enviado | shortDate }}
+                {{ item.fecha_enviado | smartDate }}
               </span>
             </div>
            </template>
@@ -142,8 +149,11 @@ export default {
     headers: [
       // { text: '', value: 'data-table-select', width: '40px' },
       { text: '', value: 'iconos', align: ' px-0', width: '60px' },
-      { text: '', value: 'enviados', align: ' pr-0'},
+      { text: '', value: 'enviado_nombre', align: ' pr-0'},
       { text: '', value: 'asunto', align: '' },
+      { text: '', value: 'tipo_documento', align: ' d-none' },
+      { text: '', value: 'contenido', align: ' d-none' },
+      { text: '', value: 'dptosEnviados', align: ' d-none' },
       { text: '', value: 'fecha_enviado', width: '100' },
     ],
     data: [],
@@ -152,6 +162,7 @@ export default {
       oficio: 'info'
     },
     filterData: '',
+    search: '',
     updating: false,
     page: 1,
     pageCount: 0,
@@ -173,7 +184,11 @@ export default {
         : 0
     },
     itemsData () {
-      return this.data.filter(item => item.tipo_documento.includes(this.filterData))
+      return this.data.filter(item => item.tipo_documento.includes(this.filterData)).map(item => ({
+        ...item,
+        enviado_nombre: item?.enviados[0]?.nombre ?? '',
+        dptosEnviados: item?.enviados.map(item => item?.nombre).join(',')
+      }))
     },
     paginationText () {
       return this.infoPagination
@@ -189,7 +204,7 @@ export default {
       if(actualizar) this.updating = true
       this.loading = true
       try {
-        const { documentos } = await getBandeja({ bandeja: 'enviados' })
+        const { documentos = [] } = await getBandeja({ bandeja: 'enviados' })
         this.data = documentos
       } catch (error) {
         console.log(error)

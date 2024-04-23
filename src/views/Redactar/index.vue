@@ -508,14 +508,16 @@ export default {
         this.doc.contenido = documento.contenido
         this.doc.tipo_documento = documento.tipo_documento
         this.doc.copias = temporal?.departamentos_copias !== null
+        this.copiaShow = this.doc.copias
 
         this.dataDpto.destino = documento.tipo_documento === 'circular'
           ? temporal?.departamentos_destino.split(',').map(item => item !== 'all' ? parseInt(item) : item)
           : parseInt(temporal?.departamentos_destino)
 
         this.dataDpto.copias = temporal.departamentos_copias !== null
-          ? temporal.departamentos_copias.split(',')
+          ? temporal.departamentos_copias.split(',').map(item => parseInt(item))
           : []
+          console.log(this.dataDpto.copias)
 
         this.estatus = documento.estatus
         this.anexos = anexos.length > 0
