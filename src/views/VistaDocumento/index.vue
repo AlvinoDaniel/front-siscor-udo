@@ -82,7 +82,7 @@
       </v-row>
       <v-row>
         <v-col cols="12" md="8" class="d-flex align-center pb-0">
-          <v-list :two-line="copias.length === 0" :three-line="copias.length > 0" class="pt-0">
+          <v-list :three-line="copias.length > 0 && isEnviado" class="pt-0">
             <v-list-item class="px-0">
               <v-list-item-avatar rounded>
                 <v-avatar
@@ -102,8 +102,8 @@
                 </v-list-item-title>
                 <v-list-item-subtitle v-if="isRecibido" v-text="doc.propietario.jefe.nombres_apellidos" />
                 <template v-if="isEnviado">
-                  <v-list-item-subtitle class="align-center">
-                    Enviado a:
+                  <v-list-item-subtitle class="align-center mb-0">
+                   <strong>Enviado a:</strong>
                     <span v-if="doc.estatus === 'enviado_all'">COMUNIDAD UNIVERSITARIA</span>
                     <span v-else v-text="textEnviados" />
                     <v-btn
@@ -117,7 +117,7 @@
                     </v-btn>
                   </v-list-item-subtitle>
                   <v-list-item-subtitle v-if="copias.length > 0">
-                    Copias a: {{ textCopia }}
+                   <strong>Copias a:</strong> {{ textCopia }}
                     <v-btn
                     x-small
                     plain
@@ -250,19 +250,19 @@ export default {
       try {
         const { enviados, dpto_copias, anexos, ...dataDoc } = await viewDocument({ id: decode(this.id), estatus: 'enviado' })
         this.doc = { ...dataDoc }
+        this.destinatario = dataDoc.tipo_documento === 'circular'
+          ? enviados
+          : enviados[0]
+        this.enviados = enviados
 
-        if(this.isRecibido) {
-          this.destinatario = dataDoc.tipo_documento === 'circular'
-            ? enviados
-            : enviados.filter(item => item.id === this.infoDepart.id)[0]
-        }
+        // if(this.isRecibido) {
+        //   this.destinatario = dataDoc.tipo_documento === 'circular'
+        //     ? enviados
+        //     : enviados.filter(item => item.id === this.infoDepart.id)[0]
+        // }
 
-        if(this.isEnviado) {
-          this.destinatario = dataDoc.tipo_documento === 'circular'
-            ? enviados
-            : enviados[0]
-          this.enviados = enviados
-        }
+        // if(this.isEnviado) {
+        // }
 
         this.copias = dpto_copias
         this.doc.nro_documento = this.doc.nro_documento.toString().padStart(4, '0')

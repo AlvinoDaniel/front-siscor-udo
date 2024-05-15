@@ -103,6 +103,9 @@ export default {
     year: moment().format('YYYY'),
     udoLogo: LOGO_UDO_COLOR,
   }),
+  created(){
+    console.log(this.destinatario)
+  },
   computed: {
     isCircular () {
       return this.dataDoc.tipo_documento === 'circular'
