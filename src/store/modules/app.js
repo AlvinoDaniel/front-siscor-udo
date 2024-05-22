@@ -54,6 +54,12 @@ const state = {
       icon: 'mdi-email-receive-outline',
       to: '/documentos-externos',
     },
+    {
+      title: 'Registro',
+      link: true,
+      icon: 'mdi-email-receive-outline',
+      to: '/registrar-externo',
+    },
 
   ],
   statusClient:{

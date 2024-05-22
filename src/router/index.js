@@ -124,7 +124,7 @@ const createRouter = () => new Router({
           ),
         },
         {
-          name: 'Redactar Externo',
+          name: 'Redactar-Externo',
           path: '/registrar-externo/',
           meta:{
             auth: true,

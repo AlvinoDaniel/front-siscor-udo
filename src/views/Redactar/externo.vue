@@ -53,7 +53,7 @@
     <validation-observer ref="WRITE_FORM">
       <v-row class="py-4 px-6">
         <v-col cols="12" class="py-0 d-flex justify-space-between align-center">
-          <validation-provider name="Tipo de Documento" vid="tipo_remitente" rules="required" v-slot="{ errors }">
+          <validation-provider name="Tipo de Documento" vid="doc.tipo_remitente" rules="required" v-slot="{ errors }">
             <div class="input-redactar theme--light d-flex align-self-center">
               <div class="v-input__control">
                 <div class="v-input__slot">
@@ -61,7 +61,7 @@
                     <span class="pr-2 pt-1"> Tipo de Remitente: </span>
                   </div>
                     <v-radio-group
-                      v-model="tipo_remitente"
+                      v-model="doc.tipo_remitente"
                       hide-details
                       row
                       class="mt-0 pt-0"
@@ -70,7 +70,7 @@
                     >
                       <v-radio
                         color="secondary"
-                        value="funcionario"
+                        value="FUNC"
                         on-icon="mdi-check-circle-outline"
                       >
                         <template v-slot:label>
@@ -82,7 +82,7 @@
                       </v-radio>
                       <v-radio
                         color="secondary"
-                        value="ente"
+                        value="PA-IN"
                         on-icon="mdi-check-circle-outline"
                       >
                         <template v-slot:label>
@@ -153,6 +153,7 @@
               class="input-redactar"
               prepend-inner-icon="mdi-card-account-details-outline"
               :error-messages="errors[0]"
+              v-mask="identityMask"
             >
               <template v-slot:label>
                 <span class="px-2 text-label">
@@ -387,6 +388,7 @@ export default {
       nro_doc: '',
       asunto: '',
       important: 0,
+      tipo_remitente: 'FUNC'
     },
     tipo_remitente: 'funcionario',
     dataDpto: {
@@ -436,6 +438,7 @@ export default {
       borrador: 'Borradores',
     },
     identifications: ['V', 'E', 'J', 'G'],
+    identityMask: [/[VvEeJjGg]/, '-', /\d/,/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,/\d/],
     personal:[],
     dataPersonal: null,
     cedulaSearch: '',
@@ -448,7 +451,7 @@ export default {
   computed: {
     responseData: get('route/query@r'),
     isFuncionario(){
-      return this.tipo_remitente === 'funcionario';
+      return this.doc.tipo_remitente === 'FUNC';
     }
   },
   watch:{
@@ -499,8 +502,8 @@ export default {
             }
           })
 
-           this.$root.$showAlert(message, 'success')
-          //  this.$router.push({ name: this.urlBandejas[status] })
+            this.$root.$showAlert(message, 'success')
+            this.$router.push({ name: 'Externos' })
         } catch (error) {
           console.log(error)
         } finally {

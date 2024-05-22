@@ -18,13 +18,13 @@
       <v-col cols="12" class="py-0 d-flex align-center justify-space-between">
         <v-tabs style="width: auto;" height="30" class="pt-3">
           <v-tab :ripple="false" @click="assignFilter('')"><strong>Todos</strong>({{data.length}})</v-tab>
-          <v-tab :ripple="false" @click="assignFilter('oficio')">
+          <v-tab :ripple="false" @click="assignFilter('FUNC')">
             <v-icon color="info">mdi-circle-medium</v-icon>
-           <strong>Funcionario</strong>({{cantOficios}})
+           <strong>Funcionario</strong>({{cantFuncionari}})
           </v-tab>
-          <v-tab :ripple="false" @click="assignFilter('circular')">
+          <v-tab :ripple="false" @click="assignFilter('PA-IN')">
             <v-icon color="tertiary">mdi-circle-medium</v-icon>
-           <strong>Particular/Institucion</strong>({{cantCopias}})
+           <strong>Particular/Institucion</strong>({{cantParticular}})
           </v-tab>
         </v-tabs>
         <div class="d-flex align-center">
@@ -66,7 +66,7 @@
           hide-default-footer
           :search="search"
           :headers="headers"
-          :items="data"
+          :items="itemsData"
           :loading="loading"
           :sort-desc="true"
           :page.sync="page"
@@ -79,14 +79,14 @@
               <v-icon
                 size="19"
                 class="mx-2"
-                :color="item.copia !== null && item.copia === 1 ? 'yellow darken-1' : 'grey lighten-2'"
-                v-text="item.copia !== null && item.copia === 1 ? 'mdi-pin mdi-rotate-45' : 'mdi-pin-outline mdi-rotate-45'"
+                :color="item.importante !== null && item.importante === 1 ? 'red' : 'grey lighten-2'"
+                v-text="item.importante !== null && item.importante === 1 ? 'mdi-pin mdi-rotate-45' : 'mdi-pin-outline mdi-rotate-45'"
               />
             </div>
           </template>
            <template v-slot:item.remitente="{ item }">
             <span
-              class="text-capitalize font-weight-medium"
+              class="text-capitalize font-weight-medium d-flex" 
                v-text="item.remitente"
             />
            </template>
@@ -100,17 +100,17 @@
            </template>
           <template v-slot:item.asunto="{ item }">
             <div class="d-flex align-center">
-              <v-icon class="pt-1" :color="colorTipo[item.tipo_documento]">mdi-circle-medium</v-icon>
+              <v-icon class="pt-1" :color="colorTipo[item.tipo]">mdi-circle-medium</v-icon>
               <span
-                style="width:30rem"
-                class="d-inline-flex text-truncate"
+                style="width:25rem"
+                class="d-inline-flex text-truncate font-weight-light grey--text"
                 :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
                 v-text="item.asunto"
               />
             </div>
           </template>
            <template v-slot:item.fecha_entrada="{ item }">
-            <div class="d-flex justify-end ">
+            <div class="d-flex justify-end" style="width:100px">
               <v-icon v-if="item.anexos > 0" size="19" class="mx-2" color="grey">mdi-paperclip</v-icon>
               <span
                 class="grey--text font-weight-normal"
@@ -128,7 +128,7 @@
                   max-width="300"
                   style="opacity: .7;"
                 />
-                <span class="text-h5 font-weight-bold blue-grey--text">No tiene Recibidos</span>
+                <span class="text-h5 font-weight-bold blue-grey--text">No tiene Documentos Externos registrados.</span>
               </v-col>
             </v-row>
            </template>
@@ -154,14 +154,13 @@ export default {
       { text: '', value: 'remitente' },
       { text: '', value: 'asunto', align: '' },
       { text: '', value: 'estatus', align: ' px-0', width: '60px' },
-      { text: '', value: 'tipo_documento', align: ' d-none' },
       { text: '', value: 'contenido', align: ' d-none' },
-      { text: '', value: 'fecha_entrada', width: '100' },
+      { text: '', value: 'fecha_entrada' },
     ],
     data: [],
     colorTipo: {
-      circular: 'tertiary',
-      oficio: 'info'
+      'PA-IN': 'tertiary',
+      'FUNC': 'info'
     },
     filterData: '',
     search: '',
@@ -174,21 +173,18 @@ export default {
     }
   }),
   computed: {
-    cantOficios () {
+    cantFuncionari () {
       return this.data.length > 0
-        ? this.data.filter(item => item.tipo_documento === 'oficio').length
+        ? this.data.filter(item => item.tipo === 'FUNC').length
         : 0
     },
-    cantCopias () {
+    cantParticular () {
       return this.data.length > 0
-        ? this.data.filter(item => item.tipo_documento === 'circular').length
+        ? this.data.filter(item => item.tipo === 'PA-IN').length
         : 0
     },
     itemsData () {
-      return this.data.filter(item => item.tipo_documento.includes(this.filterData)).map(item => ({
-        ...item,
-        propietario_nombre: item?.propietario?.nombre ?? ''
-      }))
+      return this.data.filter(item => item.tipo.includes(this.filterData))
     },
     paginationText () {
 
@@ -213,16 +209,6 @@ export default {
       } finally {
         this.loading = false
         if(actualizar) this.updating = false
-      }
-    },
-    async getBandejaCount() {
-      this.loading = true
-      try {
-        const { documentos } = await bandeja()
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.loading = false
       }
     },
     viewDocumento (row) {
