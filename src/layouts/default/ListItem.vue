@@ -27,7 +27,7 @@
       class="my-2 mr-4 align-self-center"
       :class="{'ml-5': sub && !mini , 'ml-1': !sub || mini}"
     >
-      <v-icon color="secondary" v-text="item.icon" />
+      <v-icon :color="item.color ? item.color : 'secondary'" v-text="item.icon" />
     </v-list-item-icon>
 
     <v-list-item-content v-if="item.title">

@@ -11,7 +11,12 @@ const state = {
   menuApp: [],
   items: [
     {
+      title: 'Bandejas',
+      text: true,
+    },
+    {
       title: 'Recibidos',
+      link: true,
       icon: 'mdi-email-open-outline',
       to: '/recibidos',
       meta: {
@@ -20,11 +25,13 @@ const state = {
     },
     {
       title: 'Enviados',
+      link: true,
       icon: 'mdi-send-outline mdi-rotate-315',
       to: '/enviados',
     },
     {
       title: 'Por Corregir',
+      link: true,
       meta: {
         badge: null,
       },
@@ -33,8 +40,19 @@ const state = {
     },
     {
       title: 'Borradores',
+      link: true,
       icon: 'mdi-text-box-outline',
       to: '/borradores',
+    },
+    {
+      title: 'Externo',
+      text: true,
+    },
+    {
+      title: 'Entrada',
+      link: true,
+      icon: 'mdi-email-receive-outline',
+      to: '/documentos-externos',
     },
 
   ],
@@ -48,12 +66,12 @@ const state = {
 const mutations = {
   ...make.mutations(state),
   NEW_DOCUMENTS(state, news){
-    let { meta } = state.items[0]
+    let { meta } = state.items.find(item => item.title === 'Recibidos')
     meta.badge = news
   },
 
   NEW_DOCUMENTS_CORRECT(state, news){
-    let { meta } = state.items[2]
+    let { meta } =  state.items.find(item => item.title === 'Por Corregir')
     meta.badge = news
   }
 

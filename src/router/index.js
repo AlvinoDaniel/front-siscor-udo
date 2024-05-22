@@ -47,6 +47,17 @@ const createRouter = () => new Router({
           },
         },
         {
+          name: 'Externo',
+          path: '/documento-externo/:id',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/VistaDocumento/externo'
+          ),
+        },
+        {
           name: 'Recibidos',
           path: '/recibidos',
           meta:{
@@ -91,6 +102,17 @@ const createRouter = () => new Router({
           ),
         },
         {
+          name: 'Externos',
+          path: '/documentos-externos',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/Externo/index'
+          ),
+        },
+        {
           name: 'Redactar',
           path: '/redactar/:doc(\\d+)?',
           meta:{
@@ -99,6 +121,17 @@ const createRouter = () => new Router({
           component: () => import(
             /* webpackChunkName: "views-[request]" */
             '@/views/Redactar/index'
+          ),
+        },
+        {
+          name: 'Redactar Externo',
+          path: '/registrar-externo/',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/Redactar/externo'
           ),
         },
         {
