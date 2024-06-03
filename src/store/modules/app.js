@@ -55,6 +55,18 @@ const state = {
       to: '/documentos-externos',
     },
     {
+      title: 'Por Aprobar',
+      link: true,
+      icon: 'mdi-email-receive-outline',
+      to: '/documentos-externos-por-aprobar',
+    },
+    {
+      title: 'Salida',
+      link: true,
+      icon: 'mdi-email-receive-outline',
+      to: '/documentos-respuestas-externos',
+    },
+    {
       title: 'Registro',
       link: true,
       icon: 'mdi-email-receive-outline',
