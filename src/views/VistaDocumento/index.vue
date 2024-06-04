@@ -173,7 +173,7 @@
   import { screenshot } from '@/util/CaptureData'
   import  exportPDF from '@/util/ExportPDF'
   import store from '@/store'
-  import { getInitals } from '@/util/helpers'
+  import { getInitals, TYPE_DOC } from '@/util/helpers'
   import { encode, decode } from 'js-base64';
   import moment from 'moment'
 
@@ -348,12 +348,13 @@ export default {
     },
 
     responseDocument () {
-      const {propietario, tipo_documento, nro_documento } = this.doc
+      const {propietario, tipo_documento, nro_documento, id } = this.doc
 
       const PARAMS_JSON = {
         id: propietario?.id,
-        tipo_documento,
+        tipo_documento: TYPE_DOC.INTERNO,
         nro_documento,
+        id_doc: id
       }
       const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
       this.$router.push({name: 'Redactar', query: {r: PARAMS_ENCODE}})

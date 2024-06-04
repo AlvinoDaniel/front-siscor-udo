@@ -6,7 +6,7 @@
     placeholder=""
     :multiple="multiple"
     chips
-    item-text="nombre"
+    item-text="nombre_legal"
     item-value="id"
     :class="$attrs.class"
     :disabled="$attrs.disabled"
@@ -16,21 +16,6 @@
   >
     <template v-slot:prepend-inner>
       <span class="px-2" v-text="labelText" />
-    </template>
-    <template v-if="btnCopia" v-slot:append-outer>
-       <v-btn-toggle
-        v-model="copia"
-        color="secondary"
-        dense
-        group
-        :value="false"
-        @change="showCopia"
-      >
-        <v-btn class="btn-cc" :value="true" text>
-          <v-icon left>mdi-text-box-plus-outline</v-icon>
-          Copias
-        </v-btn>
-      </v-btn-toggle>
     </template>
     <template v-slot:selection="data">
       <v-chip
@@ -42,39 +27,27 @@
         @click:close="remove(data.item)"
       >
         <v-avatar left color="secondary">
-          <span class="white--text caption" v-text="data.item.siglas" />
+          <span class="white--text text-uppercase caption" v-text="data.item.nombre_legal.at(0)" />
         </v-avatar>
-        {{ data.item.nombre }}
+        {{ data.item.nombre_legal }} <strong class="ml-1">(EXTERNO)</strong>
       </v-chip>
     </template>
     <template v-slot:item="data">
       <v-list-item-avatar color="secondary" class="justify-center">
-        <span class="white--text font-weight-bold text-h6" v-text="data.item.siglas" />
+        <span class="white--text font-weight-bold text-h6" v-text="data.item.nombre_legal.at(0)" />
       </v-list-item-avatar>
       <v-list-item-content>
-        <v-list-item-title v-html="data.item.nombre" />
+        <v-list-item-title v-html="data.item.nombre_legal" />
         <v-list-item-subtitle
-          v-if="data.item.jefe"
-          v-html="data.item.jefe.nombres_apellidos"
+          v-html="data.item.documento_identidad"
         />
       </v-list-item-content>
     </template>
-    <!-- <template v-slot:prepend-item>
-      <v-list-item @click="allSeleted">
-        <v-list-item-avatar color="tertiary" class="justify-center">
-          <span class="white--text font-weight-bold" v-text="'C'" />
-        </v-list-item-avatar>
-        <v-list-item-content>
-          <v-list-item-title v-text="'Comunidad Universitaria'" />
-          <v-list-item-subtitle v-text="'Todos los Departamentos'" />
-        </v-list-item-content>
-      </v-list-item>
-    </template> -->
   </v-autocomplete>
 </template>
 <script>
 export default {
-  name: 'SelectDepartamento',
+  name: 'SelectExternos',
   props: {
 
     value: {
@@ -88,10 +61,6 @@ export default {
     multiple: {
       type: Boolean,
       default: false,
-    },
-    btnCopia: {
-      type: Boolean,
-      default: true,
     },
     error: String,
     labelText: String,
@@ -125,9 +94,6 @@ export default {
       } else {
         this.selected = []
       }
-    },
-    showCopia (e) {
-      this.$emit('showCopia', Boolean(this.copia))
     },
     emitChange (e) {
       if(typeof e === 'object' && e.includes('all')) {

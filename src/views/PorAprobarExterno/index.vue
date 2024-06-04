@@ -8,7 +8,7 @@
     <loader-app v-if="updating" />
     <v-row class="ma-0 pb-4" align="center">
       <v-col cols="12" md="8" class="pb-0">
-        <span class="text-h4 font-weight-bold">Documentos Por Corregir</span>
+        <span class="text-h4 font-weight-bold">Documentos Por Aprobar</span>
       </v-col>
       <v-col cols="12" md="4" class="pb-0">
         <search-expand v-model="search" />
@@ -88,7 +88,6 @@
               <span
               :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
               >{{item.enviado_nombre}}</span>
-              <v-chip v-if="item.enviados.length > 1" x-small color="blue-grey lighten-4" class="px-1 font-weight-bold ml-1" label>+{{item.enviados.length - 1}}</v-chip>
             </div>
            </template>
           <template v-slot:item.asunto="{ item }">
@@ -114,7 +113,7 @@
                   :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
                   class="grey--text font-weight-normal"
                 >
-                  {{ item.fecha_creado | smartDate }}
+                  {{ item.created_at | smartDate }}
                 </span>
               </div>
               <div class="action-delete justify-end">
@@ -165,7 +164,7 @@ import { TYPE_DOC } from '@/util/helpers'
 import { encode, decode } from 'js-base64';
 
 export default {
-  name: 'PorCorregir',
+  name: 'PorAprobar',
   data: () => ({
     loading: false,
     headers: [
@@ -208,8 +207,7 @@ export default {
     itemsData () {
       return this.data.filter(item => item.tipo_documento.includes(this.filterData)).map(item => ({
         ...item,
-        enviado_nombre: item?.enviados[0]?.nombre ?? '',
-        dptosEnviados: item?.enviados.map(item => item?.nombre).join(',')
+        enviado_nombre: item?.respuesta_externo?.documento_externo?.remitente?.nombre_legal,
       }))
     },
     paginationText () {
@@ -226,7 +224,7 @@ export default {
       if(actualizar) this.updating = true
       this.loading = true
       try {
-        const { documentos = [] } = await getBandeja({ bandeja: 'por-corregir' })
+        const { documentos = [] } = await getBandeja({ bandeja: 'externos-por-aprobar' })
         this.data = documentos
       } catch (error) {
         console.log(error)
@@ -236,21 +234,18 @@ export default {
       }
     },
      updateDocumento (row) {
-      const {propietario, tipo_documento, nro_documento, id, respuesta } = row
+      const {tipo_documento, nro_documento, id, respuesta_externo } = row
 
-      if(respuesta !== null){
-        const PARAMS_JSON = {
-          id: propietario?.id,
-          tipo_documento: TYPE_DOC.INTERNO,
-          nro_documento,
-          id_doc: respuesta.documento_respuesta,
-          id_respuesta: respuesta.id
-        }
-        const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
-        this.$router.push({ path: `/redactar/${ row.id }`, query: {r: PARAMS_ENCODE} })
-        return;
+      const PARAMS_JSON = {
+        id: respuesta_externo?.documento_externo?.remitente?.id,
+        tipo_documento: TYPE_DOC.EXTERNO,
+        nro_documento,
+        id_doc: respuesta_externo.id_documento_externo,
+        id_respuesta: respuesta_externo.id
       }
-      this.$router.push({ path: `/redactar/${ row.id }` })
+      const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
+      this.$router.push({ path: `/redactar/${ row.id }`, query: {r: PARAMS_ENCODE} })
+      return;
     },
     assignFilter(filter) {
       this.filterData = filter

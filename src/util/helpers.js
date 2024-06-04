@@ -44,3 +44,8 @@ export const getInitals = (name, length=3) => {
 
   return INITIALS
 }
+
+export const TYPE_DOC = {
+  INTERNO: 'in',
+  EXTERNO: 'ex'
+}

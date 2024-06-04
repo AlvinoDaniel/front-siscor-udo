@@ -113,6 +113,28 @@ const createRouter = () => new Router({
           ),
         },
         {
+          name: 'Externos-Salida',
+          path: '/documentos-respuestas-externos',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/ExternoSalida/index'
+          ),
+        },
+        {
+          name: 'Externos-Por-Aprobar',
+          path: '/documentos-externos-por-aprobar',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/PorAprobarExterno/index'
+          ),
+        },
+        {
           name: 'Redactar',
           path: '/redactar/:doc(\\d+)?',
           meta:{

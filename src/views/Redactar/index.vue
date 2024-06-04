@@ -12,7 +12,7 @@
           <v-icon left @click="$router.go(-1)">
             mdi-arrow-left
           </v-icon>
-          Redactar Documento
+          Redactar {{ isResponse ? 'Respuesta' : 'Documento' }}
         </h4>
         <div
           v-if="!loadingDoc"
@@ -30,6 +30,7 @@
             @change="addAnexo"
           />
           <v-btn
+            v-if="!isExternal"
             small
             text
             depressed
@@ -40,9 +41,9 @@
             <v-icon left color="secondary">mdi-paperclip</v-icon>
             Adjuntar
           </v-btn>
-          <v-divider vertical class="my-1"></v-divider>
+          <v-divider v-if="!isExternal" vertical class="my-1"></v-divider>
           <v-btn
-            v-if="estatus === 'nuevo' || isBorrador"
+            v-if="!isResponse && (estatus === 'nuevo' || isBorrador)"
             small
             text
             depressed
@@ -54,7 +55,7 @@
             <span v-if="isBorrador" class="pr-1">Guardar </span>
             Borrador
           </v-btn>
-          <v-divider vertical class="my-1"></v-divider>
+          <v-divider v-if="!isResponse && (estatus === 'nuevo' || isBorrador)" vertical class="my-1"></v-divider>
           <v-btn
             v-if="estatus === 'nuevo' || isCorregir"
             small
@@ -71,7 +72,7 @@
               mdi-email-edit-outline
             </v-icon>
             <span v-if="isCorregir" class="pr-1">Guardar </span>
-            Corregir
+             {{ isExternal ? 'Por Aprobar' : 'Corregir' }}
           </v-btn>
 
           <v-btn
@@ -104,6 +105,7 @@
                       row
                       class="mt-0 pt-0"
                       active-class="active-type font-weight-bold"
+                      :disabled="isResponse"
                       @change="clearInputs"
                     >
                       <v-radio
@@ -132,7 +134,7 @@
             </div>
           </validation-provider>
         </v-col>
-        <v-col cols="12" class="py-0">
+        <v-col v-if="!isExternal" cols="12" class="py-0">
           <validation-provider name="Enviar" vid="dataDpto.destino" rules="required" v-slot="{ errors }">
             <select-departamento
               v-model="dataDpto.destino"
@@ -141,8 +143,22 @@
               :items="allDepartamentos"
               :multiple="isCircular"
               :error="errors[0]"
-              :btn-copia="!isCircular"
+              :btn-copia="!isResponse && !isCircular"
+              :disabled="isResponse"
               @showCopia="getShowCopia"
+              @change="verificateCopia"
+            />
+          </validation-provider>
+        </v-col>
+        <v-col v-else cols="12" class="py-0">
+          <validation-provider name="Enviar" vid="doc.remitente_externo" rules="required" v-slot="{ errors }">
+            <select-externos
+              v-model="doc.remitente_externo"
+              label-text="Rem a:"
+              class="input-redactar input-cc"
+              :items="externos"
+              :error="errors[0]"
+              :disabled="isResponse"
               @change="verificateCopia"
             />
           </validation-provider>
@@ -268,7 +284,7 @@
   import { getDepartamentoList, getDepartamentos } from '@/services/departamento'
   import { sendDocument, viewDocument, updateDocument, deleteAttach } from '@/services/documento'
   import { get } from 'vuex-pathify'
-  import { validateFile, getInitals } from '@/util/helpers'
+  import { validateFile, getInitals, TYPE_DOC } from '@/util/helpers'
   import { decode } from 'js-base64';
 
 
@@ -278,6 +294,10 @@ export default {
     SelectDepartamento: () => import(
       /* webpackChunkName: "select-departamento" */
       './components/SelectDepartamento.vue'
+    ),
+    SelectExternos: () => import(
+      /* webpackChunkName: "select-externos" */
+      './components/SelectExternos.vue'
     ),
     ListAnexos: () => import(
       /* webpackChunkName: "list-anexos" */
@@ -297,6 +317,9 @@ export default {
       departamentos_copias: '',
       copias: false,
       estatus: '',
+      remitente_externo: '',
+      doc_respuesta: null,
+      id_respuesta: null
     },
     dataDpto: {
       destino: [],
@@ -337,13 +360,17 @@ export default {
       },
     },
     departamentos: [],
+    externos: [],
     loading: false,
     loadingDoc: false,
     urlBandejas: {
       enviar: 'Enviados',
       corregir: 'Por Corregir',
+      enviarExterno: 'Externos-Salida',
+      corregirExterno: 'Externos-Por-Aprobar',
       borrador: 'Borradores',
     },
+    tipoRespuesta: '',
   }),
   computed: {
     doc_id: get('route/params@doc'),
@@ -418,29 +445,55 @@ export default {
         ? this.departamentos.filter(item => item.id === this.dataDpto.destino)[0]
         : defaultValue
     },
+    destinoExterno(){
+      const remitente = this.externos.find(item => item.id === this.doc.remitente_externo)
+      const externoValue = {
+        nombre: 'DESTINATARIO SIN DEFINIR',
+        siglas: 'XX',
+        jefe: {
+          nombres_apellidos: remitente?.nombre_legal,
+          descripcion_cargo: null,
+        },
+      }
+      return externoValue;
+    },
     previewDptos () {
+      if(this.isExternal){
+        return {
+          destinatario: this.destinoExterno,
+          copias: [],
+        }
+      }
       return {
         destinatario: this.isCircular ? this.destinosCircular : this.destinos,
         copias: this.departamentos.filter(item => this.dataDpto.copias.includes(item.id)),
       }
     },
+    isResponse(){
+      return this.responseData !== undefined
+    },
+    isExternal(){
+      return this.isResponse && this.tipoRespuesta === TYPE_DOC.EXTERNO
+    }
   },
   created () {
     this.getDepartamentos()
+    if(this.responseData)
+      this.assignResponse()
+
     if (this.doc_id) {
       this.getDocumento()
     }
 
-    if(this.responseData)
-      this.assignResponse()
 
   },
   methods: {
     async getDepartamentos () {
       this.loading = true
       try {
-        const { departamentos } = await getDepartamentos()
+        const { departamentos, externos } = await getDepartamentos()
         this.departamentos = departamentos
+        this.externos = externos
       } catch (error) {
         console.log(error)
       } finally {
@@ -474,6 +527,13 @@ export default {
           }
         }
 
+        data.append('respuesta', this.isResponse)
+        if(this.isResponse){
+          data.append('tipo_respuesta', this.tipoRespuesta)
+          data.append('aprobado', status === 'enviar' ? 1 : 0)
+        }
+
+
         if (this.anexos.length > 0) {
           this.anexos
             .filter(item => 'File' in window && item.file instanceof File)
@@ -489,7 +549,7 @@ export default {
             : await sendDocument({ datos: data, status })
 
            this.$root.$showAlert(message, 'success')
-           this.$router.push({ name: this.urlBandejas[status] })
+           this.$router.push({ name: this.urlBandejas[`${status}${this.tipoRespuesta === TYPE_DOC.EXTERNO ? 'Externo' : ''}`] })
         } catch (error) {
           console.log(error)
         } finally {
@@ -503,11 +563,11 @@ export default {
     async getDocumento () {
       this.loadingDoc = true
       try {
-        const { temporal, anexos, ...documento } = await viewDocument({ id: this.doc_id, estatus: 'temporal' })
+        const { temporal, anexos, ...documento } = await viewDocument({ id: this.doc_id, estatus: this.tipoRespuesta === TYPE_DOC.EXTERNO ? 'externo' : 'temporal' })
         this.doc.asunto = documento.asunto
         this.doc.contenido = documento.contenido
         this.doc.tipo_documento = documento.tipo_documento
-        this.doc.copias = temporal?.departamentos_copias !== null
+        this.doc.copias = temporal?.departamentos_copias && temporal?.departamentos_copias !== null
         this.copiaShow = this.doc.copias
 
         this.dataDpto.destino = documento.tipo_documento === 'circular'
@@ -517,7 +577,7 @@ export default {
         this.dataDpto.copias = temporal.departamentos_copias !== null
           ? temporal.departamentos_copias.split(',').map(item => parseInt(item))
           : []
-          console.log(this.dataDpto.copias)
+
 
         this.estatus = documento.estatus
         this.anexos = anexos.length > 0
@@ -534,8 +594,13 @@ export default {
       const DATA = JSON.parse(decode(this.responseData))
       this.doc.asunto = `RESPUESTA AL OFICIO NRO ${DATA.nro_documento}`
       this.doc.contenido = `En respuesta al oficio Nro. ${DATA.nro_documento}`
-      this.doc.tipo_documento = DATA.tipo_documento
-      this.dataDpto.destino = DATA.id
+      this.tipoRespuesta = DATA.tipo_documento
+      this.doc.doc_respuesta = DATA.id_doc
+      this.doc.id_respuesta = DATA.id_respuesta
+      if(this.tipoRespuesta === TYPE_DOC.INTERNO)
+        this.dataDpto.destino = DATA.id
+      if(this.tipoRespuesta === TYPE_DOC.EXTERNO)
+        this.doc.remitente_externo = DATA.id
     },
 
     clearInputs (event) {

@@ -8,7 +8,7 @@
     <loader-app v-if="updating" />
     <v-row class="ma-0 pb-4" align="center">
       <v-col cols="12" md="8" class="pb-0">
-        <span class="text-h4 font-weight-bold">Documentos Externos</span>
+        <span class="text-h4 font-weight-bold">Bandeja de Salida</span>
       </v-col>
       <v-col cols="12" md="4" class="pb-0">
         <search-expand v-model="search" />
@@ -18,13 +18,13 @@
       <v-col cols="12" class="py-0 d-flex align-center justify-space-between">
         <v-tabs style="width: auto;" height="30" class="pt-3">
           <v-tab :ripple="false" @click="assignFilter('')"><strong>Todos</strong>({{data.length}})</v-tab>
-          <v-tab :ripple="false" @click="assignFilter('FUNC')">
+          <v-tab :ripple="false" @click="assignFilter('oficio')">
             <v-icon color="info">mdi-circle-medium</v-icon>
-           <strong>Funcionario</strong>({{cantFuncionari}})
+           <strong>Oficio</strong>({{cantOficios}})
           </v-tab>
-          <v-tab :ripple="false" @click="assignFilter('PA-IN')">
+          <v-tab :ripple="false" @click="assignFilter('circular')">
             <v-icon color="tertiary">mdi-circle-medium</v-icon>
-           <strong>Particular/Institucion</strong>({{cantParticular}})
+           <strong>Circular</strong>({{cantCopias}})
           </v-tab>
         </v-tabs>
         <div class="d-flex align-center">
@@ -59,64 +59,54 @@
     </v-row>
     <v-row>
       <v-col cols="12" class="py-0">
-          <!-- :item-class="setColorRow" -->
+          <!--
+          :loading="loadingData" -->
+          <!-- single-select
+          show-select -->
         <v-data-table
-          sort-by="fecha_entrada"
-          class="inbox"
-          hide-default-footer
-          :search="search"
           :headers="headers"
           :items="itemsData"
           :loading="loading"
+          :search="search"
+          no-data-text="No hay Documentos Enviados"
+          no-results-text="Ningún documento coincide con la búsqueda"
+          sort-by="fecha_enviado"
+          hide-default-footer
           :sort-desc="true"
+          class="inbox"
           :page.sync="page"
           @page-count="pageCount = $event"
           @pagination="infoPagination = $event"
           @click:row="viewDocumento"
           >
           <template v-slot:item.iconos="{ item }">
-            <div class="d-flex justify-center align-center ml-3">
-              <v-icon
-                size="19"
-                class="mx-2"
-                :color="item.importante !== null && item.importante === 1 ? 'red' : 'grey lighten-2'"
-                v-text="item.importante !== null && item.importante === 1 ? 'mdi-pin mdi-rotate-45' : 'mdi-pin-outline mdi-rotate-45'"
-              />
-            </div>
+            <viewed-copy :enviados="item.enviados" :copias="item.dpto_copias" />
           </template>
-           <template v-slot:item.remitente="{ item }">
-            <span
-              class="text-capitalize font-weight-medium d-flex"
-               v-text="item.remitente"
-            />
-           </template>
-           <template v-slot:item.estatus="{ item }">
-              <v-chip
-                class="ma-2 pa-3 white--text font-weight-medium"
-                x-small
-                :color="setColorStatus(item.estatus)"
-                v-text="item.estatus"
-              />
+           <template v-slot:item.enviado_nombre="{ item }">
+            <div>
+              <span>{{item.enviado_nombre}}</span>
+            </div>
            </template>
           <template v-slot:item.asunto="{ item }">
             <div class="d-flex align-center">
-              <v-icon class="pt-1" :color="colorTipo[item.tipo]">mdi-circle-medium</v-icon>
+              <v-icon :color="colorTipo[item.tipo_documento]">mdi-circle-medium</v-icon>
               <span
-                style="width:25rem"
-                class="d-inline-flex text-truncate font-weight-light grey--text"
-                :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
+                class="font-weight-bold text-uppercase"
+                v-text="item.tipo_documento"
+              />
+              <span class="mx-2">-</span>
+              <span
+                style="width:30rem"
+                class="d-inline-flex text-truncate"
                 v-text="item.asunto"
               />
             </div>
           </template>
-           <template v-slot:item.fecha_entrada="{ item }">
-            <div class="d-flex justify-end" style="width:100px">
+           <template v-slot:item.fecha_enviado="{ item }">
+            <div class="d-flex justify-end ">
               <v-icon v-if="item.anexos > 0" size="19" class="mx-2" color="grey">mdi-paperclip</v-icon>
-              <span
-                class="grey--text font-weight-normal"
-                :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
-              >
-                {{ item.fecha_entrada | smartDate }}
+              <span class="grey--text font-weight-normal">
+                {{ item.fecha_enviado | smartDate }}
               </span>
             </div>
            </template>
@@ -124,46 +114,55 @@
             <v-row>
               <v-col cols="12" class="d-flex flex-column justify-center align-center pa-12">
                 <v-img
-                  :src="require('@/assets/Icons/ICONO_RECIBIDOS.png')"
-                  max-width="300"
+                  :src="require('@/assets/Icons/ICONO_ENVIADOS.png')"
+                  max-width="250"
                   style="opacity: .7;"
+                  class="ml-8"
                 />
-                <span class="text-h5 font-weight-bold blue-grey--text">No tiene Documentos Externos registrados.</span>
+                <span class="text-h5 font-weight-bold blue-grey--text">No tiene Enviados</span>
+                <span class="text-h5 blue-grey--text">Empiece a redactar un nuevo documentos</span>
               </v-col>
             </v-row>
            </template>
         </v-data-table>
       </v-col>
-      <v-col v-if="data.length > 0" cols="12" class="pt-0">
+      <v-col v-if="itemsData.length > 0" cols="12" class="pt-0">
         <v-divider></v-divider>
       </v-col>
     </v-row>
   </v-container>
 </template>
 <script>
-import { getBandeja, bandeja } from '@/services/bandejas'
+import { getBandeja } from '@/services/bandejas'
 import { Base64 } from 'js-base64';
 export default {
-  name: 'Recibidos',
+  name: 'Enviados',
+  components: {
+    ViewedCopy: () => import(
+      /* webpackChunkName: "viewed-copy" */
+      '@/widgets/ViewedCopy.vue'
+    ),
+  },
   data: () => ({
     loading: false,
-    updating: false,
     headers: [
       // { text: '', value: 'data-table-select', width: '40px' },
       { text: '', value: 'iconos', align: ' px-0', width: '60px' },
-      { text: '', value: 'remitente' },
+      { text: '', value: 'enviado_nombre', align: ' pr-0'},
       { text: '', value: 'asunto', align: '' },
-      { text: '', value: 'estatus', align: ' px-0', width: '60px' },
+      { text: '', value: 'tipo_documento', align: ' d-none' },
       { text: '', value: 'contenido', align: ' d-none' },
-      { text: '', value: 'fecha_entrada' },
+      { text: '', value: 'dptosEnviados', align: ' d-none' },
+      { text: '', value: 'fecha_enviado', width: '100' },
     ],
     data: [],
     colorTipo: {
-      'PA-IN': 'tertiary',
-      'FUNC': 'info'
+      circular: 'tertiary',
+      oficio: 'info'
     },
     filterData: '',
     search: '',
+    updating: false,
     page: 1,
     pageCount: 0,
     infoPagination: {
@@ -173,25 +172,26 @@ export default {
     }
   }),
   computed: {
-    cantFuncionari () {
+    cantOficios () {
       return this.data.length > 0
-        ? this.data.filter(item => item.tipo === 'FUNC').length
+        ? this.data.filter(item => item.tipo_documento === 'oficio').length
         : 0
     },
-    cantParticular () {
+    cantCopias () {
       return this.data.length > 0
-        ? this.data.filter(item => item.tipo === 'PA-IN').length
+        ? this.data.filter(item => item.tipo_documento === 'circular').length
         : 0
     },
     itemsData () {
-      return this.data.filter(item => item?.tipo?.includes(this.filterData))
+      return this.data.filter(item => item.tipo_documento.includes(this.filterData)).map(item => ({
+        ...item,
+        enviado_nombre: item?.respuesta_externo?.documento_externo?.remitente?.nombre_legal,
+      }))
     },
     paginationText () {
-
       return this.infoPagination
         ? `${this.infoPagination.pageStart + 1} - ${this.infoPagination.pageStop} de ${this.infoPagination.itemsLength}`
         : ''
-
     }
   },
   created () {
@@ -202,7 +202,7 @@ export default {
       if(actualizar) this.updating = true
       this.loading = true
       try {
-        const { documentos = [] } = await getBandeja({ bandeja: 'externos' })
+        const { documentos = [] } = await getBandeja({ bandeja: 'externos-salida' })
         this.data = documentos
       } catch (error) {
         console.log(error)
@@ -212,23 +212,11 @@ export default {
       }
     },
     viewDocumento (row) {
-      this.$router.push({ name: 'Externo', params: { id: Base64.encodeURI(row.id) } })
+      // this.$router.push({ path: `/documento/${ row.id }` })
+      this.$router.push({ name: 'Documento', params: { id: Base64.encodeURI(row.id) }, query: {tab: 'enviado'} })
     },
     assignFilter(filter) {
       this.filterData = filter
-    },
-    setColorRow(item) {
-      const NOT_READED = item.leido === 0
-      return NOT_READED ? 'unread' : ''
-    },
-    setColorStatus(status) {
-
-      const textStatus = status.toLowerCase().split(" ").join('-');
-      const COLORS = {
-        "en-proceso": 'amber darken-2',
-        "tramitado": 'teal darken-1'
-      }
-      return COLORS[textStatus] ?? 'light-blue darken-2'
     }
   },
 }
