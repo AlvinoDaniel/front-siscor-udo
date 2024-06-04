@@ -153,6 +153,7 @@
               class="input-redactar"
               prepend-inner-icon="mdi-card-account-details-outline"
               :error-messages="errors[0]"
+              placeholder="Ejemplo V-00000000"
               v-mask="identityMask"
             >
               <template v-slot:label>
@@ -205,6 +206,8 @@
               :error-messages="errors[0]"
               prepend-inner-icon="mdi-phone-outline"
               label=""
+              v-mask="'####-#######'"
+              placeholder="Ejemplo 0000-0000000"
             >
               <template v-slot:label>
                 <span class="px-2 text-label">
