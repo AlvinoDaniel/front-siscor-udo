@@ -17,62 +17,17 @@
               mdi-arrow-left
             </v-icon>
             <span class="text-h4 font-weight-bold primary--text d-block ml-2" v-text="doc.asunto" />
-            <!-- <v-chip
-              class="text-uppercase pl-1 pr-2 py-2 font-weight-light mx-3 mt-1"
-              :color="colorTipo[doc.tipo_documento]"
-              x-small
-              outlined
-              label
-              >
-              <v-icon size="14">mdi-circle-medium</v-icon>
-              {{ doc.tipo_documento }}
-            </v-chip> -->
           </div>
-          <!-- <div>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  icon
-                  color="blue-grey lighten-2"
-                  v-bind="attrs"
-                  v-on="on"
-                  @click="responseDocument"
-                  >
-                  <v-icon size="22">mdi-undo-variant</v-icon>
-                </v-btn>
-              </template>
-              <span>Responder</span>
-            </v-tooltip>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  icon
-                  color="blue-grey lighten-2"
-                  v-bind="attrs"
-                  v-on="on"
-                  @click="getScreenshot"
-                  >
-                  <v-icon size="22">mdi-camera-plus-outline</v-icon>
-                </v-btn>
-              </template>
-              <span>Capturar Documento</span>
-            </v-tooltip>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  icon
-                  color="blue-grey lighten-2"
-                  v-bind="attrs"
-                  v-on="on"
-                  :disabled="downloading"
-                  @click="generatePDF"
-                >
-                  <v-icon size="22">mdi-file-download-outline</v-icon>
-                </v-btn>
-              </template>
-              <span>Descargar</span>
-            </v-tooltip>
-          </div> -->
+          <v-chip
+            class="text-uppercase pa-2 font-weight-light mx-3"
+            :color="colorEstatus[doc.estatus.split(' ').join('')]"
+            x-small
+            outlined
+            label
+            >
+            <v-icon size="14">mdi-circle-medium</v-icon>
+            {{ doc.estatus }}
+          </v-chip>
         </v-col>
       </v-row>
       <v-row>
@@ -107,23 +62,26 @@
         >
          <span class="text-subtitle-1 blue-grey--text mr-2">{{ doc.fecha_entrada | smartDate }}</span>
          <v-divider vertical inset class="my-5 mx-2"></v-divider>
-         <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              small
-              text
-              color="blue-grey lighten-2"
-              v-bind="attrs"
-              v-on="on"
-              @click="responseDocument"
-              >
-              <v-icon left size="22">mdi-undo-variant</v-icon>
-              responder
-            </v-btn>
-          </template>
-          <span>Responder</span>
-        </v-tooltip>
-        <v-divider vertical inset class="my-5 mx-2"></v-divider>
+
+           <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                small
+                text
+                v-if="requireResponse"
+                color="blue-grey lighten-2"
+                v-bind="attrs"
+                v-on="on"
+                @click="responseDocument"
+                >
+                <v-icon left size="22">mdi-undo-variant</v-icon>
+                responder
+              </v-btn>
+            </template>
+            <span>Responder</span>
+          </v-tooltip>
+          <v-divider v-if="requireResponse" vertical inset class="my-5 mx-2"></v-divider>
+
          <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -196,9 +154,9 @@ export default {
     copias: [],
     anexos: [],
     enviados: [],
-    colorTipo: {
-      circular: 'tertiary',
-      oficio: 'info'
+    colorEstatus: {
+      "EnProceso": 'tertiary',
+      "Respondido": 'info'
     },
     showList: false,
     showListCopy: false,
@@ -209,6 +167,9 @@ export default {
   computed: {
     id: get('route/params@id'),
     infoDepart: get('user/departamento'),
+    requireResponse(){
+      return Boolean(this.doc.responder) && !this.doc.respuesta
+    }
   },
   created () {
     this.getDocumento()

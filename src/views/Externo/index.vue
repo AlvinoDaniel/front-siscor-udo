@@ -94,6 +94,7 @@
               <v-chip
                 class="ma-2 pa-3 white--text font-weight-medium"
                 x-small
+                v-if="Boolean(item.requiere_respuesta)"
                 :color="setColorStatus(item.estatus)"
                 v-text="item.estatus"
               />
