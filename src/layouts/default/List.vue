@@ -4,7 +4,8 @@
     nav
     v-bind="$attrs"
     v-on="$listeners"
-    class="px-2"
+    class="px-2 pb-0"
+    dense
   >
   <template v-for="(item, i) in items">
       <v-subheader  v-if="item.text" class="text-uppercase" style="height: 28px;">{{item.title}}</v-subheader>

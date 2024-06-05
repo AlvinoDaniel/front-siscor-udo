@@ -119,8 +119,7 @@
                   style="opacity: .7;"
                   class="ml-8"
                 />
-                <span class="text-h5 font-weight-bold blue-grey--text">No tiene Enviados</span>
-                <span class="text-h5 blue-grey--text">Empiece a redactar un nuevo documentos</span>
+                <span class="text-h5 font-weight-bold blue-grey--text">No tiene Documentos registrados</span>
               </v-col>
             </v-row>
            </template>

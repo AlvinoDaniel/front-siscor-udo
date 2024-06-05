@@ -113,6 +113,39 @@
           <span>Descargar</span>
         </v-tooltip>
         </v-col>
+        <v-col v-if="respuesta !== null" cols="12">
+          <v-card
+            color="blue-grey lighten-5"
+            outlined
+          >
+            <v-row>
+              <v-col cols="12">
+                <v-list class="pt-0">
+                  <v-list-item>
+                    <v-list-item-avatar rounded>
+                      <v-avatar
+                        color="indigo"
+                        size="30"
+                      >
+                        <span
+                          class="white--text font-weight-bold text-4 text-uppercase"
+                          v-text="respuesta.propietario.siglas || toInitials(respuesta.propietario.nombre)"
+                        />
+                      </v-avatar>
+                    </v-list-item-avatar>
+                    <v-list-item-content>
+                      <v-list-item-title class="d-flex justify-space-between">
+                        <span class="font-weight-bold text-h5" v-text="respuesta.propietario.nombre" />
+                        <span class="text-subtitle-1 blue-grey--text" v-if="respuesta.fecha_enviado">{{ respuesta.fecha_enviado | smartDate }}</span>
+                      </v-list-item-title>
+                      <v-list-item-subtitle v-text="respuesta.asunto" />
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-col>
         <v-col cols="12">
           <document-externo :data-doc="doc"/>
         </v-col>
@@ -173,7 +206,8 @@ export default {
     showList: false,
     showListCopy: false,
     downloading: false,
-    messageAwait: ''
+    messageAwait: '',
+    respuesta: '',
 
   }),
   computed: {
@@ -195,8 +229,9 @@ export default {
     async getDocumento () {
       this.loading = true
       try {
-        const { respuesta, ...dataDoc } = await viewDocument({ id: decode(this.id) })
+        const { respuesta = null, ...dataDoc } = await viewDocument({ id: decode(this.id) })
         this.doc = { ...dataDoc }
+        this.respuesta = respuesta?.respuesta ??  null
       } catch (error) {
           if(error.response) {
             const { data: { errors } } = error?.response

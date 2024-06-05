@@ -140,7 +140,7 @@
                   max-width="250"
                   style="opacity: .7;"
                 />
-                <span class="text-h5 font-weight-bold blue-grey--text">No tiene documentos Por Corregir</span>
+                <span class="text-h5 font-weight-bold blue-grey--text">No tiene documentos por Aprobar</span>
               </v-col>
             </v-row>
            </template>

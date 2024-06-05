@@ -39,6 +39,19 @@
       <default-list :items="items" />
     </div>
 
+    <div class="px-3">
+      <v-btn
+        text
+        color="info"
+        block
+        class="text-left justify-start pl-2"
+        :to="{name: 'Redactar-Externo'}"
+      >
+        <v-icon size="24" class="mr-3">mdi-plus-circle-outline</v-icon>
+        Registrar Externo
+      </v-btn>
+    </div>
+
     <template #append>
       <v-list nav class="px-2">
         <v-list-item link class="py-1 lighten-4" @click="handleLogout">
@@ -52,7 +65,7 @@
       </v-list>
     </template>
 
-    <div class="pt-12" />
+    <!-- <div class="pt-12" /> -->
   </v-navigation-drawer>
 </template>
 

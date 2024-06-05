@@ -51,27 +51,27 @@ const state = {
     {
       title: 'Entrada',
       link: true,
-      icon: 'mdi-email-receive-outline',
+      icon: 'mdi-file-document-outline',
       to: '/documentos-externos',
     },
     {
       title: 'Por Aprobar',
       link: true,
-      icon: 'mdi-email-receive-outline',
+      icon: 'mdi-file-document-edit-outline',
       to: '/documentos-externos-por-aprobar',
     },
     {
       title: 'Salida',
       link: true,
-      icon: 'mdi-email-receive-outline',
+      icon: 'mdi-file-check-outline',
       to: '/documentos-respuestas-externos',
     },
-    {
-      title: 'Registro',
-      link: true,
-      icon: 'mdi-email-receive-outline',
-      to: '/registrar-externo',
-    },
+    // {
+    //   title: 'Registar Externo',
+    //   link: true,
+    //   icon: 'mdi-file-document-plus-outline',
+    //   to: '/registrar-externo',
+    // },
 
   ],
   statusClient:{

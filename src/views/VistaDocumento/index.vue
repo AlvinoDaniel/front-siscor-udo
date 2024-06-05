@@ -28,7 +28,7 @@
               {{ doc.tipo_documento }}
             </v-chip>
           </div>
-          <div>
+          <!-- <div>
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -53,7 +53,6 @@
                   v-on="on"
                   @click="getScreenshot"
                   >
-                  <!-- mdi-image-plus mdi-camera-plus -->
                   <v-icon size="22">mdi-camera-plus-outline</v-icon>
                 </v-btn>
               </template>
@@ -74,7 +73,7 @@
               </template>
               <span>Descargar</span>
             </v-tooltip>
-          </div>
+          </div> -->
         </v-col>
         <!-- <v-col cols="12" md="11" class="pt-0">
           <span class="text-h4 font-weight-bold primary--text d-block" v-text="doc.asunto" />
@@ -143,7 +142,7 @@
           md="6"
           class="d-flex align-center justify-end pr-6"
         >
-         <span class="text-subtitle-1 blue-grey--text pb-6">{{ doc.fecha_enviado | FullDate }}</span>
+         <span class="text-subtitle-1 blue-grey--text mx-2">{{ doc.fecha_enviado | FullDate }}</span>
          <v-divider vertical inset class="my-5 mx-2"></v-divider>
          <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
@@ -299,7 +298,7 @@ export default {
     async getDocumento () {
       this.loading = true
       try {
-        const { enviados, dpto_copias, anexos, respuesta_externo, ...dataDoc } = await viewDocument({ id: decode(this.id), estatus: 'enviado' })
+        const { enviados = [], dpto_copias = [], anexos, respuesta_externo, ...dataDoc } = await viewDocument({ id: decode(this.id), estatus: this.isSalida ? 'enviado_externo' : 'enviado' })
         this.doc = { ...dataDoc }
         this.destinatario = dataDoc.tipo_documento === 'circular'
           ? enviados
