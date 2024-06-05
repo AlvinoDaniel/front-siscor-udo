@@ -81,7 +81,7 @@
         </v-col> -->
       </v-row>
       <v-row>
-        <v-col cols="12" md="8" class="d-flex align-center pb-0">
+        <v-col cols="12" md="6" class="d-flex align-center pb-0">
           <v-list :three-line="copias.length > 0 && isEnviado" class="pt-0">
             <v-list-item class="px-0">
               <v-list-item-avatar rounded>
@@ -129,16 +129,57 @@
                   </v-btn>
                   </v-list-item-subtitle>
                 </template>
+                <template v-if="isSalida">
+                  <v-list-item-subtitle class="align-center mb-0">
+                   <strong>Enviado a: </strong> {{ remitente.nombre_legal }}
+                  </v-list-item-subtitle>
+                </template>
               </v-list-item-content>
             </v-list-item>
           </v-list>
         </v-col>
         <v-col
           cols="12"
-          md="4"
+          md="6"
           class="d-flex align-center justify-end pr-6"
         >
          <span class="text-subtitle-1 blue-grey--text pb-6">{{ doc.fecha_enviado | FullDate }}</span>
+         <v-divider vertical inset class="my-5 mx-2"></v-divider>
+         <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-if="isRecibido"
+                small
+                text
+                color="blue-grey lighten-2"
+                v-bind="attrs"
+                v-on="on"
+                @click="responseDocument"
+                >
+                <v-icon left size="22">mdi-undo-variant</v-icon>
+                Responder
+              </v-btn>
+            </template>
+            <span>Responder</span>
+          </v-tooltip>
+          <v-divider v-if="isRecibido" vertical inset class="my-5 mx-2"></v-divider>
+          <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  small
+                  text
+                  color="blue-grey lighten-2"
+                  v-bind="attrs"
+                  v-on="on"
+                  :disabled="downloading"
+                  @click="generatePDF"
+                >
+                  <v-icon left size="22">mdi-file-download-outline</v-icon>
+                  Descargar
+                </v-btn>
+              </template>
+              <span>Descargar</span>
+            </v-tooltip>
         </v-col>
         <!-- <v-col cols="12" class="pl-8 py-2">
           <span
@@ -154,7 +195,13 @@
           <list-anexos-descarga :anexos="anexos" />
         </v-col>
         <v-col cols="12">
-          <document :data-doc="doc" :destinatario="destinatario" :copias="copias"/>
+          <document 
+            :data-doc="doc" 
+            :destinatario="destinatario" 
+            :copias="copias" 
+            :externo="isSalida"
+            :remitente="remitente"
+          />
         </v-col>
       </v-row>
     </section>
@@ -203,6 +250,7 @@ export default {
     departamentos: [],
     loading: false,
     destinatario: {},
+    remitente: {},
     copias: [],
     anexos: [],
     enviados: [],
@@ -226,6 +274,9 @@ export default {
     isRecibido () {
       return this.tab === 'recibido'
     },
+    isSalida () {
+      return this.tab === 'salida'
+    },
     textEnviados () {
       const more = this.enviados.length > 2 ? `... +${this.enviados.length - 2}` : ''
       return this.enviados.length > 0
@@ -248,12 +299,16 @@ export default {
     async getDocumento () {
       this.loading = true
       try {
-        const { enviados, dpto_copias, anexos, ...dataDoc } = await viewDocument({ id: decode(this.id), estatus: 'enviado' })
+        const { enviados, dpto_copias, anexos, respuesta_externo, ...dataDoc } = await viewDocument({ id: decode(this.id), estatus: 'enviado' })
         this.doc = { ...dataDoc }
         this.destinatario = dataDoc.tipo_documento === 'circular'
           ? enviados
           : enviados[0]
         this.enviados = enviados
+
+        this.remitente = respuesta_externo?.documento_externo 
+          ? respuesta_externo?.documento_externo?.remitente
+          : null
 
         // if(this.isRecibido) {
         //   this.destinatario = dataDoc.tipo_documento === 'circular'

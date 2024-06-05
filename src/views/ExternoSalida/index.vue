@@ -213,7 +213,7 @@ export default {
     },
     viewDocumento (row) {
       // this.$router.push({ path: `/documento/${ row.id }` })
-      this.$router.push({ name: 'Documento', params: { id: Base64.encodeURI(row.id) }, query: {tab: 'enviado'} })
+      this.$router.push({ name: 'Documento', params: { id: Base64.encodeURI(row.id) }, query: {tab: 'salida'} })
     },
     assignFilter(filter) {
       this.filterData = filter

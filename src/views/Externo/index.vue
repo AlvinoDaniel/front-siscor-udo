@@ -92,7 +92,7 @@
            </template>
            <template v-slot:item.estatus="{ item }">
               <v-chip
-                class="ma-2 pa-3 white--text font-weight-medium"
+                class="ma-2 pa-3 white--text font-weight-medium text-uppercase"
                 x-small
                 v-if="Boolean(item.requiere_respuesta)"
                 :color="setColorStatus(item.estatus)"
@@ -154,7 +154,7 @@ export default {
       { text: '', value: 'iconos', align: ' px-0', width: '60px' },
       { text: '', value: 'remitente' },
       { text: '', value: 'asunto', align: '' },
-      { text: '', value: 'estatus', align: ' px-0', width: '60px' },
+      { text: '', value: 'estatus', align: ' px-0 text-center', width: '60px' },
       { text: '', value: 'contenido', align: ' d-none' },
       { text: '', value: 'fecha_entrada' },
     ],

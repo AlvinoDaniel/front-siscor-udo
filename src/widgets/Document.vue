@@ -10,7 +10,8 @@
             <span v-if="dataDoc.propietario.nucleo" v-text="dataDoc.propietario.nucleo.nombre" />
           </div>
           <div class="page-date">
-            <span class="font-bold">{{ dataDoc.propietario.siglas || toInitials(dataDoc.propietario.nombre) }} N° {{ dataDoc.nro_documento }}-{{ year }}</span>
+            <span  v-if="!externo" class="font-bold">{{ dataDoc.propietario.siglas || toInitials(dataDoc.propietario.nombre) }} N° {{ dataDoc.nro_documento }}-{{ year }}</span>
+            <span v-else class="font-bold">{{ dataDoc.propietario.siglas || toInitials(dataDoc.propietario.nombre) }} N° {{ dataDoc.nro_documento }}</span>
             <span>Cumaná, {{ dataDoc.fecha_enviado | DocDate }}</span>
           </div>
           <div v-if="isCircular" class="page-header title-header">
@@ -33,10 +34,17 @@
               <span>Ciudadano(a):</span>
               <span
                 class="font-bold"
+                v-if="!externo"
                 v-text="destinatario.jefe.nombres_apellidos"
               />
               <span
                 class="font-bold"
+                v-if="externo"
+                v-text="remitente.nombre_legal"
+              />
+              <span
+                class="font-bold"
+                v-if="!externo"
                 v-text="destinatario.jefe.descripcion_cargo"
               />
               <span>Su Despacho.- </span>
@@ -90,11 +98,19 @@ export default {
       type: [Object, Array],
       default: () => ([]),
     },
+    remitente: {
+      type: [Object, Array],
+      default: () => ({}),
+    },
     copias: {
       type: Array,
       default: () => ([]),
     },
     preview: {
+      type: Boolean,
+      default: false,
+    },
+    externo: {
       type: Boolean,
       default: false,
     },

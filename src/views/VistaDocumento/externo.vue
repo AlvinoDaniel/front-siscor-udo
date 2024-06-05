@@ -16,13 +16,25 @@
             <v-icon left @click="$router.go(-1)" color="blue-grey lighten-2">
               mdi-arrow-left
             </v-icon>
+            <v-template v-if="Boolean(doc.importante)">
+              <v-chip
+                class="text-uppercase pa-2 font-weight-light mx-1"
+                color="red"
+                x-small
+                outlined
+                label
+              >
+                <v-icon size="14" left v-text="'mdi-pin mdi-rotate-45'" color="red"/>
+                IMPORTANTE
+              </v-chip>
+            </v-template>
             <span class="text-h4 font-weight-bold primary--text d-block ml-2" v-text="doc.asunto" />
           </div>
           <v-chip
             class="text-uppercase pa-2 font-weight-light mx-3"
             :color="colorEstatus[doc.estatus.split(' ').join('')]"
             x-small
-            outlined
+            dark
             label
             >
             <v-icon size="14">mdi-circle-medium</v-icon>
@@ -68,7 +80,7 @@
               <v-btn
                 small
                 text
-                v-if="requireResponse"
+                v-if="requireResponse && !isTratimado"
                 color="blue-grey lighten-2"
                 v-bind="attrs"
                 v-on="on"
@@ -80,7 +92,7 @@
             </template>
             <span>Responder</span>
           </v-tooltip>
-          <v-divider v-if="requireResponse" vertical inset class="my-5 mx-2"></v-divider>
+          <v-divider v-if="requireResponse && !isTratimado" vertical inset class="my-5 mx-2"></v-divider>
 
          <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
@@ -156,7 +168,7 @@ export default {
     enviados: [],
     colorEstatus: {
       "EnProceso": 'tertiary',
-      "Respondido": 'info'
+      "Tramitado": 'info'
     },
     showList: false,
     showListCopy: false,
@@ -169,6 +181,9 @@ export default {
     infoDepart: get('user/departamento'),
     requireResponse(){
       return Boolean(this.doc.responder) && !this.doc.respuesta
+    },
+    isTratimado(){
+      return this.doc.estatus === 'Tramitado'
     }
   },
   created () {

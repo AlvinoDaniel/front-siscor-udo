@@ -38,7 +38,7 @@ const createRouter = () => new Router({
             '@/views/VistaDocumento/index'
           ),
           beforeEnter: (to, from, next) => {
-            const ALLOWED = ['enviado', 'recibido']
+            const ALLOWED = ['enviado', 'recibido', 'salida']
             if(to.query.tab && ALLOWED.includes(to.query.tab)) {
               next()
             } else {
