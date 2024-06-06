@@ -40,7 +40,8 @@ export const validateFile = (type) => {
 }
 
 export const getInitals = (name, length=3) => {
-  const INITIALS = name.split(' ').splice(0,length).map(item => item.toUpperCase().charAt(0)).join('')
+  const articulos = ['de', 'la'];
+  const INITIALS = name.split(' ').splice(0,length).map(item => articulos.includes(item) ? '' : item.toUpperCase().charAt(0)).join('')
 
   return INITIALS
 }

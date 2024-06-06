@@ -121,7 +121,7 @@
             <v-row>
               <v-col cols="12">
                 <v-list class="pt-0">
-                  <v-list-item>
+                  <v-list-item @click="showDoc">
                     <v-list-item-avatar rounded>
                       <v-avatar
                         color="indigo"
@@ -169,6 +169,7 @@
   import { getInitals, TYPE_DOC } from '@/util/helpers'
   import { encode, decode } from 'js-base64';
   import moment from 'moment'
+  import { Base64 } from 'js-base64';
 
 export default {
   name: 'Documento',
@@ -314,7 +315,11 @@ export default {
       }
       const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
       this.$router.push({name: 'Redactar', query: {r: PARAMS_ENCODE}})
-    }
+    },
+
+    showDoc () {
+      this.$router.push({ name: 'Documento', params: { id: Base64.encodeURI(this.respuesta.id_documento) }, query: {tab: 'salida'} })
+    },
   },
 }
 // E2E7F1
