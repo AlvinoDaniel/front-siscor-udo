@@ -79,3 +79,12 @@ export const downloadDocument = async ({ id }) => {
     return Promise.reject(error)
   }
 }
+
+export const assignDocument = async ({ datos }) => {
+  try {
+    const { data } = await api.post('documento/asignar', datos)
+    return data
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}

@@ -118,12 +118,38 @@
            <template v-slot:item.fecha_enviado="{ item }">
             <div class="d-flex justify-end ">
               <v-icon v-if="item.anexos > 0" size="19" class="mx-2" color="grey">mdi-paperclip</v-icon>
-              <span
-                class="grey--text font-weight-normal"
-                :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
-              >
-                {{ item.fecha_enviado | smartDate }}
-              </span>
+              <div class="d-flex align-center">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-chip
+                      class="ma-2 pa-3 white--text font-weight-medium text-uppercase"
+                      x-small
+                      v-if="item.asignado"
+                      :color="setColorStatus(item.estado)"
+                      v-text="item.estado"
+                    />
+                    <v-btn 
+                      v-if="asignar && item.assign && !item.asignado" 
+                      icon 
+                      small 
+                      class="mr-3"  
+                      v-bind="attrs" 
+                      v-on="on"
+                      @click.stop="assignDoc(item)"
+                    >
+                      <v-icon size="22">mdi-file-replace-outline</v-icon>
+                    </v-btn> 
+                  </template>
+                  Asignar Documento
+                </v-tooltip>
+                <span
+                  class="grey--text font-weight-normal"
+                  style="width:80px"
+                  :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
+                >
+                  {{ item.fecha_enviado | smartDate }}
+                </span>
+              </div>
             </div>
            </template>
            <template v-slot:no-data>
@@ -144,24 +170,32 @@
         <v-divider></v-divider>
       </v-col>
     </v-row>
+    <asignar v-model="show_assign" :doc="doc_assign" @processed="getBandejaRecibidos(true)" />
   </v-container>
 </template>
 <script>
 import { getBandeja, bandeja } from '@/services/bandejas'
 import { Base64 } from 'js-base64';
+import { get } from 'vuex-pathify'
 export default {
   name: 'Recibidos',
+  components: {
+    asignar: () => import(
+      /* webpackChunkName: "select-departamento" */
+      './Asignar.vue'
+    ),
+  },
   data: () => ({
     loading: false,
     updating: false,
     headers: [
       // { text: '', value: 'data-table-select', width: '40px' },
-      { text: '', value: 'iconos', align: ' px-0', width: '60px' },
+      { text: '', value: 'iconos', align: ' px-0', width: '120px' },
       { text: '', value: 'propietario_nombre' },
       { text: '', value: 'asunto', align: '' },
       { text: '', value: 'tipo_documento', align: ' d-none' },
       { text: '', value: 'contenido', align: ' d-none' },
-      { text: '', value: 'fecha_enviado', width: '100' },
+      { text: '', value: 'fecha_enviado' },
     ],
     data: [],
     colorTipo: {
@@ -176,9 +210,13 @@ export default {
       pageStart: 0,
       pageStop: 0,
       itemsLength:0,
-    }
+    },
+    doc_assign: {},
+    show_assign: false
   }),
   computed: {
+    asignar: get('user/asignar'),
+    subDptos: get('user/subDepartamentos'),
     cantOficios () {
       return this.data.length > 0
         ? this.data.filter(item => item.tipo_documento === 'oficio').length
@@ -192,7 +230,8 @@ export default {
     itemsData () {
       return this.data.filter(item => item.tipo_documento.includes(this.filterData)).map(item => ({
         ...item,
-        propietario_nombre: item?.propietario?.nombre ?? ''
+        propietario_nombre: item?.propietario?.nombre ?? '',
+        assign: this.subDptos.length > 0 ? !this.subDptos.some(d => d.id === item.propietario.id) : false
       }))
     },
     paginationText () {
@@ -241,6 +280,22 @@ export default {
     setColorRow(item) {
       const NOT_READED = item.leido === 0
       return NOT_READED ? 'unread' : ''
+    },
+    assignDoc(doc){
+      this.doc_assign = doc;
+      this.show_assign = true;
+    },
+    setColorStatus(status) {
+
+      if(!status) return '';
+
+    const textStatus = status.toLowerCase().split(" ").join('-');
+      const COLORS = {
+        "en-proceso": 'amber darken-2',
+        "asignado": 'light-blue darken-1',
+        "procesado": 'teal darken-1',
+      }
+      return COLORS[textStatus] ?? 'light-blue darken-2'
     }
   },
 }

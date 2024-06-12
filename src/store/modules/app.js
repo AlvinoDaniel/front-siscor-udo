@@ -66,12 +66,12 @@ const state = {
       icon: 'mdi-file-check-outline',
       to: '/documentos-respuestas-externos',
     },
-    // {
-    //   title: 'Registar Externo',
-    //   link: true,
-    //   icon: 'mdi-file-document-plus-outline',
-    //   to: '/registrar-externo',
-    // },
+    {
+      title: 'Registar Externo',
+      link: true,
+      icon: 'mdi-plus-circle-outline',
+      to: '/registrar-externo',
+    },
 
   ],
   statusClient:{

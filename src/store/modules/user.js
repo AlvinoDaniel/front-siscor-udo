@@ -79,6 +79,16 @@ const getters = {
         }
       : ''
   },
+  subDepartamentos (state) {
+    const { departamento } = state.info
+
+    return departamento?.sub_departamentos ?? [];
+  },
+  asignar(state) {
+    const { departamento } = state.info
+
+    return departamento?.can_assign ?? false;
+  }
 }
 
 export default {

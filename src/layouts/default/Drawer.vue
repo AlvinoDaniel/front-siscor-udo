@@ -39,7 +39,7 @@
       <default-list :items="items" />
     </div>
 
-    <div class="px-3">
+    <!-- <div class="px-3">
       <v-btn
         text
         color="info"
@@ -50,7 +50,7 @@
         <v-icon size="24" class="mr-3">mdi-plus-circle-outline</v-icon>
         Registrar Externo
       </v-btn>
-    </div>
+    </div> -->
 
     <template #append>
       <v-list nav class="px-2">
