@@ -28,52 +28,6 @@
               {{ doc.tipo_documento }}
             </v-chip>
           </div>
-          <!-- <div>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  v-if="isRecibido"
-                  icon
-                  color="blue-grey lighten-2"
-                  v-bind="attrs"
-                  v-on="on"
-                  @click="responseDocument"
-                  >
-                  <v-icon size="22">mdi-undo-variant</v-icon>
-                </v-btn>
-              </template>
-              <span>Responder</span>
-            </v-tooltip>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  icon
-                  color="blue-grey lighten-2"
-                  v-bind="attrs"
-                  v-on="on"
-                  @click="getScreenshot"
-                  >
-                  <v-icon size="22">mdi-camera-plus-outline</v-icon>
-                </v-btn>
-              </template>
-              <span>Capturar Documento</span>
-            </v-tooltip>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  icon
-                  color="blue-grey lighten-2"
-                  v-bind="attrs"
-                  v-on="on"
-                  :disabled="downloading"
-                  @click="generatePDF"
-                >
-                  <v-icon size="22">mdi-file-download-outline</v-icon>
-                </v-btn>
-              </template>
-              <span>Descargar</span>
-            </v-tooltip>
-          </div> -->
         </v-col>
         <!-- <v-col cols="12" md="11" class="pt-0">
           <span class="text-h4 font-weight-bold primary--text d-block" v-text="doc.asunto" />
@@ -147,7 +101,7 @@
          <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
-                v-if="isRecibido"
+                v-if="isRecibido && !doc.es_asignado"
                 small
                 text
                 color="blue-grey lighten-2"
@@ -161,7 +115,7 @@
             </template>
             <span>Responder</span>
           </v-tooltip>
-          <v-divider v-if="isRecibido" vertical inset class="my-5 mx-2"></v-divider>
+          <v-divider v-if="isRecibido && !doc.es_asignado" vertical inset class="my-5 mx-2"></v-divider>
           <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -180,12 +134,58 @@
               <span>Descargar</span>
             </v-tooltip>
         </v-col>
-        <!-- <v-col cols="12" class="pl-8 py-2">
-          <span
-            class="text-h4 font-weight-bold"
-            v-text="doc.asunto"
-          />
-        </v-col> -->
+        <v-col v-if="doc.es_asignado" cols="12">
+          <v-card
+            color="blue-grey lighten-5"
+            outlined
+            elevation="2"
+            class="rounded-lg"
+          >
+            <v-card-title class="blue-grey lighten-5 h5 py-3 d-flex justify-space-between align-center">
+              <h4>Asignado</h4>
+              <v-chip
+                class="mx-2 pa-3 white--text font-weight-medium text-uppercase"
+                x-small
+                v-if="doc.es_asignado"
+                :color="setColorStatus(doc.estado)"
+                v-text="doc.estado"
+              />
+            </v-card-title>
+            <v-row>
+              <v-col cols="12">
+                <v-list class="pt-0">
+                  <v-list-item>
+                    <v-list-item-avatar class="mr-1" rounded>
+                      <v-avatar
+                        color="indigo"
+                        size="30"
+                      >
+                        <span
+                          class="white--text font-weight-bold text-4 text-uppercase"
+                          v-text="toInitials(doc.asignado_a.nombre)"
+                        />
+                      </v-avatar>
+                    </v-list-item-avatar>
+                    <v-list-item-content>
+                      <!-- <v-list-item-subtitle v-text="'Asignado a'" /> -->
+                      <v-list-item-title class="d-flex justify-space-between align-center">
+                        <span class="font-weight-bold text-h5" v-text="doc.asignado_a.nombre" />
+                        <div class="d-flex">
+                          <span class="text-subtitle-1 blue-grey--text mx-1" v-if="doc.asignado_a.fecha_asignado">
+                            <v-icon class="mr-1" small>mdi-check</v-icon> {{ doc.asignado_a.fecha_asignado | smartDate }}
+                          </span>
+                          <span v-if="Boolean(doc.asignado_a.leido) &&  doc.asignado_a.fecha_leido" class="text-subtitle-1 blue-grey--text mx-1">
+                            <v-icon class="mr-1" small>mdi-check-all</v-icon> {{ doc.asignado_a.fecha_leido | smartDate }}
+                          </span>
+                        </div>
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-col>
         <v-col v-if="this.anexos.length > 0" cols="12" class="py-2">
           <div class="d-blok text-subtitle label-text pl-2 pb-1">
             <v-icon small color="label">mdi-file</v-icon>
@@ -194,10 +194,10 @@
           <list-anexos-descarga :anexos="anexos" />
         </v-col>
         <v-col cols="12">
-          <document 
-            :data-doc="doc" 
-            :destinatario="destinatario" 
-            :copias="copias" 
+          <document
+            :data-doc="doc"
+            :destinatario="destinatario"
+            :copias="copias"
             :externo="isSalida"
             :remitente="remitente"
           />
@@ -305,7 +305,7 @@ export default {
           : enviados[0]
         this.enviados = enviados
 
-        this.remitente = respuesta_externo?.documento_externo 
+        this.remitente = respuesta_externo?.documento_externo
           ? respuesta_externo?.documento_externo?.remitente
           : null
 
@@ -412,6 +412,18 @@ export default {
       }
       const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
       this.$router.push({name: 'Redactar', query: {r: PARAMS_ENCODE}})
+    },
+    setColorStatus(status) {
+
+      if(!status) return '';
+
+      const textStatus = status.toLowerCase().split(" ").join('-');
+      const COLORS = {
+        "en-proceso": 'amber darken-2',
+        "asignado": 'light-blue darken-1',
+        "procesado": 'teal darken-1',
+      }
+      return COLORS[textStatus] ?? 'light-blue darken-2'
     }
   },
 }
