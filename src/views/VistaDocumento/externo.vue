@@ -18,6 +18,7 @@
             </v-icon>
             <v-template v-if="Boolean(doc.importante)">
               <v-chip
+                v-if="doc.importante"
                 class="text-uppercase pa-2 font-weight-light mx-1"
                 color="red"
                 x-small
@@ -115,13 +116,23 @@
         </v-col>
         <v-col v-if="respuesta !== null" cols="12">
           <v-card
-            color="blue-grey lighten-5"
             outlined
+            class="rounded-lg"
+            @click="showDoc"
           >
+          <v-card-title class="blue-grey lighten-5 h5 py-3 d-flex justify-space-between align-center">
+            <h4>Respuesta</h4>
+            <v-chip
+              class="mx-2 pa-3 white--text font-weight-medium text-uppercase"
+              x-small
+              :color="setColorStatus(respuesta.estatus)"
+              v-text="respuesta.estatus"
+              />
+          </v-card-title>
             <v-row>
               <v-col cols="12">
-                <v-list class="pt-0">
-                  <v-list-item @click="showDoc">
+                <v-list class="pt-0 transparent">
+                  <v-list-item>
                     <v-list-item-avatar rounded>
                       <v-avatar
                         color="indigo"
@@ -318,7 +329,30 @@ export default {
     },
 
     showDoc () {
+      const {remitente, numero_oficio, respuesta } = this.doc
+      const PARAMS_JSON = {
+        id: remitente?.id,
+        tipo_documento: TYPE_DOC.EXTERNO,
+        nro_documento: numero_oficio,
+        id_doc: this.doc.id, //respuesta_externo.id_documento_externo
+        // id_respuesta: respuesta.id
+      }
+      const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
+      if(this.respuesta.estatus === "por_aprobar"){
+        this.$router.push({ name: 'Redactar', params: { id: this.respuesta.id_documento }, query: {r: PARAMS_ENCODE} })
+        return;
+      }
       this.$router.push({ name: 'Documento', params: { id: Base64.encodeURI(this.respuesta.id_documento) }, query: {tab: 'salida'} })
+    },
+    setColorStatus(status) {
+
+      if(!status) return '';
+
+      const COLORS = {
+        "por_aprobar": 'amber darken-2',
+        "enviado": 'icono'
+      }
+      return COLORS[status] ?? 'light-blue darken-2'
     },
   },
 }

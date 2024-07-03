@@ -154,7 +154,7 @@
           <validation-provider name="Enviar" vid="doc.remitente_externo" rules="required" v-slot="{ errors }">
             <select-externos
               v-model="doc.remitente_externo"
-              label-text="Rem a:"
+              label-text="Remitente:"
               class="input-redactar input-cc"
               :items="externos"
               :error="errors[0]"
@@ -319,7 +319,8 @@ export default {
       estatus: '',
       remitente_externo: '',
       doc_respuesta: null,
-      id_respuesta: null
+      id_respuesta: null,
+      id_asignado: null
     },
     dataDpto: {
       destino: [],
@@ -563,12 +564,14 @@ export default {
     async getDocumento () {
       this.loadingDoc = true
       try {
-        const { temporal, anexos, ...documento } = await viewDocument({ id: this.doc_id, estatus: this.tipoRespuesta === TYPE_DOC.EXTERNO ? 'externo' : 'temporal' })
+        const { temporal, anexos, es_respuesta_asignado, es_respuesta, ...documento } = await viewDocument({ id: this.doc_id, estatus: this.tipoRespuesta === TYPE_DOC.EXTERNO ? 'externo' : 'temporal' })
         this.doc.asunto = documento.asunto
         this.doc.contenido = documento.contenido
         this.doc.tipo_documento = documento.tipo_documento
         this.doc.copias = temporal?.departamentos_copias && temporal?.departamentos_copias !== null
         this.copiaShow = this.doc.copias
+        this.doc.id_respuesta = es_respuesta !== null ? es_respuesta?.id : null;
+        this.doc.id_asignado = es_respuesta_asignado !== null ? es_respuesta_asignado?.id : null;
 
         this.dataDpto.destino = documento.tipo_documento === 'circular'
           ? temporal?.departamentos_destino.split(',').map(item => item !== 'all' ? parseInt(item) : item)
@@ -592,11 +595,13 @@ export default {
 
     assignResponse () {
       const DATA = JSON.parse(decode(this.responseData))
+      console.log(DATA)
       this.doc.asunto = `RESPUESTA AL OFICIO NRO ${DATA.nro_documento}`
       this.doc.contenido = `En respuesta al oficio Nro. ${DATA.nro_documento}`
       this.tipoRespuesta = DATA.tipo_documento
       this.doc.doc_respuesta = DATA.id_doc
       this.doc.id_respuesta = DATA.id_respuesta
+      this.doc.id_asignado = DATA.id_asignado
       if(this.tipoRespuesta === TYPE_DOC.INTERNO)
         this.dataDpto.destino = DATA.id
       if(this.tipoRespuesta === TYPE_DOC.EXTERNO)

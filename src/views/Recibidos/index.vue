@@ -78,7 +78,7 @@
           @click:row="viewDocumento"
         >
           <template v-slot:item.iconos="{ item }">
-            <div class="d-flex justify-center align-center ml-3">
+            <div class="d-flex align-center ml-3">
               <v-icon
                 size="19"
                 class="mx-2"
@@ -91,6 +91,7 @@
                 :color="item.leido !== null && item.leido === 1 ? 'icono' : 'grey lighten-2'"
                 v-text="item.leido !== null && item.leido === 1 ? 'mdi-check-all' : 'mdi-check-outline'"
               />
+              <v-icon v-if="item.asignado" class="mx-2" size="19" color="blue-grey">mdi-file-replace</v-icon>
             </div>
           </template>
            <template v-slot:item.propietario_nombre="{ item }">
@@ -115,9 +116,8 @@
               />
             </div>
           </template>
-           <template v-slot:item.fecha_enviado="{ item }">
+           <template v-slot:item.asignado="{ item }">
             <div class="d-flex justify-end ">
-              <v-icon v-if="item.anexos > 0" size="19" class="mx-2" color="grey">mdi-paperclip</v-icon>
               <div class="d-flex align-center">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
@@ -128,20 +128,27 @@
                       :color="setColorStatus(item.estado)"
                       v-text="item.estado"
                     />
-                    <v-btn 
-                      v-if="asignar && item.assign && !item.asignado" 
-                      icon 
-                      small 
-                      class="mr-3"  
-                      v-bind="attrs" 
+                    <v-btn
+                      v-if="asignar && item.assign && !item.asignado"
+                      icon
+                      small
+                      class="mr-3"
+                      v-bind="attrs"
                       v-on="on"
                       @click.stop="assignDoc(item)"
                     >
                       <v-icon size="22">mdi-file-replace-outline</v-icon>
-                    </v-btn> 
+                    </v-btn>
                   </template>
                   Asignar Documento
                 </v-tooltip>
+              </div>
+            </div>
+           </template>
+           <template v-slot:item.fecha_enviado="{ item }">
+            <div class="d-flex justify-end ">
+              <v-icon v-if="item.anexos > 0" size="19" class="mx-2" color="grey">mdi-paperclip</v-icon>
+              <div class="d-flex align-center">
                 <span
                   class="grey--text font-weight-normal"
                   style="width:80px"
@@ -195,6 +202,7 @@ export default {
       { text: '', value: 'asunto', align: '' },
       { text: '', value: 'tipo_documento', align: ' d-none' },
       { text: '', value: 'contenido', align: ' d-none' },
+      { text: '', value: 'asignado', align: '', width: '120px' },
       { text: '', value: 'fecha_enviado' },
     ],
     data: [],
@@ -217,6 +225,7 @@ export default {
   computed: {
     asignar: get('user/asignar'),
     subDptos: get('user/subDepartamentos'),
+    departamentoUser: get('user/departamento'),
     cantOficios () {
       return this.data.length > 0
         ? this.data.filter(item => item.tipo_documento === 'oficio').length
@@ -248,6 +257,7 @@ export default {
   },
   methods: {
     async getBandejaRecibidos (actualizar=false) {
+      this.data = [];
       if(actualizar) this.updating = true
       this.loading = true
       try {
@@ -272,7 +282,7 @@ export default {
     },
     viewDocumento (row) {
       // this.$router.push({ path: `/documento/${ row.id }`, query: {tab: 'recibido'} })
-      this.$router.push({ name: 'Documento', params: { id: Base64.encodeURI(row.id) }, query: {tab: 'recibido'} })
+      this.$router.push({ name: 'Documento', params: { id: Base64.encodeURI(row.id) }, query: {tab: 'recibido', asignado: row?.asignado && row?.asignado_a?.departamento_id === this.departamentoUser.id} })
     },
     assignFilter(filter) {
       this.filterData = filter

@@ -236,15 +236,26 @@ export default {
       }
     },
      updateDocumento (row) {
-      const {propietario, tipo_documento, nro_documento, id, respuesta } = row
+      const {propietario, tipo_documento, nro_documento, id, respuesta, respuesta_asignado } = row
 
       if(respuesta !== null){
         const PARAMS_JSON = {
           id: propietario?.id,
           tipo_documento: TYPE_DOC.INTERNO,
           nro_documento,
-          id_doc: respuesta.documento_respuesta,
-          id_respuesta: respuesta.id
+          id_doc: respuesta?.documento_respuesta,
+          id_respuesta: respuesta?.id
+        }
+        const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
+        this.$router.push({ path: `/redactar/${ row.id }`, query: {r: PARAMS_ENCODE} })
+        return;
+      }
+      if(respuesta_asignado !== null){
+        const PARAMS_JSON = {
+          tipo_documento: TYPE_DOC.INTERNO,
+          nro_documento,
+          id_doc: respuesta_asignado?.id_documento_respuesta,
+          id_asignado: respuesta_asignado?.id
         }
         const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
         this.$router.push({ path: `/redactar/${ row.id }`, query: {r: PARAMS_ENCODE} })

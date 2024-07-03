@@ -101,7 +101,7 @@
          <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
-                v-if="isRecibido && !doc.es_asignado"
+                v-if="isRecibido && !showAsign && !hasResponse"
                 small
                 text
                 color="blue-grey lighten-2"
@@ -115,7 +115,7 @@
             </template>
             <span>Responder</span>
           </v-tooltip>
-          <v-divider v-if="isRecibido && !doc.es_asignado" vertical inset class="my-5 mx-2"></v-divider>
+          <v-divider v-if="isRecibido && !showAsign && !hasResponse" vertical inset class="my-5 mx-2"></v-divider>
           <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -134,7 +134,7 @@
               <span>Descargar</span>
             </v-tooltip>
         </v-col>
-        <v-col v-if="doc.es_asignado" cols="12">
+        <v-col v-if="showAsign" cols="12">
           <v-card
             color="blue-grey lighten-5"
             outlined
@@ -186,6 +186,54 @@
             </v-row>
           </v-card>
         </v-col>
+        <v-col v-if="hasResponse && responseDoc !== null" cols="12">
+          <v-card
+            outlined
+            class="rounded-lg"
+            @click="redirectResponse"
+          >
+            <v-card-title class="blue-grey lighten-5 h5 py-3 d-flex justify-space-between align-center">
+              <h4>Respuesta</h4>
+              <v-chip
+                class="mx-2 pa-3 white--text font-weight-medium text-uppercase"
+                x-small
+                :color="setColorStatus(doc.estatus)"
+                v-text="responseDoc.estatus"
+                />
+            </v-card-title>
+            <v-row>
+              <v-col cols="12">
+                <v-list class="pt-0 transparent">
+                  <v-list-item>
+                    <v-list-item-avatar class="mr-1" rounded>
+                      <v-avatar
+                        color="indigo"
+                        size="30"
+                      >
+                        <span
+                          v-if="responseDoc.propietario"
+                          class="white--text font-weight-bold h5 text-uppercase"
+                          v-text="responseDoc.propietario.siglas || toInitials(responseDoc.propietario.nombre)"
+                        />
+                      </v-avatar>
+                    </v-list-item-avatar>
+                    <v-list-item-content v-if="responseDoc.propietario">
+                      <v-list-item-title class="d-flex justify-space-between align-center">
+                        <span class="font-weight-bold text-h5" v-text="responseDoc.propietario.nombre" />
+                        <div class="d-flex">
+                          <span class="text-subtitle-1 blue-grey--text mx-1" v-if="responseDoc.fecha_enviado">
+                            <v-icon class="mr-1" small>mdi-check</v-icon> {{ responseDoc.fecha_enviado | smartDate }}
+                          </span>
+                        </div>
+                      </v-list-item-title>
+                      <v-list-item-subtitle>{{responseDoc.asunto}}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-col>
         <v-col v-if="this.anexos.length > 0" cols="12" class="py-2">
           <div class="d-blok text-subtitle label-text pl-2 pb-1">
             <v-icon small color="label">mdi-file</v-icon>
@@ -220,7 +268,7 @@
   import  exportPDF from '@/util/ExportPDF'
   import store from '@/store'
   import { getInitals, TYPE_DOC } from '@/util/helpers'
-  import { encode, decode } from 'js-base64';
+  import { encode, decode, Base64 } from 'js-base64';
   import moment from 'moment'
 
 export default {
@@ -266,6 +314,7 @@ export default {
   computed: {
     id: get('route/params@id'),
     tab: get('route/query@tab'),
+    asign: get('route/query@asignado'),
     infoDepart: get('user/departamento'),
     isEnviado () {
       return this.tab === 'enviado'
@@ -288,6 +337,27 @@ export default {
         ? this.copias.slice(0,1).map(item => item.nombre).join(', ') + more
         : ''
     },
+    showAsign(){
+      return this.doc?.es_asignado && this.doc?.asignado_a?.departamento_id !== this.infoDepart.id
+    },
+    hasResponse(){
+      if(this.doc?.es_asignado){
+        return this.doc?.asignado_a?.id_documento_respuesta !== null
+      }
+
+      return this.doc?.respuesta !== null
+    },
+    responseDoc(){
+      if(this.doc?.asignado_a?.respuesta_asignado){
+        return this.doc?.asignado_a?.respuesta_asignado
+      }
+
+      if(this.doc?.respuesta){
+        return this.doc?.respuesta?.respuesta
+      }
+
+      return null;
+    }
   },
   created () {
     this.getDocumento()
@@ -298,7 +368,7 @@ export default {
     async getDocumento () {
       this.loading = true
       try {
-        const { enviados = [], dpto_copias = [], anexos, respuesta_externo, ...dataDoc } = await viewDocument({ id: decode(this.id), estatus: this.isSalida ? 'enviado_externo' : 'enviado' })
+        const { enviados = [], dpto_copias = [], anexos, respuesta_externo, ...dataDoc } = await viewDocument({ id: decode(this.id), estatus: this.isSalida ? 'enviado_externo' : 'enviado', asignado: this.asign })
         this.doc = { ...dataDoc }
         this.destinatario = dataDoc.tipo_documento === 'circular'
           ? enviados
@@ -402,13 +472,14 @@ export default {
     },
 
     responseDocument () {
-      const {propietario, tipo_documento, nro_documento, id } = this.doc
+      const {propietario, tipo_documento, nro_documento, id, asignado_a } = this.doc
 
       const PARAMS_JSON = {
-        id: propietario?.id,
+        id: this.asign ? asignado_a?.id_departamento_superior : propietario?.id,
         tipo_documento: TYPE_DOC.INTERNO,
         nro_documento,
-        id_doc: id
+        id_doc: id,
+        id_asignado:this.asign ? asignado_a?.id : null
       }
       const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
       this.$router.push({name: 'Redactar', query: {r: PARAMS_ENCODE}})
@@ -422,8 +493,29 @@ export default {
         "en-proceso": 'amber darken-2',
         "asignado": 'light-blue darken-1',
         "procesado": 'teal darken-1',
+        "por_corregir": 'amber darken-2',
+        "enviado": 'icono'
       }
       return COLORS[textStatus] ?? 'light-blue darken-2'
+    },
+    redirectResponse(){
+      const {propietario, respuesta, nro_documento, id, asignado_a } = this.doc
+      const PARAMS_JSON = {
+        id: this.asign ? asignado_a?.id_departamento_superior : propietario?.id,
+        tipo_documento: TYPE_DOC.INTERNO,
+        nro_documento,
+        id_doc: id,
+        id_asignado:this.asign ? asignado_a?.id : null,
+        id_respuesta: respuesta?.id ?? null
+      }
+      const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
+      if(this.responseDoc.estatus === 'por_corregir'){
+        this.$router.push({ path: `/redactar/${ this.responseDoc.id }?r=${PARAMS_ENCODE}` })
+        return;
+      }
+
+      this.$router.push({ name: 'Documento', params: { id: Base64.encodeURI(this.responseDoc.id) }, query: {tab: 'enviado'} })
+
     }
   },
 }

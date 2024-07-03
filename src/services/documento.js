@@ -23,9 +23,9 @@ export const updateDocument = async ({ datos, id }) => {
   }
 }
 
-export const viewDocument = async ({ id, estatus }) => {
+export const viewDocument = async ({ id, estatus, asignado }) => {
   try {
-    const { data } = await api.get(`documento/${id}?estatus=${estatus}`)
+    const { data } = await api.get(`documento/${id}?estatus=${estatus}&asignado=${asignado}`)
     return data.data
   } catch (error) {
     return Promise.reject(error)

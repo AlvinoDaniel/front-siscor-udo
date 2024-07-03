@@ -61,7 +61,7 @@
       <v-col cols="12" class="py-0">
         <v-data-table
           :headers="headers"
-          :items="data"
+          :items="itemsData"
           :loading="loading"
           :search="search"
           no-data-text="No hay Documentos por Corregir"
