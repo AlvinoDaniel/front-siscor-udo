@@ -101,7 +101,7 @@
          <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
               <v-btn
-                v-if="isRecibido && !showAsign && !hasResponse"
+                v-if="isRecibido && !showAsign && !hasResponse && !doc.is_copy"
                 small
                 text
                 color="blue-grey lighten-2"
@@ -115,7 +115,7 @@
             </template>
             <span>Responder</span>
           </v-tooltip>
-          <v-divider v-if="isRecibido && !showAsign && !hasResponse" vertical inset class="my-5 mx-2"></v-divider>
+          <v-divider v-if="isRecibido && !showAsign && !hasResponse && !doc.is_copy" vertical inset class="my-5 mx-2"></v-divider>
           <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -136,9 +136,7 @@
         </v-col>
         <v-col v-if="showAsign" cols="12">
           <v-card
-            color="blue-grey lighten-5"
             outlined
-            elevation="2"
             class="rounded-lg"
           >
             <v-card-title class="blue-grey lighten-5 h5 py-3 d-flex justify-space-between align-center">
@@ -153,7 +151,7 @@
             </v-card-title>
             <v-row>
               <v-col cols="12">
-                <v-list class="pt-0">
+                <v-list class="pt-0 transparent">
                   <v-list-item>
                     <v-list-item-avatar class="mr-1" rounded>
                       <v-avatar
