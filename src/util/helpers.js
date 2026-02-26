@@ -39,8 +39,14 @@ export const validateFile = (type) => {
   return typeAllowed.includes(type)
 }
 
-export const getInitals = (name) => {
-  const INITIALS = name.split(' ').splice(0,3).map(item => item.toUpperCase().charAt(0)).join('')
+export const getInitals = (name, length=3) => {
+  const articulos = ['de', 'la'];
+  const INITIALS = name.split(' ').splice(0,length).map(item => articulos.includes(item) ? '' : item.toUpperCase().charAt(0)).join('')
 
   return INITIALS
+}
+
+export const TYPE_DOC = {
+  INTERNO: 'in',
+  EXTERNO: 'ex'
 }

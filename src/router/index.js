@@ -38,13 +38,24 @@ const createRouter = () => new Router({
             '@/views/VistaDocumento/index'
           ),
           beforeEnter: (to, from, next) => {
-            const ALLOWED = ['enviado', 'recibido']
+            const ALLOWED = ['enviado', 'recibido', 'salida']
             if(to.query.tab && ALLOWED.includes(to.query.tab)) {
               next()
             } else {
               next({ path: '/404' })
             }
           },
+        },
+        {
+          name: 'Externo',
+          path: '/documento-externo/:id',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/VistaDocumento/externo'
+          ),
         },
         {
           name: 'Recibidos',
@@ -91,6 +102,39 @@ const createRouter = () => new Router({
           ),
         },
         {
+          name: 'Externos',
+          path: '/documentos-externos',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/Externo/index'
+          ),
+        },
+        {
+          name: 'Externos-Salida',
+          path: '/documentos-respuestas-externos',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/ExternoSalida/index'
+          ),
+        },
+        {
+          name: 'Externos-Por-Aprobar',
+          path: '/documentos-externos-por-aprobar',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/PorAprobarExterno/index'
+          ),
+        },
+        {
           name: 'Redactar',
           path: '/redactar/:doc(\\d+)?',
           meta:{
@@ -99,6 +143,17 @@ const createRouter = () => new Router({
           component: () => import(
             /* webpackChunkName: "views-[request]" */
             '@/views/Redactar/index'
+          ),
+        },
+        {
+          name: 'Redactar-Externo',
+          path: '/registrar-externo/',
+          meta:{
+            auth: true,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/Redactar/externo'
           ),
         },
         {
@@ -126,15 +181,50 @@ const createRouter = () => new Router({
       ],
     },
     {
-      name: 'Login',
-      path: '/auth/login',
+      name: 'Auth',
+      path: '/auth',
       meta:{
         auth: false,
       },
       component: () => import(
         /* webpackChunkName: "views-[request]" */
-        '@/views/Auth/Login'
+        '@/layouts/Auth/Index'
       ),
+      children: [
+        {
+          name: 'Login',
+          path: 'login',
+          meta:{
+            auth: false,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/Auth/Login'
+          ),
+        },
+        {
+          name: 'Recuperacion',
+          path: 'recuperar-clave',
+          meta:{
+            auth: false,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/Auth/RecoverPassword'
+          ),
+        },
+        {
+          name: 'Verificacion',
+          path: 'resetear-clave',
+          meta:{
+            auth: false,
+          },
+          component: () => import(
+            /* webpackChunkName: "views-[request]" */
+            '@/views/Auth/VerificationCode'
+          ),
+        },
+      ],
     },
     {
       name: 'Error',

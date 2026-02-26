@@ -11,6 +11,9 @@ import { sync } from 'vuex-router-sync'
 import VueFileAgentStyles from 'vue-file-agent/dist/vue-file-agent.css';
 // import VueApexCharts from 'vue-apexcharts'
 import CKEditor from '@ckeditor/ckeditor5-vue2'
+import VueMask from 'v-mask'
+
+Vue.use(VueMask)
 
 Vue.use(CKEditor);
 /* CHART COMPONENT */

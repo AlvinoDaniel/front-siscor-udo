@@ -4,16 +4,19 @@
     nav
     v-bind="$attrs"
     v-on="$listeners"
+    class="px-2 pb-0"
+    dense
   >
-    <template v-for="(item, i) in items">
+  <template v-for="(item, i) in items">
+      <v-subheader  v-if="item.text" class="text-uppercase" style="height: 28px;">{{item.title}}</v-subheader>
       <default-list-group
-        v-if="item.children"
+        v-if="item.children && item.link"
         :key="`group-${i}`"
         :item="item"
       />
 
       <default-list-item
-        v-else
+        v-if="!item.children && item.link"
         :key="`item-${i}`"
         :item="item"
       />

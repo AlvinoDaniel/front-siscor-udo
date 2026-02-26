@@ -23,9 +23,9 @@ export const updateDocument = async ({ datos, id }) => {
   }
 }
 
-export const viewDocument = async ({ id, estatus }) => {
+export const viewDocument = async ({ id, estatus, asignado }) => {
   try {
-    const { data } = await api.get(`documento/${id}?estatus=${estatus}`)
+    const { data } = await api.get(`documento/${id}?estatus=${estatus}&asignado=${asignado}`)
     return data.data
   } catch (error) {
     return Promise.reject(error)
@@ -76,6 +76,15 @@ export const downloadDocument = async ({ id }) => {
     return data
   } catch (error) {
     console.log({error})
+    return Promise.reject(error)
+  }
+}
+
+export const assignDocument = async ({ datos }) => {
+  try {
+    const { data } = await api.post('documento/asignar', datos)
+    return data
+  } catch (error) {
     return Promise.reject(error)
   }
 }

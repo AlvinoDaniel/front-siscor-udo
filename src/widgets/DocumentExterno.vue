@@ -3,49 +3,28 @@
     <div id="pageDocument" class="page page-shadow">
       <div class="page-content">
         <div>
-          <div class="page-header">
-            <img :src="udoLogo" width="70" height="68">
+          <!-- <div class="page-header">
             <span>UNIVERSIDAD DE ORIENTE</span>
             <span v-text="dataDoc.propietario.nombre" />
             <span v-if="dataDoc.propietario.nucleo" v-text="dataDoc.propietario.nucleo.nombre" />
+          </div> -->
+          <div class="page-date mt-12">
+            <span class="font-bold">{{ dataDoc.numero_oficio}} </span>
+            <span>Cumaná, {{ dataDoc.fecha_oficio | DocDate }}</span>
           </div>
-          <div class="page-date">
-            <span  v-if="!externo" class="font-bold">{{ dataDoc.propietario.siglas || toInitials(dataDoc.propietario.nombre) }} N° {{ dataDoc.nro_documento }}-{{ year }}</span>
-            <span v-else class="font-bold">{{ dataDoc.propietario.siglas || toInitials(dataDoc.propietario.nombre) }} N° {{ dataDoc.nro_documento }}</span>
-            <span>Cumaná, {{ dataDoc.fecha_enviado | DocDate }}</span>
+          <div class="page-header title-header">
+            <span>OFICIO</span>
           </div>
-          <div v-if="isCircular" class="page-header title-header">
-            <span>CIRCULAR</span>
-          </div>
-          <template v-if="isCircular">
-            <div class="page-addressee">
-              <p>
-                <span>Para:</span>
-                <span class="font-bold font-uppercase"> {{ destinoCircular }}</span>
-              </p>
-              <p>
-                <span>De: </span>
-                <span class="font-bold font-uppercase"> {{ dataDoc.propietario.nombre }}</span>
-              </p>
-            </div>
-          </template>
-          <template v-else>
+          <template>
             <div class="page-addressee">
               <span>Ciudadano(a):</span>
               <span
                 class="font-bold"
-                v-if="!externo"
-                v-text="destinatario.jefe.nombres_apellidos"
+                v-text="infoDepart.jefe"
               />
               <span
                 class="font-bold"
-                v-if="externo"
-                v-text="remitente.nombre_legal"
-              />
-              <span
-                class="font-bold"
-                v-if="!externo"
-                v-text="destinatario.jefe.descripcion_cargo"
+                v-text="infoDepart.cargo_jefe"
               />
               <span>Su Despacho.- </span>
             </div>
@@ -55,111 +34,43 @@
             v-html="dataDoc.contenido"
           />
           <div class="page-sincerely">
-            <span style="margin-bottom:5px">Atentamente,</span>
-            <template v-if="isFirma">
-              <v-img
-                :src="dataDoc.propietario.jefe.baseUrlFirma"
-                width="200"
-              />
-            </template>
-            <div class="page-user-signature">
-              <span v-text="dataDoc.propietario.jefe.nombres_apellidos" />
+            <span>Atentamente,</span>
+            <div class="page-user-footer">
+              <span v-text="dataDoc.remitente.nombre_legal" />
             </div>
-            <span v-text="dataDoc.propietario.jefe.descripcion_cargo" />
+            <span v-text="dataDoc.remitente.documento_identidad" />
           </div>
         </div>
-        <template v-if="hasCopia">
-          <div class="page-copys">
-            <span>CC: </span>
-            <span class="font-uppercase font-medium" v-text="dataCopia" />
-          </div>
-        </template>
       </div>
-      <div class="page-footer">
+      <!-- <div class="page-footer">
         <span class="font-bold">DEL PUEBLO VENIMOS / HACIA EL PUEBLO VAMOS</span>
         <span class="text-center" style="font-size:10px" v-text="direccion" />
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
 <script>
-import { LogoUdo, LOGO_UDO_COLOR } from '@/util/Iconos'
 import moment from 'moment'
-import { getInitals } from '@/util/helpers'
+import { get } from 'vuex-pathify'
 
 export default {
-  name: 'Document',
+  name: 'DocumentExterno',
   props: {
     dataDoc: {
       type: Object,
       default: () => ({}),
     },
-    destinatario: {
-      type: [Object, Array],
-      default: () => ([]),
-    },
-    remitente: {
-      type: [Object, Array],
-      default: () => ({}),
-    },
-    copias: {
-      type: Array,
-      default: () => ([]),
-    },
-    preview: {
-      type: Boolean,
-      default: false,
-    },
-    externo: {
-      type: Boolean,
-      default: false,
-    },
   },
   data: () => ({
     year: moment().format('YYYY'),
-    udoLogo: LOGO_UDO_COLOR,
   }),
   created(){
     console.log(this.destinatario)
   },
   computed: {
-    isCircular () {
-      return this.dataDoc.tipo_documento === 'circular'
-    },
-    hasCopia () {
-      return this.copias.length > 0
-    },
-    dataCopia () {
-      return this.copias.map(item => item.nombre).join(', ')
-    },
-    isFirma (){
-      return this.dataDoc.propietario.jefe.baseUrlFirma !== null
-    },
-    destinoCircular () {
-      const comunidad = {
-        nombre: 'Comunidad Universitaria',
-        siglas: 'CU',
-        jefe: {
-          nombres_apellidos: 'Todos los Departamentos'
-        },
-      }
-
-      if (this.dataDoc?.estatus === 'enviado_all') {
-        return comunidad.nombre
-      }
-
-      return typeof this.destinatario === 'object'
-        ? this.destinatario.map(item => item.nombre).join(', ')
-        : ''
-    },
-    direccion(){
-      return this.dataDoc?.propietario?.direccion !== null
-        ? this.dataDoc?.propietario?.direccion
-        : this.dataDoc?.propietario?.nucleo?.direccion
-    }
+    infoDepart: get('user/departamento'),
   },
   methods: {
-    toInitials: getInitals,
   },
 }
 </script>
@@ -296,14 +207,11 @@ export default {
   width: 100%;
 }
 
-.page-user-signature {
+.page-user-footer {
   margin-top: 15px;
   padding-left: 40px;
   padding-right: 40px;
   padding-top: 5px;
-  border-color: black;
-  border-style: solid;
-  border-width: 1px 0 0 0;
 }
 
 .title-header {

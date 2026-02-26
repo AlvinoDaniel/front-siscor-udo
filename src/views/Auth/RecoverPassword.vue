@@ -1,29 +1,5 @@
 <template>
   <div>
-    <!-- <v-app-bar
-      app
-      absolute
-      color="white"
-      elevation="1"
-    >
-      <v-toolbar-title>
-        <v-img
-          :src="
-            require('@/assets/Logos/IDENTIDAD_1.png')"
-          width="250"
-        />
-      </v-toolbar-title>
-
-      <v-spacer></v-spacer>
-
-     <v-toolbar-title>
-        <v-img
-          :src="
-            require('@/assets/Logos/Logo_UDO.png')"
-          width="50"
-        />
-      </v-toolbar-title>
-    </v-app-bar> -->
     <v-row justify="center">
       <v-col cols="12" sm="6" md="4">
         <v-card
@@ -47,83 +23,92 @@
                 >
                   SISTEMA DE CORRESPONDENCIA
                   <div class="text-subtitle-1 text-center mb-n4 font-weight-bold">
-                    Autenticación Web
+                    Recuperar Contraseña
                   </div>
                 </div>
               </v-theme-provider>
             </v-sheet>
           </v-card-title>
           <v-card-text :class="{'pa-0':$vuetify.breakpoint.xsOnly, 'px-8':!$vuetify.breakpoint.xsOnly}">
-            <validation-observer ref="LOGIN_FORM">
-              <v-row>
+            <validation-observer ref="RESET_FORM">
+              <v-row class="pb-3 pt-1">
+                <v-col cols="12" class="mb-0 pb-0 text-center">
+                  <span>Se enviara un correo con un código de verificación para continuar con la solicitud, por favor ingrese los datos de su usuario registrado.</span>
+                </v-col>
                 <v-col cols="12" class="mb-0 pb-0">
-                  <validation-provider name="Usuario/Correo Electrónico" vid="username_email" rules="required" v-slot="{ errors }">
+                  <validation-provider name="Correo Electrónico" vid="email" rules="required|email" v-slot="{ errors }">
                     <v-text-field
-                      v-model="credentials.username_email"
+                      v-model="credentials.email"
 
-                      label="Usuario/Correo Electrónico"
+                      label="Correo Eléctronico"
                       clearable
                       :error-messages="errors[0]"
-                      :disabled="LoadingLogin"
+                      :disabled="loading"
                       color="label"
                     >
                       <template slot="prepend-inner">
-                        <v-icon color="label">mdi-account</v-icon>
+                        <v-icon left color="label">mdi-email</v-icon>
                       </template>
                     </v-text-field>
                   </validation-provider>
                 </v-col>
-                <v-col cols="12" class="mb-0 py-0">
-                  <validation-provider name="Contraseña" vid="password" rules="required" v-slot="{ errors }">
+                <v-col cols="12" class="mb-0 pb-0">
+                  <validation-provider name="Cédula de Identidad" vid="identification" rules="required|numeric|max:8" v-slot="{ errors }">
                     <v-text-field
-                      v-model="credentials.password"
+                      v-model="credentials.identification"
 
-                      color="label"
-                      :type="ShowPassword ? 'text' : 'password'"
-                      label="Contraseña"
-                      prepend-inner-icon="mdi-lock"
-                      :append-icon="ShowPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                      @click:append="ShowPassword = !ShowPassword"
+                      label="Cédula de Identidad"
                       clearable
                       :error-messages="errors[0]"
-                      :disabled="LoadingLogin"
-                      @keyup.enter="login"
+                      :disabled="loading"
+                      color="label"
                     >
                       <template slot="prepend-inner">
-                        <v-icon color="label">mdi-lock</v-icon>
+                        <v-icon left color="label">mdi-badge-account-horizontal</v-icon>
                       </template>
                     </v-text-field>
                   </validation-provider>
                 </v-col>
               </v-row>
               <v-row>
-                <v-col cols="12" sm="10" class="text-center mx-auto mt-5">
+                <v-col cols="12" class="text-center mx-auto mt-5">
                 <v-btn
                     color="secondary"
                     depressed
                     class="px-12"
                     block
-                    @click="login"
-                    :loading="LoadingLogin"
+                    @click="verificateUser"
+                    :loading="loading"
                   >
-                    Acceder
+                    Enviar
                     <v-icon right>
                       mdi-arrow-right
                     </v-icon>
                   </v-btn>
                 </v-col>
-                <v-col cols="12" class="d-flex justify-center align-center pt-0">
-                  <span class="text-subtitle-1 label--text mx-2">¿Olvidaste tu Contraseña?</span>
+                <v-col cols="12" class="d-flex justify-space-between align-center pt-0">
                   <v-btn
                     link
                     text
                     small
                     :ripple="false"
                     color="secondary"
-                    class="text-capitalize"
-                    :to="{path: '/auth/recuperar-clave'}"
+                    :to="{path: '/auth/login'}"
                   >
-                    recuperar Aquí
+                    <v-icon left>
+                      mdi-arrow-left
+                    </v-icon>
+                    regresar
+                  </v-btn>
+                  <v-btn
+                    link
+                    text
+                    small
+                    :ripple="false"
+                    color="secondary"
+                    class=""
+                  >
+                    Ya tengo el código
                   </v-btn>
                 </v-col>
               </v-row>
@@ -132,12 +117,7 @@
         </v-card>
       </v-col>
     </v-row>
-    <!-- <v-main class="d-flex justify-center align-center blue-grey lighten-5 full-height">
-      <v-container
-        fluid
-      >
-      </v-container>
-    </v-main> -->
+    <modal-success-verificate v-model="modalSuccess" :user-data="response" />
     <material-snackbar
       v-model="error.active"
       type="error"
@@ -147,16 +127,24 @@
   </div>
 </template>
 <script>
+import { recoverPassword } from '@/services/auth'
 export default {
   name: 'Login',
+  components: {
+    ModalSuccessVerificate: () => import(
+      /* webpackChunkName: "modal-success-verificate" */
+      './components/ModalSuccessVerificate.vue'
+    )
+  },
   data () {
     return {
       credentials: {
-        username_email: '',
-        password: '',
+        email: 'eclopezluna@gmail.com',
+        identification: '16037750',
       },
-      ShowPassword: false,
-      LoadingLogin: false,
+      modalSuccess: false,
+      loading: false,
+      response: '',
       error:{
         active: false,
         message: '',
@@ -164,23 +152,31 @@ export default {
     }
   },
   methods:{
-    async login () {
-      const valid = await this.$refs.LOGIN_FORM.validate();
+    async verificateUser () {
+      const valid = await this.$refs.RESET_FORM.validate();
       if(valid) {
-        this.LoadingLogin = true;
-        this.$store.dispatch('user/login',this.credentials).then(response => {
-          this.$router.push({ path: '/'});
-          this.LoadingLogin = false;
-        }).catch(e => {
+        this.loading = true;
+        try {
+          const { data } = await recoverPassword({ datos: this.credentials })
+          this.response = data?.ur
+          console.log(data)
+          this.modalSuccess = true
+        } catch ({response = null}) {
+          if(response?.status === 422) {
+            this.$refs.RESET_FORM.setErrors(response?.data?.errors)
+            return 
+          }
+          
           this.error = {
             active: true,
-            message: e.response ? e.response?.data?.errors?.message : 'Lo sentimos, hubo un error al intentar conectar con el Servidor.'
-          };
-          this.LoadingLogin = false;
-        });
+            message: response ? response?.data?.errors?.message : 'Lo sentimos, hubo un error al intentar conectar con el Servidor.',
+          }          
+        } finally {
+          this.loading = false
+        }
       }
 		},
-  }
+  },
 
 }
 </script>

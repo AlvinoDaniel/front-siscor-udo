@@ -51,14 +51,14 @@ table
   border-color: rgba(0, 0, 0, 0.09)
 
 .theme-custom.v-text-field--filled > .v-input__control > .v-input__slot
-  background: #eceff1 !important
-  min-height: 32px !important
+  background: #f1f3f5 !important
+  // min-height: 32px !important
+  padding-left: 15px
   &:before  
-    border: none !important
+    // border: none !important
   & .v-input__prepend-inner
-    margin-top: 5px !important
-  & .v-input__append-inner
-    margin-top: 5px !important
+    margin-right: 5px !important
+
 
 .theme-custom.v-text-field > .v-input__control > .v-input__slot:before
   border: none !important
@@ -81,7 +81,7 @@ table
   transform: translateX(0%)
 
 .active-menu
-  background-color: rgba(255,255,255,0.8) !important
+  background-color: rgba(229, 240, 250,0.8) !important
   border-color: #FFFFFF !important
 
 .active-submenu, .v-list-group__items
@@ -209,7 +209,8 @@ table
 
 .unread 
   background-color: rgba(245, 248, 250, .7) !important
-
+  position: relative
+  
 .text-pagination
   color: #607D8B
   font-size: 0.775rem
@@ -221,7 +222,7 @@ table
   
 .custom-table tr .action-delete, .custom-table tr .actions-date
   display: none
-  width: 100px
+  width: 100%
 
 .custom-table tr:hover .action-delete
   display: inline-flex

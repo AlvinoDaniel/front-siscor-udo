@@ -8,7 +8,7 @@
     <loader-app v-if="updating" />
     <v-row class="ma-0 pb-4" align="center">
       <v-col cols="12" md="8" class="pb-0">
-        <span class="text-h4 font-weight-bold">Documentos Por Corregir</span>
+        <span class="text-h4 font-weight-bold">Bandeja de Salida</span>
       </v-col>
       <v-col cols="12" md="4" class="pb-0">
         <search-expand v-model="search" />
@@ -36,7 +36,7 @@
                 color="blue-grey"
                 v-bind="attrs"
                 v-on="on"
-                @click="getBandejaPorCorregir(true)"
+                @click="getBandejaRecibidos(true)"
               >
                 <v-icon>mdi-refresh</v-icon>
               </v-btn>
@@ -59,36 +59,32 @@
     </v-row>
     <v-row>
       <v-col cols="12" class="py-0">
+          <!--
+          :loading="loadingData" -->
+          <!-- single-select
+          show-select -->
         <v-data-table
           :headers="headers"
-          :items="data"
+          :items="itemsData"
           :loading="loading"
           :search="search"
-          no-data-text="No hay Documentos por Corregir"
+          no-data-text="No hay Documentos Enviados"
           no-results-text="Ningún documento coincide con la búsqueda"
+          sort-by="fecha_enviado"
           hide-default-footer
-          class="inbox custom-table"
+          :sort-desc="true"
+          class="inbox"
           :page.sync="page"
           @page-count="pageCount = $event"
           @pagination="infoPagination = $event"
-          @click:row="updateDocumento"
-        >
+          @click:row="viewDocumento"
+          >
           <template v-slot:item.iconos="{ item }">
-            <div class="d-flex justify-center align-center">
-              <v-icon
-                size="19"
-                class="mx-4"
-                :color="Boolean(item.leido) ? 'icono' : 'grey lighten-2'"
-                v-text="Boolean(item.leido) ? 'mdi-check-all' : 'mdi-check-outline'"
-              />
-            </div>
+            <viewed-copy :enviados="item.enviados" :copias="item.dpto_copias" />
           </template>
            <template v-slot:item.enviado_nombre="{ item }">
             <div>
-              <span
-              :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
-              >{{item.enviado_nombre}}</span>
-              <v-chip v-if="item.enviados.length > 1" x-small color="blue-grey lighten-4" class="px-1 font-weight-bold ml-1" label>+{{item.enviados.length - 1}}</v-chip>
+              <span>{{item.enviado_nombre}}</span>
             </div>
            </template>
           <template v-slot:item.asunto="{ item }">
@@ -101,47 +97,29 @@
               <span class="mx-2">-</span>
               <span
                 style="width:30rem"
-                :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
                 class="d-inline-flex text-truncate"
                 v-text="item.asunto"
               />
             </div>
           </template>
            <template v-slot:item.fecha_enviado="{ item }">
-              <div class="d-flex justify-end actions-date">
-                <v-icon v-if="item.anexos > 0" size="19" class="mx-2" color="grey">mdi-paperclip</v-icon>
-                <span
-                  :class="{'font-weight-bold': item.leido !== null && item.leido === 0}"
-                  class="grey--text font-weight-normal"
-                >
-                  {{ item.fecha_creado | smartDate }}
-                </span>
-              </div>
-              <div class="action-delete justify-end">
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                      icon
-                      v-bind="attrs"
-                      v-on="on"
-                      @click.stop="deleteDoc(item)"
-                    >
-                      <v-icon size="19" class="mx-2" color="blue-grey">mdi-trash-can-outline</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Eliminar</span>
-                </v-tooltip>
-              </div>
+            <div class="d-flex justify-end ">
+              <v-icon v-if="item.anexos > 0" size="19" class="mx-2" color="grey">mdi-paperclip</v-icon>
+              <span class="grey--text font-weight-normal">
+                {{ item.fecha_enviado | smartDate }}
+              </span>
+            </div>
            </template>
            <template v-slot:no-data>
             <v-row>
               <v-col cols="12" class="d-flex flex-column justify-center align-center pa-12">
                 <v-img
-                  :src="require('@/assets/Icons/ICONO_CORREGIR.png')"
+                  :src="require('@/assets/Icons/ICONO_ENVIADOS.png')"
                   max-width="250"
                   style="opacity: .7;"
+                  class="ml-8"
                 />
-                <span class="text-h5 font-weight-bold blue-grey--text">No tiene documentos Por Corregir</span>
+                <span class="text-h5 font-weight-bold blue-grey--text">No tiene Documentos registrados</span>
               </v-col>
             </v-row>
            </template>
@@ -151,26 +129,25 @@
         <v-divider></v-divider>
       </v-col>
     </v-row>
-    <material-wait
-      v-model="deleting"
-      icon="mdi-trash-can-outline"
-      text="Eliminando Documento, por favor espere..."
-    />
   </v-container>
 </template>
 <script>
 import { getBandeja } from '@/services/bandejas'
-import { deleteDocument } from '@/services/documento'
-import { TYPE_DOC } from '@/util/helpers'
-import { encode, decode } from 'js-base64';
-
+import { Base64 } from 'js-base64';
 export default {
-  name: 'PorCorregir',
+  name: 'Enviados',
+  components: {
+    ViewedCopy: () => import(
+      /* webpackChunkName: "viewed-copy" */
+      '@/widgets/ViewedCopy.vue'
+    ),
+  },
   data: () => ({
     loading: false,
     headers: [
+      // { text: '', value: 'data-table-select', width: '40px' },
       { text: '', value: 'iconos', align: ' px-0', width: '60px' },
-      { text: '', value: 'enviado_nombre' },
+      { text: '', value: 'enviado_nombre', align: ' pr-0'},
       { text: '', value: 'asunto', align: '' },
       { text: '', value: 'tipo_documento', align: ' d-none' },
       { text: '', value: 'contenido', align: ' d-none' },
@@ -185,7 +162,6 @@ export default {
     filterData: '',
     search: '',
     updating: false,
-    deleting: false,
     page: 1,
     pageCount: 0,
     infoPagination: {
@@ -208,8 +184,7 @@ export default {
     itemsData () {
       return this.data.filter(item => item.tipo_documento.includes(this.filterData)).map(item => ({
         ...item,
-        enviado_nombre: item?.enviados[0]?.nombre ?? '',
-        dptosEnviados: item?.enviados.map(item => item?.nombre).join(',')
+        enviado_nombre: item?.respuesta_externo?.documento_externo?.remitente?.nombre_legal,
       }))
     },
     paginationText () {
@@ -219,14 +194,14 @@ export default {
     }
   },
   created () {
-    this.getBandejaPorCorregir()
+    this.getBandejaRecibidos()
   },
   methods: {
-    async getBandejaPorCorregir (actualizar=false) {
+    async getBandejaRecibidos (actualizar=false) {
       if(actualizar) this.updating = true
       this.loading = true
       try {
-        const { documentos = [] } = await getBandeja({ bandeja: 'por-corregir' })
+        const { documentos = [] } = await getBandeja({ bandeja: 'externos-salida' })
         this.data = documentos
       } catch (error) {
         console.log(error)
@@ -235,66 +210,12 @@ export default {
         if(actualizar) this.updating = false
       }
     },
-     updateDocumento (row) {
-      const {propietario, tipo_documento, nro_documento, id, respuesta, respuesta_asignado } = row
-
-      if(respuesta !== null){
-        const PARAMS_JSON = {
-          id: propietario?.id,
-          tipo_documento: TYPE_DOC.INTERNO,
-          nro_documento,
-          id_doc: respuesta?.documento_respuesta,
-          id_respuesta: respuesta?.id
-        }
-        const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
-        this.$router.push({ path: `/redactar/${ row.id }`, query: {r: PARAMS_ENCODE} })
-        return;
-      }
-      if(respuesta_asignado !== null){
-        const PARAMS_JSON = {
-          tipo_documento: TYPE_DOC.INTERNO,
-          nro_documento,
-          id_doc: respuesta_asignado?.id_documento_respuesta,
-          id_asignado: respuesta_asignado?.id
-        }
-        const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
-        this.$router.push({ path: `/redactar/${ row.id }`, query: {r: PARAMS_ENCODE} })
-        return;
-      }
-      this.$router.push({ path: `/redactar/${ row.id }` })
+    viewDocumento (row) {
+      // this.$router.push({ path: `/documento/${ row.id }` })
+      this.$router.push({ name: 'Documento', params: { id: Base64.encodeURI(row.id) }, query: {tab: 'salida'} })
     },
     assignFilter(filter) {
       this.filterData = filter
-    },
-    async deleteDoc({id, asunto}){
-      const CONFIRM = await this.$root.$confirm(
-        'Eliminar Documento',
-        `¿Está seguro que desea eliminar el documento: "${asunto}"?`,
-        {
-          type: 'delete',
-          btnConfirmText: 'Si, Eliminar',
-          btnCancelText: 'Descartar',
-        }
-      )
-      if(CONFIRM){
-        this.deleting = true
-        try {
-          const data = await deleteDocument({id})
-          this.getBandejaPorCorregir()
-          this.$root.$showAlert(
-            'Se ha eliminado el Documento exitosamente',
-            'success',
-          )
-        } catch (error) {
-          console.log(error)
-          this.$root.$showAlert(
-            'Hubo un error al intentar eliminar el documento.',
-            'error',
-          )
-        } finally {
-          this.deleting = false
-        }
-      }
     }
   },
 }

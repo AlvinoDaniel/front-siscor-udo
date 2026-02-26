@@ -28,61 +28,14 @@
               {{ doc.tipo_documento }}
             </v-chip>
           </div>
-          <div>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  v-if="isRecibido"
-                  icon
-                  color="blue-grey lighten-2"
-                  v-bind="attrs"
-                  v-on="on"
-                  @click="responseDocument"
-                  >
-                  <v-icon size="22">mdi-undo-variant</v-icon>
-                </v-btn>
-              </template>
-              <span>Responder</span>
-            </v-tooltip>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  icon
-                  color="blue-grey lighten-2"
-                  v-bind="attrs"
-                  v-on="on"
-                  @click="getScreenshot"
-                  >
-                  <!-- mdi-image-plus mdi-camera-plus -->
-                  <v-icon size="22">mdi-camera-plus-outline</v-icon>
-                </v-btn>
-              </template>
-              <span>Capturar Documento</span>
-            </v-tooltip>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  icon
-                  color="blue-grey lighten-2"
-                  v-bind="attrs"
-                  v-on="on"
-                  :disabled="downloading"
-                  @click="generatePDF"
-                >
-                  <v-icon size="22">mdi-file-download-outline</v-icon>
-                </v-btn>
-              </template>
-              <span>Descargar</span>
-            </v-tooltip>
-          </div>
         </v-col>
         <!-- <v-col cols="12" md="11" class="pt-0">
           <span class="text-h4 font-weight-bold primary--text d-block" v-text="doc.asunto" />
         </v-col> -->
       </v-row>
       <v-row>
-        <v-col cols="12" md="8" class="d-flex align-center pb-0">
-          <v-list :two-line="copias.length === 0" :three-line="copias.length > 0" class="pt-0">
+        <v-col cols="12" md="6" class="d-flex align-center pb-0">
+          <v-list :three-line="copias.length > 0 && isEnviado" class="pt-0">
             <v-list-item class="px-0">
               <v-list-item-avatar rounded>
                 <v-avatar
@@ -102,8 +55,8 @@
                 </v-list-item-title>
                 <v-list-item-subtitle v-if="isRecibido" v-text="doc.propietario.jefe.nombres_apellidos" />
                 <template v-if="isEnviado">
-                  <v-list-item-subtitle class="align-center">
-                    Enviado a:
+                  <v-list-item-subtitle class="align-center mb-0">
+                   <strong>Enviado a:</strong>
                     <span v-if="doc.estatus === 'enviado_all'">COMUNIDAD UNIVERSITARIA</span>
                     <span v-else v-text="textEnviados" />
                     <v-btn
@@ -117,7 +70,7 @@
                     </v-btn>
                   </v-list-item-subtitle>
                   <v-list-item-subtitle v-if="copias.length > 0">
-                    Copias a: {{ textCopia }}
+                   <strong>Copias a:</strong> {{ textCopia }}
                     <v-btn
                     x-small
                     plain
@@ -129,23 +82,156 @@
                   </v-btn>
                   </v-list-item-subtitle>
                 </template>
+                <template v-if="isSalida">
+                  <v-list-item-subtitle class="align-center mb-0">
+                   <strong>Enviado a: </strong> {{ remitente.nombre_legal }}
+                  </v-list-item-subtitle>
+                </template>
               </v-list-item-content>
             </v-list-item>
           </v-list>
         </v-col>
         <v-col
           cols="12"
-          md="4"
+          md="6"
           class="d-flex align-center justify-end pr-6"
         >
-         <span class="text-subtitle-1 blue-grey--text pb-6">{{ doc.fecha_enviado | FullDate }}</span>
+         <span class="text-subtitle-1 blue-grey--text mx-2">{{ doc.fecha_enviado | FullDate }}</span>
+         <v-divider vertical inset class="my-5 mx-2"></v-divider>
+         <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-if="isRecibido && !showAsign && !hasResponse && !doc.is_copy"
+                small
+                text
+                color="blue-grey lighten-2"
+                v-bind="attrs"
+                v-on="on"
+                @click="responseDocument"
+                >
+                <v-icon left size="22">mdi-undo-variant</v-icon>
+                Responder
+              </v-btn>
+            </template>
+            <span>Responder</span>
+          </v-tooltip>
+          <v-divider v-if="isRecibido && !showAsign && !hasResponse && !doc.is_copy" vertical inset class="my-5 mx-2"></v-divider>
+          <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  small
+                  text
+                  color="blue-grey lighten-2"
+                  v-bind="attrs"
+                  v-on="on"
+                  :disabled="downloading"
+                  @click="generatePDF"
+                >
+                  <v-icon left size="22">mdi-file-download-outline</v-icon>
+                  Descargar
+                </v-btn>
+              </template>
+              <span>Descargar</span>
+            </v-tooltip>
         </v-col>
-        <!-- <v-col cols="12" class="pl-8 py-2">
-          <span
-            class="text-h4 font-weight-bold"
-            v-text="doc.asunto"
-          />
-        </v-col> -->
+        <v-col v-if="showAsign" cols="12">
+          <v-card
+            outlined
+            class="rounded-lg"
+          >
+            <v-card-title class="blue-grey lighten-5 h5 py-3 d-flex justify-space-between align-center">
+              <h4>Asignado</h4>
+              <v-chip
+                class="mx-2 pa-3 white--text font-weight-medium text-uppercase"
+                x-small
+                v-if="doc.es_asignado"
+                :color="setColorStatus(doc.estado)"
+                v-text="doc.estado"
+              />
+            </v-card-title>
+            <v-row>
+              <v-col cols="12">
+                <v-list class="pt-0 transparent">
+                  <v-list-item>
+                    <v-list-item-avatar class="mr-1" rounded>
+                      <v-avatar
+                        color="indigo"
+                        size="30"
+                      >
+                        <span
+                          class="white--text font-weight-bold text-4 text-uppercase"
+                          v-text="toInitials(doc.asignado_a.nombre)"
+                        />
+                      </v-avatar>
+                    </v-list-item-avatar>
+                    <v-list-item-content>
+                      <!-- <v-list-item-subtitle v-text="'Asignado a'" /> -->
+                      <v-list-item-title class="d-flex justify-space-between align-center">
+                        <span class="font-weight-bold text-h5" v-text="doc.asignado_a.nombre" />
+                        <div class="d-flex">
+                          <span class="text-subtitle-1 blue-grey--text mx-1" v-if="doc.asignado_a.fecha_asignado">
+                            <v-icon class="mr-1" small>mdi-check</v-icon> {{ doc.asignado_a.fecha_asignado | smartDate }}
+                          </span>
+                          <span v-if="Boolean(doc.asignado_a.leido) &&  doc.asignado_a.fecha_leido" class="text-subtitle-1 blue-grey--text mx-1">
+                            <v-icon class="mr-1" small>mdi-check-all</v-icon> {{ doc.asignado_a.fecha_leido | smartDate }}
+                          </span>
+                        </div>
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-col>
+        <v-col v-if="hasResponse && responseDoc !== null" cols="12">
+          <v-card
+            outlined
+            class="rounded-lg"
+            @click="redirectResponse"
+          >
+            <v-card-title class="blue-grey lighten-5 h5 py-3 d-flex justify-space-between align-center">
+              <h4>Respuesta</h4>
+              <v-chip
+                class="mx-2 pa-3 white--text font-weight-medium text-uppercase"
+                x-small
+                :color="setColorStatus(doc.estatus)"
+                v-text="responseDoc.estatus"
+                />
+            </v-card-title>
+            <v-row>
+              <v-col cols="12">
+                <v-list class="pt-0 transparent">
+                  <v-list-item>
+                    <v-list-item-avatar class="mr-1" rounded>
+                      <v-avatar
+                        color="indigo"
+                        size="30"
+                      >
+                        <span
+                          v-if="responseDoc.propietario"
+                          class="white--text font-weight-bold h5 text-uppercase"
+                          v-text="responseDoc.propietario.siglas || toInitials(responseDoc.propietario.nombre)"
+                        />
+                      </v-avatar>
+                    </v-list-item-avatar>
+                    <v-list-item-content v-if="responseDoc.propietario">
+                      <v-list-item-title class="d-flex justify-space-between align-center">
+                        <span class="font-weight-bold text-h5" v-text="responseDoc.propietario.nombre" />
+                        <div class="d-flex">
+                          <span class="text-subtitle-1 blue-grey--text mx-1" v-if="responseDoc.fecha_enviado">
+                            <v-icon class="mr-1" small>mdi-check</v-icon> {{ responseDoc.fecha_enviado | smartDate }}
+                          </span>
+                        </div>
+                      </v-list-item-title>
+                      <v-list-item-subtitle>{{responseDoc.asunto}}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-col>
         <v-col v-if="this.anexos.length > 0" cols="12" class="py-2">
           <div class="d-blok text-subtitle label-text pl-2 pb-1">
             <v-icon small color="label">mdi-file</v-icon>
@@ -154,7 +240,13 @@
           <list-anexos-descarga :anexos="anexos" />
         </v-col>
         <v-col cols="12">
-          <document :data-doc="doc" :destinatario="destinatario" :copias="copias"/>
+          <document
+            :data-doc="doc"
+            :destinatario="destinatario"
+            :copias="copias"
+            :externo="isSalida"
+            :remitente="remitente"
+          />
         </v-col>
       </v-row>
     </section>
@@ -173,8 +265,8 @@
   import { screenshot } from '@/util/CaptureData'
   import  exportPDF from '@/util/ExportPDF'
   import store from '@/store'
-  import { getInitals } from '@/util/helpers'
-  import { encode, decode } from 'js-base64';
+  import { getInitals, TYPE_DOC } from '@/util/helpers'
+  import { encode, decode, Base64 } from 'js-base64';
   import moment from 'moment'
 
 export default {
@@ -203,6 +295,7 @@ export default {
     departamentos: [],
     loading: false,
     destinatario: {},
+    remitente: {},
     copias: [],
     anexos: [],
     enviados: [],
@@ -219,12 +312,16 @@ export default {
   computed: {
     id: get('route/params@id'),
     tab: get('route/query@tab'),
+    asign: get('route/query@asignado'),
     infoDepart: get('user/departamento'),
     isEnviado () {
       return this.tab === 'enviado'
     },
     isRecibido () {
       return this.tab === 'recibido'
+    },
+    isSalida () {
+      return this.tab === 'salida'
     },
     textEnviados () {
       const more = this.enviados.length > 2 ? `... +${this.enviados.length - 2}` : ''
@@ -238,6 +335,27 @@ export default {
         ? this.copias.slice(0,1).map(item => item.nombre).join(', ') + more
         : ''
     },
+    showAsign(){
+      return this.doc?.es_asignado && this.doc?.asignado_a?.departamento_id !== this.infoDepart.id
+    },
+    hasResponse(){
+      if(this.doc?.es_asignado){
+        return this.doc?.asignado_a?.id_documento_respuesta !== null
+      }
+
+      return this.doc?.respuesta !== null
+    },
+    responseDoc(){
+      if(this.doc?.asignado_a?.respuesta_asignado){
+        return this.doc?.asignado_a?.respuesta_asignado
+      }
+
+      if(this.doc?.respuesta){
+        return this.doc?.respuesta?.respuesta
+      }
+
+      return null;
+    }
   },
   created () {
     this.getDocumento()
@@ -248,21 +366,25 @@ export default {
     async getDocumento () {
       this.loading = true
       try {
-        const { enviados, dpto_copias, anexos, ...dataDoc } = await viewDocument({ id: decode(this.id), estatus: 'enviado' })
+        const { enviados = [], dpto_copias = [], anexos, respuesta_externo, ...dataDoc } = await viewDocument({ id: decode(this.id), estatus: this.isSalida ? 'enviado_externo' : 'enviado', asignado: this.asign })
         this.doc = { ...dataDoc }
+        this.destinatario = dataDoc.tipo_documento === 'circular'
+          ? enviados
+          : enviados[0]
+        this.enviados = enviados
 
-        if(this.isRecibido) {
-          this.destinatario = dataDoc.tipo_documento === 'circular'
-            ? enviados
-            : enviados.filter(item => item.id === this.infoDepart.id)[0]
-        }
+        this.remitente = respuesta_externo?.documento_externo
+          ? respuesta_externo?.documento_externo?.remitente
+          : null
 
-        if(this.isEnviado) {
-          this.destinatario = dataDoc.tipo_documento === 'circular'
-            ? enviados
-            : enviados[0]
-          this.enviados = enviados
-        }
+        // if(this.isRecibido) {
+        //   this.destinatario = dataDoc.tipo_documento === 'circular'
+        //     ? enviados
+        //     : enviados.filter(item => item.id === this.infoDepart.id)[0]
+        // }
+
+        // if(this.isEnviado) {
+        // }
 
         this.copias = dpto_copias
         this.doc.nro_documento = this.doc.nro_documento.toString().padStart(4, '0')
@@ -292,7 +414,7 @@ export default {
     async getScreenshot () {
       const { tipo_documento, propietario: { nombre } } = this.doc
       const date = moment().valueOf()
-      const fileName = `${tipo_documento}_${nombre}_${date}.pdf`
+      const fileName = `${tipo_documento}_${nombre}_${date}`
       const page = document.getElementById('pageDocument')
       page.classList.remove('page-shadow')
       try {
@@ -348,15 +470,50 @@ export default {
     },
 
     responseDocument () {
-      const {propietario, tipo_documento, nro_documento } = this.doc
+      const {propietario, tipo_documento, nro_documento, id, asignado_a } = this.doc
 
       const PARAMS_JSON = {
-        id: propietario?.id,
-        tipo_documento,
+        id: this.asign ? asignado_a?.id_departamento_superior : propietario?.id,
+        tipo_documento: TYPE_DOC.INTERNO,
         nro_documento,
+        id_doc: id,
+        id_asignado:this.asign ? asignado_a?.id : null
       }
       const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
       this.$router.push({name: 'Redactar', query: {r: PARAMS_ENCODE}})
+    },
+    setColorStatus(status) {
+
+      if(!status) return '';
+
+      const textStatus = status.toLowerCase().split(" ").join('-');
+      const COLORS = {
+        "en-proceso": 'amber darken-2',
+        "asignado": 'light-blue darken-1',
+        "procesado": 'teal darken-1',
+        "por_corregir": 'amber darken-2',
+        "enviado": 'icono'
+      }
+      return COLORS[textStatus] ?? 'light-blue darken-2'
+    },
+    redirectResponse(){
+      const {propietario, respuesta, nro_documento, id, asignado_a } = this.doc
+      const PARAMS_JSON = {
+        id: this.asign ? asignado_a?.id_departamento_superior : propietario?.id,
+        tipo_documento: TYPE_DOC.INTERNO,
+        nro_documento,
+        id_doc: id,
+        id_asignado:this.asign ? asignado_a?.id : null,
+        id_respuesta: respuesta?.id ?? null
+      }
+      const PARAMS_ENCODE = encode(JSON.stringify(PARAMS_JSON))
+      if(this.responseDoc.estatus === 'por_corregir'){
+        this.$router.push({ path: `/redactar/${ this.responseDoc.id }?r=${PARAMS_ENCODE}` })
+        return;
+      }
+
+      this.$router.push({ name: 'Documento', params: { id: Base64.encodeURI(this.responseDoc.id) }, query: {tab: 'enviado'} })
+
     }
   },
 }
