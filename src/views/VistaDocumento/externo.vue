@@ -3,14 +3,14 @@
     id="vista"
     fluid
     tag="section"
-    class="px-8"
+
   >
     <loader-doc v-if="loading" />
     <section
     v-if="(doc !== null && !loading)"
     id="header"
     >
-      <v-row align="center">
+      <v-row align="center" class="px-8">
         <v-col cols="12" class="pb-1 d-flex justify-space-between align-center">
           <div class="d-flex align-center">
             <v-icon left @click="$router.go(-1)" color="blue-grey lighten-2">
@@ -43,7 +43,7 @@
           </v-chip>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row class="px-8">
         <v-col cols="12" md="4" class="d-flex align-center pb-0">
           <v-list class="pt-0">
             <v-list-item class="px-0">
@@ -157,8 +157,10 @@
             </v-row>
           </v-card>
         </v-col>
-        <v-col cols="12">
-          <document-externo :data-doc="doc"/>
+      </v-row>
+      <v-row>
+        <v-col cols="12" class="px-0">
+          <document :data-doc="doc"/>
         </v-col>
       </v-row>
     </section>
@@ -185,9 +187,9 @@
 export default {
   name: 'Documento',
   components: {
-    DocumentExterno: () => import(
+    Document: () => import(
       /* webpackChunkName: "document" */
-      '@/widgets/DocumentExterno'
+      '@/widgets/Document'
     ),
     ListAnexosDescarga: () => import(
       /* webpackChunkName: "list-anexos-descarga" */

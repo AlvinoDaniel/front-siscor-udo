@@ -218,7 +218,7 @@
                   color="blue-grey"
                   text
                   :disabled="doc.contenido === ''"
-                  @click="previewShow = true"
+                  @click="setPreview"
                 >
                   <v-icon left>mdi-file-search-outline</v-icon>
                   Vista Previa
@@ -256,7 +256,7 @@
     </validation-observer>
     <preview
       v-model="previewShow"
-      :doc="doc"
+      :doc="dataDoc"
       :data-dptos="previewDptos"
     />
   </v-container>
@@ -322,6 +322,7 @@ export default {
       id_respuesta: null,
       id_asignado: null
     },
+    dataDoc: null,
     dataDpto: {
       destino: [],
       copias: [],
@@ -664,6 +665,10 @@ export default {
       }
       this.anexos.splice(index, 1)
     },
+    setPreview(){
+      this.dataDoc = {...this.doc}
+      this.previewShow = true;
+    }
   },
 }
 

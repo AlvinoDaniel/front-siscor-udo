@@ -88,3 +88,13 @@ export const assignDocument = async ({ datos }) => {
     return Promise.reject(error)
   }
 }
+
+export const generatePreview = async ({ datos }) => {
+  try {
+    const { data } = await api.post('documento/generar-preview', datos)
+    return data
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}
+
